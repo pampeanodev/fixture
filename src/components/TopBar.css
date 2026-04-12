@@ -1,33 +1,83 @@
+/* TopBar layout */
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-center { display: flex; align-items: center; }
+.topbar-right { position: relative; }
+
 .topbar-title { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
-.topbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.mode-toggle { display: flex; background: rgba(255,255,255,0.15); border-radius: 20px; overflow: hidden; }
+
+/* Name input */
+.topbar-name-input {
+  padding: 6px 12px; border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+  background: rgba(255,255,255,0.08); color: #ffffff; font-size: 13px;
+  outline: none; width: 120px; font-weight: 600;
+  transition: border-color 0.15s, background 0.15s;
+}
+.topbar-name-input::placeholder { color: rgba(255,255,255,0.35); font-weight: 400; }
+.topbar-name-input:focus { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.12); }
+
+/* Mode toggle */
+.mode-toggle {
+  display: flex; background: rgba(255,255,255,0.12); border-radius: 20px;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+}
 .mode-toggle button {
-  padding: 6px 14px; border: none; background: transparent;
-  color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 600; cursor: pointer;
+  padding: 7px 16px; border: none; background: transparent;
+  color: rgba(255,255,255,0.5); font-size: 12px; font-weight: 600; cursor: pointer;
   transition: background 0.2s, color 0.2s; white-space: nowrap;
 }
-.mode-toggle button.active { background: rgba(255,255,255,0.25); color: #ffffff; }
-.topbar-btn {
-  padding: 5px 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-  background: transparent; color: #ffffff; font-size: 11px; cursor: pointer;
-  transition: background 0.15s; white-space: nowrap;
+.mode-toggle button.active {
+  background: rgba(255,255,255,0.2); color: #ffffff;
 }
-.topbar-btn:hover { background: rgba(255,255,255,0.1); }
-.topbar-btn-secondary { opacity: 0.6; font-size: 10px; }
-.topbar-btn-secondary:hover { opacity: 1; }
+.mode-toggle button:hover:not(.active) { color: rgba(255,255,255,0.8); }
+
+/* Menu button */
+.topbar-menu-btn {
+  width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+  background: rgba(255,255,255,0.08); color: #ffffff; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  letter-spacing: 2px;
+}
+.topbar-menu-btn:hover { background: rgba(255,255,255,0.15); }
+
+/* Dropdown */
+.topbar-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: #ffffff; border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+  min-width: 200px; z-index: 200; overflow: hidden;
+  animation: dropdown-in 0.15s ease-out;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-section {
+  padding: 10px 14px 4px; font-size: 10px; font-weight: 700;
+  color: #999; text-transform: uppercase; letter-spacing: 1px;
+}
+
+.dropdown-item {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 10px 14px; border: none; background: none;
+  font-size: 13px; color: #333; cursor: pointer; text-align: left;
+  transition: background 0.1s;
+}
+.dropdown-item:hover { background: #f5f5f5; }
+
+.dropdown-icon {
+  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #888;
+}
+
+.dropdown-divider { height: 1px; background: #eee; margin: 4px 0; }
+
 .import-input { display: none; }
 
-.topbar-name-input {
-  padding: 5px 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-  background: rgba(255,255,255,0.1); color: #ffffff; font-size: 12px;
-  outline: none; width: 110px; font-weight: 600;
-}
-.topbar-name-input::placeholder { color: rgba(255,255,255,0.4); font-weight: 400; }
-.topbar-name-input:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.15); }
-
+/* Mobile */
 @media (max-width: 480px) {
-  .topbar-title { font-size: 15px; }
-  .mode-toggle button { padding: 4px 10px; font-size: 11px; }
-  .topbar-btn { padding: 4px 8px; font-size: 10px; }
-  .topbar-name-input { width: 80px; font-size: 11px; }
+  .topbar-name-input { width: 80px; font-size: 12px; padding: 5px 8px; }
+  .mode-toggle button { padding: 5px 10px; font-size: 11px; }
 }
