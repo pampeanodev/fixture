@@ -4,13 +4,13 @@
 .standings-table {
   width: 100%; border-collapse: collapse; margin-bottom: 24px; background: var(--card-bg);
   border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  table-layout: fixed;
+  table-layout: auto;
 }
 .standings-table th {
   background: var(--accent-green); color: white; font-size: 11px; font-weight: 600;
   padding: 8px 4px; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;
 }
-.standings-table th:first-child { text-align: left; padding-left: 12px; width: 40%; }
+.standings-table th:first-child { text-align: left; padding-left: 12px; white-space: nowrap; }
 .standings-table td { padding: 8px 4px; text-align: center; font-size: 13px; border-bottom: 1px solid #eee; }
 .standings-table td:first-child { text-align: left; padding-left: 12px; font-weight: 600; }
 .standings-table tr.qualify { background: var(--accent-qualify); }
@@ -59,7 +59,15 @@
 .group-match-prediction-row .prediction-indicator { margin-left: 4px; }
 
 @media (max-width: 480px) {
-  .standings-table th:first-child { width: 34%; }
+  .standings-table th:first-child { white-space: nowrap; }
   .standings-table { font-size: 11px; }
-  .standings-table th, .standings-table td { padding: 6px 3px; }
+  .standings-table th, .standings-table td { padding: 6px 2px; font-size: 10px; }
+  .standings-table th { font-size: 9px; letter-spacing: 0; }
+  .team-cell { gap: 4px; }
+  .team-flag { font-size: 14px; }
+}
+
+@media (max-width: 360px) {
+  .standings-table th:first-child { white-space: nowrap; }
+  .standings-table th, .standings-table td { padding: 5px 1px; font-size: 9px; }
 }
