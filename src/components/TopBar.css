@@ -13,10 +13,21 @@
   transition: background 0.15s; white-space: nowrap;
 }
 .topbar-btn:hover { background: rgba(255,255,255,0.1); }
+.topbar-btn-secondary { opacity: 0.6; font-size: 10px; }
+.topbar-btn-secondary:hover { opacity: 1; }
 .import-input { display: none; }
+
+.topbar-name-input {
+  padding: 5px 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
+  background: rgba(255,255,255,0.1); color: #ffffff; font-size: 12px;
+  outline: none; width: 110px; font-weight: 600;
+}
+.topbar-name-input::placeholder { color: rgba(255,255,255,0.4); font-weight: 400; }
+.topbar-name-input:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.15); }
 
 @media (max-width: 480px) {
   .topbar-title { font-size: 15px; }
   .mode-toggle button { padding: 4px 10px; font-size: 11px; }
   .topbar-btn { padding: 4px 8px; font-size: 10px; }
+  .topbar-name-input { width: 80px; font-size: 11px; }
 }

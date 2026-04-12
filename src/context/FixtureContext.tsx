@@ -9,7 +9,11 @@ import { selectBestThirds } from "../utils/bestThirds";
 import type { ThirdPlaceEntry } from "../utils/bestThirds";
 import { assignThirdPlaceSlots } from "../data/thirdPlaceMapping";
 import { resolveKnockoutTeams } from "../utils/knockout";
-import { saveToLocalStorage, loadFromLocalStorage } from "../utils/persistence";
+import {
+  saveToLocalStorage, loadFromLocalStorage,
+  savePlayerName, loadPlayerName,
+  saveRivals, loadRivals,
+} from "../utils/persistence";
 
 function fixtureReducer(state: FixtureState, action: FixtureAction): FixtureState {
   switch (action.type) {
@@ -31,6 +35,14 @@ function fixtureReducer(state: FixtureState, action: FixtureAction): FixtureStat
       return { ...state, activeView: action.view };
     case "IMPORT_STATE":
       return { ...state, groupMatches: action.groupMatches, knockoutMatches: action.knockoutMatches };
+    case "SET_PLAYER_NAME":
+      return { ...state, playerName: action.name };
+    case "ADD_RIVAL": {
+      const filtered = state.rivals.filter((r) => r.name !== action.rival.name);
+      return { ...state, rivals: [...filtered, action.rival] };
+    }
+    case "REMOVE_RIVAL":
+      return { ...state, rivals: state.rivals.filter((r) => r.name !== action.name) };
     default:
       return state;
   }
@@ -44,6 +56,8 @@ function buildInitialState(): FixtureState {
     groupMatches: saved?.groupMatches ?? INITIAL_GROUP_MATCHES,
     knockoutMatches: saved?.knockoutMatches ?? INITIAL_KNOCKOUT_MATCHES,
     activeView: { type: "groups", group: "A" },
+    playerName: loadPlayerName(),
+    rivals: loadRivals(),
   };
 }
 
@@ -88,6 +102,7 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
     return resolveKnockoutTeams(state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds.qualifying.map((t) => t.group));
   }, [state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds]);
 
+  // Persist match data
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     clearTimeout(saveTimerRef.current);
@@ -96,6 +111,12 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
     }, 500);
     return () => clearTimeout(saveTimerRef.current);
   }, [state.groupMatches, state.knockoutMatches]);
+
+  // Persist player name
+  useEffect(() => { savePlayerName(state.playerName); }, [state.playerName]);
+
+  // Persist rivals
+  useEffect(() => { saveRivals(state.rivals); }, [state.rivals]);
 
   const value = useMemo(
     () => ({ state, dispatch, standingsByGroup, resolvedKnockout, bestThirds }),

@@ -57,10 +57,17 @@ export interface StandingRow {
   points: number;
 }
 
+export interface Rival {
+  name: string;
+  groupPredictions: Record<string, Score>;   // matchId -> Score
+  knockoutPredictions: Record<string, Score>; // matchId -> Score
+}
+
 export type ViewTarget =
   | { type: "groups"; group: string }
   | { type: "knockout"; round: KnockoutRound }
-  | { type: "schedule" };
+  | { type: "schedule" }
+  | { type: "ranking" };
 
 export type FixtureMode = "results" | "predictions";
 
@@ -70,6 +77,8 @@ export interface FixtureState {
   groupMatches: GroupMatch[];
   knockoutMatches: KnockoutMatch[];
   activeView: ViewTarget;
+  playerName: string;
+  rivals: Rival[];
 }
 
 export type FixtureAction =
@@ -77,4 +86,7 @@ export type FixtureAction =
   | { type: "SET_KNOCKOUT_SCORE"; matchId: string; score: Score | null }
   | { type: "TOGGLE_MODE" }
   | { type: "SET_VIEW"; view: ViewTarget }
-  | { type: "IMPORT_STATE"; groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] };
+  | { type: "IMPORT_STATE"; groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] }
+  | { type: "SET_PLAYER_NAME"; name: string }
+  | { type: "ADD_RIVAL"; rival: Rival }
+  | { type: "REMOVE_RIVAL"; name: string };

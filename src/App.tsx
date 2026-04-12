@@ -5,6 +5,7 @@ import { TopBar } from "./components/TopBar";
 import { GroupView } from "./components/GroupView";
 import { BracketView } from "./components/BracketView";
 import { ScheduleView } from "./components/ScheduleView";
+import { RankingView } from "./components/RankingView";
 import "./App.css";
 
 function useIsMobile() {
@@ -49,6 +50,7 @@ export default function App() {
           {activeView.type === "groups" && <GroupView group={activeView.group} />}
           {activeView.type === "knockout" && <BracketView round={activeView.round} />}
           {activeView.type === "schedule" && <ScheduleView />}
+          {activeView.type === "ranking" && <RankingView />}
         </div>
       </div>
     </div>

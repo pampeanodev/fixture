@@ -40,6 +40,17 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
         onClick={() => navigate({ type: "knockout", round: activeView.type === "knockout" ? activeView.round : "R32" })}>
         Eliminatorias
       </div>
+      <div className="sidebar-divider" />
+      <div
+        className={`sidebar-item ${activeView.type === "ranking" ? "active" : ""}`}
+        onClick={() => navigate({ type: "ranking" })}>
+        Ranking
+        {state.rivals.length > 0 && (
+          <span style={{ fontSize: "10px", opacity: 0.6, marginLeft: "6px" }}>
+            {state.rivals.length + 1}
+          </span>
+        )}
+      </div>
     </nav>
   );
 }
