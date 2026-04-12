@@ -1,0 +1,18 @@
+.score-input-wrapper { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.score-field {
+  width: 32px; height: 28px; text-align: center; font-size: 16px; font-weight: 700;
+  border: 1px solid var(--card-border); border-radius: 4px; background: var(--card-bg);
+  color: var(--content-text); outline: none; transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.score-field::-webkit-inner-spin-button, .score-field::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.score-field:focus { border-color: var(--accent-green); }
+.score-field.prediction { border-color: var(--prediction-blue); color: var(--prediction-blue); }
+.score-separator { font-size: 14px; font-weight: 700; color: #999; }
+.score-readonly { font-size: 16px; font-weight: 700; min-width: 32px; text-align: center; }
+.prediction-indicator { margin-left: 8px; font-size: 14px; }
+.prediction-indicator.exact { color: #2e7d32; }
+.prediction-indicator.winner { color: #f9a825; }
+.prediction-indicator.wrong { color: #c62828; }
+.penalties-input { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #888; }
+.penalties-input .score-field { width: 28px; height: 24px; font-size: 13px; }
