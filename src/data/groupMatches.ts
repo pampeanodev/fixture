@@ -1,5 +1,5 @@
 // src/data/groupMatches.ts
-import { GroupMatch } from "../types";
+import type { GroupMatch } from "../types";
 
 function gm(
   id: string,

@@ -1,5 +1,5 @@
 // src/data/teams.ts
-import { Team } from "../types";
+import type { Team } from "../types";
 
 export const TEAMS: Team[] = [
   // Group A

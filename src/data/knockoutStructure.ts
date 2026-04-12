@@ -1,5 +1,5 @@
 // src/data/knockoutStructure.ts
-import { KnockoutMatch, KnockoutSlot } from "../types";
+import type { KnockoutMatch, KnockoutSlot } from "../types";
 
 function km(
   id: string,
