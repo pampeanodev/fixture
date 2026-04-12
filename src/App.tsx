@@ -3,6 +3,7 @@ import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { GroupView } from "./components/GroupView";
 import { BracketView } from "./components/BracketView";
+import { ScheduleView } from "./components/ScheduleView";
 import "./App.css";
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <div className="main-content">
           {activeView.type === "group" && <GroupView group={activeView.group} />}
           {activeView.type === "knockout" && <BracketView round={activeView.round} />}
+          {activeView.type === "schedule" && <ScheduleView />}
         </div>
       </div>
     </div>

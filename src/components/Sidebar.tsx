@@ -24,6 +24,12 @@ export function Sidebar() {
 
   return (
     <nav className="sidebar">
+      <div
+        className={`sidebar-item ${activeView.type === "schedule" ? "active" : ""}`}
+        style={{ padding: "14px 16px", fontWeight: 700, fontSize: "12px", letterSpacing: "0.5px" }}
+        onClick={() => dispatch({ type: "SET_VIEW", view: { type: "schedule" } })}>
+        Calendario
+      </div>
       <div className="sidebar-section-title">Fase de Grupos</div>
       {GROUPS.map((group) => {
         const isActive = activeView.type === "group" && activeView.group === group;
