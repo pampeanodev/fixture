@@ -11,7 +11,13 @@ const KNOCKOUT_ROUNDS: { round: KnockoutRound; label: string }[] = [
   { round: "F", label: "Final" },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  isMobile: boolean;
+  onNavigate: () => void;
+}
+
+export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
   const { state, dispatch } = useFixture();
   const { activeView, groupMatches, mode } = state;
 
@@ -22,12 +28,23 @@ export function Sidebar() {
     return `${played}/6`;
   }
 
+  function navigate(action: Parameters<typeof dispatch>[0]) {
+    dispatch(action);
+    onNavigate();
+  }
+
+  const className = [
+    "sidebar",
+    collapsed ? "collapsed" : "",
+    isMobile && !collapsed ? "open" : "",
+  ].filter(Boolean).join(" ");
+
   return (
-    <nav className="sidebar">
+    <nav className={className}>
       <div
         className={`sidebar-item ${activeView.type === "schedule" ? "active" : ""}`}
         style={{ padding: "14px 16px", fontWeight: 700, fontSize: "12px", letterSpacing: "0.5px" }}
-        onClick={() => dispatch({ type: "SET_VIEW", view: { type: "schedule" } })}>
+        onClick={() => navigate({ type: "SET_VIEW", view: { type: "schedule" } })}>
         Calendario
       </div>
       <div className="sidebar-section-title">Fase de Grupos</div>
@@ -35,7 +52,7 @@ export function Sidebar() {
         const isActive = activeView.type === "group" && activeView.group === group;
         return (
           <div key={group} className={`sidebar-item ${isActive ? "active" : ""}`}
-            onClick={() => dispatch({ type: "SET_VIEW", view: { type: "group", group } })}>
+            onClick={() => navigate({ type: "SET_VIEW", view: { type: "group", group } })}>
             <span>Grupo {group}</span>
             <span className="sidebar-badge">{countPlayed(group)}</span>
           </div>
@@ -46,7 +63,7 @@ export function Sidebar() {
         const isActive = activeView.type === "knockout" && activeView.round === round;
         return (
           <div key={round} className={`sidebar-item ${isActive ? "active" : ""}`}
-            onClick={() => dispatch({ type: "SET_VIEW", view: { type: "knockout", round } })}>
+            onClick={() => navigate({ type: "SET_VIEW", view: { type: "knockout", round } })}>
             {label}
           </div>
         );

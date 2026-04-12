@@ -17,17 +17,82 @@
   --card-border: #e0e0e0;
   --prediction-blue: #1565c0;
   --result-green: #2e7d32;
+  --sidebar-width: 200px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background: var(--content-bg); color: var(--content-text);
 }
+
+/* Layout */
 .app-layout { display: flex; height: 100vh; overflow: hidden; }
-.sidebar { width: 200px; background: var(--sidebar-bg); overflow-y: auto; flex-shrink: 0; }
-.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.sidebar {
+  width: var(--sidebar-width); background: var(--sidebar-bg);
+  overflow-y: auto; flex-shrink: 0;
+  transition: width 0.2s ease, transform 0.2s ease;
+}
+.sidebar.collapsed { width: 0; overflow: hidden; }
+
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
 .topbar {
   background: var(--topbar-bg); color: var(--topbar-text);
-  padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  padding: 12px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; gap: 12px;
 }
+
 .main-content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+  background: none; border: none; color: var(--topbar-text);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+  display: flex; align-items: center; line-height: 1;
+}
+.sidebar-toggle:hover { opacity: 0.8; }
+
+/* Overlay for mobile */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 99;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    z-index: 100; width: var(--sidebar-width);
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar.collapsed { transform: translateX(-100%); }
+
+  .sidebar-overlay.visible { display: block; }
+
+  .topbar { padding: 10px 16px; }
+  .main-content { padding: 16px; }
+
+  .topbar-title { font-size: 16px; }
+  .topbar-actions { gap: 8px; }
+  .mode-toggle button { padding: 4px 10px; font-size: 11px; }
+  .topbar-btn { padding: 4px 10px; font-size: 11px; }
+
+  /* Stack match rows vertically on small screens */
+  .group-match-row { flex-wrap: wrap; gap: 6px; }
+  .match-date { min-width: 100%; }
+  .match-teams { min-width: 100%; }
+
+  .schedule-match-row { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+  .schedule-venue { min-width: 100%; text-align: left; margin-top: 2px; }
+
+  .bracket-matches { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .match-team-name { min-width: 70px; font-size: 12px; }
+  .schedule-team-name { min-width: 80px; font-size: 12px; }
+  .standings-table { font-size: 11px; }
+  .standings-table th, .standings-table td { padding: 6px 4px; }
+}

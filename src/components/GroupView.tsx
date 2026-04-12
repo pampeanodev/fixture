@@ -43,14 +43,16 @@ export function GroupView({ group }: GroupViewProps) {
         return (
           <div key={match.id} className="group-match-row">
             <div className="match-date">{formatMatchDate(match.dateUtc)}</div>
-            <div className="match-teams">
+            <div className="match-home">
+              <span>{homeTeam?.name}</span>
               <span className="team-flag">{homeTeam?.flag}</span>
-              <span className="match-team-name home">{homeTeam?.name}</span>
-              <ScoreInput score={currentScore}
-                onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
-                isPrediction={isPrediction} readonlyScore={readonlyScore ?? undefined} />
-              <span className="match-team-name">{awayTeam?.name}</span>
+            </div>
+            <ScoreInput score={currentScore}
+              onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
+              isPrediction={isPrediction} readonlyScore={readonlyScore ?? undefined} />
+            <div className="match-away">
               <span className="team-flag">{awayTeam?.flag}</span>
+              <span>{awayTeam?.name}</span>
             </div>
           </div>
         );

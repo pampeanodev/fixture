@@ -1,3 +1,4 @@
+import { useState, useCallback, useEffect } from "react";
 import { useFixture } from "./context/FixtureContext";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
@@ -6,14 +7,44 @@ import { BracketView } from "./components/BracketView";
 import { ScheduleView } from "./components/ScheduleView";
 import "./App.css";
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+}
+
 export default function App() {
   const { state } = useFixture();
   const { activeView } = state;
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+
+  // Close sidebar on mobile when navigating
+  const handleNavigation = useCallback(() => {
+    if (isMobile) setSidebarOpen(false);
+  }, [isMobile]);
+
+  // Sync sidebar state when crossing the breakpoint
+  useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
+
   return (
     <div className="app-layout">
-      <Sidebar />
+      {isMobile && sidebarOpen && (
+        <div className="sidebar-overlay visible" onClick={() => setSidebarOpen(false)} />
+      )}
+      <Sidebar
+        collapsed={!sidebarOpen}
+        isMobile={isMobile}
+        onNavigate={handleNavigation}
+      />
       <div className="main-area">
-        <TopBar />
+        <TopBar onToggleSidebar={() => setSidebarOpen((v) => !v)} />
         <div className="main-content">
           {activeView.type === "group" && <GroupView group={activeView.group} />}
           {activeView.type === "knockout" && <BracketView round={activeView.round} />}

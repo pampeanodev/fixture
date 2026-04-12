@@ -3,7 +3,11 @@ import { useFixture } from "../context/FixtureContext";
 import { exportToJson, importFromJson } from "../utils/persistence";
 import "./TopBar.css";
 
-export function TopBar() {
+interface TopBarProps {
+  onToggleSidebar: () => void;
+}
+
+export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { state, dispatch } = useFixture();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +27,10 @@ export function TopBar() {
 
   return (
     <div className="topbar">
-      <div className="topbar-title">Mundial 2026</div>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <button className="sidebar-toggle" onClick={onToggleSidebar}>☰</button>
+        <div className="topbar-title">Mundial 2026</div>
+      </div>
       <div className="topbar-actions">
         <div className="mode-toggle">
           <button className={state.mode === "results" ? "active" : ""}
