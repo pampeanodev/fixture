@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useRef, useMemo } from "react";
 import type { ReactNode } from "react";
-import type { FixtureState, FixtureAction, GroupMatch, KnockoutMatch, StandingRow } from "../types";
+import type { FixtureState, FixtureAction, KnockoutMatch, StandingRow } from "../types";
 import { TEAMS, GROUPS } from "../data/teams";
 import { INITIAL_GROUP_MATCHES } from "../data/groupMatches";
 import { INITIAL_KNOCKOUT_MATCHES } from "../data/knockoutStructure";
@@ -88,7 +88,7 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
     return resolveKnockoutTeams(state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds.qualifying.map((t) => t.group));
   }, [state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds]);
 
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {

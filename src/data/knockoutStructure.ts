@@ -9,7 +9,7 @@ function km(
   dateUtc: string,
   venue: string
 ): KnockoutMatch {
-  return { id, round, homeSlot, awaySlot, dateUtc, venue, result: null, prediction: null };
+  return { id, round, homeSlot, awaySlot, homeTeamId: null, awayTeamId: null, dateUtc, venue, result: null, prediction: null };
 }
 
 const g = (group: string, position: 1 | 2): KnockoutSlot => ({ type: "group", group, position });
