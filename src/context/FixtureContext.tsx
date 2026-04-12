@@ -43,7 +43,7 @@ function buildInitialState(): FixtureState {
     teams: TEAMS,
     groupMatches: saved?.groupMatches ?? INITIAL_GROUP_MATCHES,
     knockoutMatches: saved?.knockoutMatches ?? INITIAL_KNOCKOUT_MATCHES,
-    activeView: { type: "group", group: "A" },
+    activeView: { type: "groups", group: "A" },
   };
 }
 

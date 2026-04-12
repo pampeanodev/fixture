@@ -58,7 +58,7 @@ export interface StandingRow {
 }
 
 export type ViewTarget =
-  | { type: "group"; group: string }
+  | { type: "groups"; group: string }
   | { type: "knockout"; round: KnockoutRound }
   | { type: "schedule" };
 

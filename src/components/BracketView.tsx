@@ -10,6 +10,14 @@ const ROUND_LABELS: Record<KnockoutRound, string> = {
   SF: "Semifinales", "3P": "Tercer Puesto", F: "Final",
 };
 
+const ROUND_TABS: { round: KnockoutRound; label: string }[] = [
+  { round: "R32", label: "32avos" },
+  { round: "R16", label: "Octavos" },
+  { round: "QF", label: "Cuartos" },
+  { round: "SF", label: "Semis" },
+  { round: "F", label: "Final" },
+];
+
 function slotLabel(match: KnockoutMatch, side: "home" | "away"): string {
   const slot = side === "home" ? match.homeSlot : match.awaySlot;
   switch (slot.type) {
@@ -27,6 +35,15 @@ export function BracketView({ round }: { round: KnockoutRound }) {
 
   return (
     <div className="bracket-view">
+      <div className="round-tabs">
+        {ROUND_TABS.map((t) => (
+          <button key={t.round}
+            className={`round-tab ${t.round === round ? "active" : ""}`}
+            onClick={() => dispatch({ type: "SET_VIEW", view: { type: "knockout", round: t.round } })}>
+            {t.label}
+          </button>
+        ))}
+      </div>
       <h2>{ROUND_LABELS[round]}</h2>
       {roundsToShow.map((r) => {
         const matches = resolvedKnockout.filter((m) => m.round === r).sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));

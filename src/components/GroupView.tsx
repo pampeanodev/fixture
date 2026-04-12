@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
-import { getTeam } from "../data/teams";
+import { getTeam, GROUPS } from "../data/teams";
 import { formatMatchDate } from "../utils/formatDate";
 import type { Score } from "../types";
 import "./GroupView.css";
@@ -32,6 +32,15 @@ export function GroupView({ group }: GroupViewProps) {
 
   return (
     <div className="group-view">
+      <div className="group-tabs">
+        {GROUPS.map((g) => (
+          <button key={g}
+            className={`group-tab ${g === group ? "active" : ""}`}
+            onClick={() => dispatch({ type: "SET_VIEW", view: { type: "groups", group: g } })}>
+            {g}
+          </button>
+        ))}
+      </div>
       <h2>Grupo {group}</h2>
       <table className="standings-table">
         <thead>

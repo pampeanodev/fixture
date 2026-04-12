@@ -46,7 +46,7 @@ export default function App() {
       <div className="main-area">
         <TopBar onToggleSidebar={() => setSidebarOpen((v) => !v)} />
         <div className="main-content">
-          {activeView.type === "group" && <GroupView group={activeView.group} />}
+          {activeView.type === "groups" && <GroupView group={activeView.group} />}
           {activeView.type === "knockout" && <BracketView round={activeView.round} />}
           {activeView.type === "schedule" && <ScheduleView />}
         </div>
