@@ -37,6 +37,8 @@ export interface KnockoutMatch {
   round: KnockoutRound;
   homeSlot: KnockoutSlot;
   awaySlot: KnockoutSlot;
+  homeTeamId: string | null;
+  awayTeamId: string | null;
   dateUtc: string;
   venue: string;
   result: Score | null;
