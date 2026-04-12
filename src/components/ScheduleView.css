@@ -9,8 +9,14 @@
 .schedule-day-header:first-of-type { margin-top: 0; }
 
 /* Match card */
+.schedule-day-matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 6px;
+}
+
 .schedule-match-card {
-  background: var(--card-bg); border-radius: 8px; margin-bottom: 6px;
+  background: var(--card-bg); border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
   border-left: 3px solid transparent;
 }

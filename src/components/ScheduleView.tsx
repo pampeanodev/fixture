@@ -82,6 +82,7 @@ export function ScheduleView() {
       {matchesByDay.map(({ day, matches }) => (
         <div key={day}>
           <div className="schedule-day-header">{day}</div>
+          <div className="schedule-day-matches">
           {matches.map((match) => (
             <ScheduleMatchCard
               key={match.id}
@@ -90,6 +91,7 @@ export function ScheduleView() {
               onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
             />
           ))}
+          </div>
         </div>
       ))}
     </div>

@@ -2,7 +2,7 @@
 
 /* Standings table */
 .standings-table {
-  width: 100%; border-collapse: collapse; margin-bottom: 24px; background: var(--card-bg);
+  width: 100%; max-width: 600px; border-collapse: collapse; margin-bottom: 24px; background: var(--card-bg);
   border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   table-layout: auto;
 }
@@ -22,8 +22,14 @@
 /* Match list */
 .group-matches-title { font-size: 16px; font-weight: 700; color: var(--content-text); margin-bottom: 12px; }
 
+.group-matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 8px;
+}
+
 .group-match-card {
-  background: var(--card-bg); border-radius: 8px; margin-bottom: 8px;
+  background: var(--card-bg); border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
 }
 
@@ -38,7 +44,7 @@
 .group-match-team-row .team-flag { font-size: 18px; }
 
 .group-match-team-name {
-  flex: 1; font-size: 14px; font-weight: 600;
+  font-size: 14px; font-weight: 600; flex: 1;
 }
 
 .group-match-score-input {

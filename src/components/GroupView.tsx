@@ -54,6 +54,7 @@ export function GroupView({ group }: GroupViewProps) {
       </table>
 
       <div className="group-matches-title">Partidos</div>
+      <div className="group-matches-grid">
       {matches.map((match) => (
         <MatchCard
           key={match.id}
@@ -66,6 +67,7 @@ export function GroupView({ group }: GroupViewProps) {
           onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
         />
       ))}
+      </div>
     </div>
   );
 }
