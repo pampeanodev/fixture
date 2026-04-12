@@ -1,6 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
-import { ScoreInput } from "./ScoreInput";
 import { getTeam } from "../data/teams";
 import type { KnockoutRound, Score } from "../types";
 import "./ScheduleView.css";
@@ -16,9 +15,11 @@ interface UnifiedMatch {
   venue: string;
   homeTeamId: string | null;
   awayTeamId: string | null;
-  label: string;          // "Grupo A" or "32avos"
+  label: string;
   isKnockout: boolean;
   hasResult: boolean;
+  currentScore: Score | null;
+  realScore: Score | null;
 }
 
 export function ScheduleView() {
@@ -28,40 +29,36 @@ export function ScheduleView() {
 
   const allMatches = useMemo(() => {
     const matches: UnifiedMatch[] = [];
-
     for (const m of state.groupMatches) {
       matches.push({
         id: m.id, dateUtc: m.dateUtc, venue: m.venue,
         homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId,
         label: `Grupo ${m.group}`, isKnockout: false,
         hasResult: m[scoreField] !== null,
+        currentScore: m[scoreField],
+        realScore: m.result,
       });
     }
-
     for (const m of resolvedKnockout) {
       matches.push({
         id: m.id, dateUtc: m.dateUtc, venue: m.venue,
         homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId,
         label: ROUND_LABELS[m.round], isKnockout: true,
         hasResult: m[scoreField] !== null,
+        currentScore: m[scoreField],
+        realScore: m.result,
       });
     }
-
     matches.sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
     return matches;
   }, [state.groupMatches, resolvedKnockout, scoreField]);
 
-  // Group matches by day (local timezone)
   const matchesByDay = useMemo(() => {
     const groups: { day: string; matches: UnifiedMatch[] }[] = [];
     let currentDay = "";
-
     for (const match of allMatches) {
       const date = new Date(match.dateUtc);
-      const day = date.toLocaleDateString("es-AR", {
-        weekday: "long", day: "numeric", month: "long",
-      });
-
+      const day = date.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
       if (day !== currentDay) {
         currentDay = day;
         groups.push({ day, matches: [] });
@@ -70,23 +67,6 @@ export function ScheduleView() {
     }
     return groups;
   }, [allMatches]);
-
-  function getScore(matchId: string) {
-    const gm = state.groupMatches.find((m) => m.id === matchId);
-    if (gm) return isPrediction ? gm.prediction : gm.result;
-    const km = resolvedKnockout.find((m) => m.id === matchId);
-    if (km) return isPrediction ? km.prediction : km.result;
-    return null;
-  }
-
-  function getReadonlyScore(matchId: string) {
-    if (!isPrediction) return undefined;
-    const gm = state.groupMatches.find((m) => m.id === matchId);
-    if (gm) return gm.result;
-    const km = resolvedKnockout.find((m) => m.id === matchId);
-    if (km) return km.result;
-    return undefined;
-  }
 
   function handleScoreChange(matchId: string, isKnockout: boolean, score: Score | null) {
     if (isKnockout) {
@@ -102,59 +82,109 @@ export function ScheduleView() {
       {matchesByDay.map(({ day, matches }) => (
         <div key={day}>
           <div className="schedule-day-header">{day}</div>
-          {matches.map((match) => {
-            const homeTeam = match.homeTeamId ? getTeam(match.homeTeamId) : null;
-            const awayTeam = match.awayTeamId ? getTeam(match.awayTeamId) : null;
-            const currentScore = getScore(match.id);
-            const readonlyScore = getReadonlyScore(match.id);
-            const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
-
-            const time = new Date(match.dateUtc).toLocaleTimeString("en-US", {
-              hour: "2-digit", minute: "2-digit", hour12: false,
-            });
-
-            return (
-              <div key={match.id}
-                className={`schedule-match-row ${match.isKnockout ? "knockout" : ""} ${match.hasResult ? "has-result" : ""}`}>
-                <span className="schedule-time">{time}</span>
-                <span className={`schedule-badge ${match.isKnockout ? "ko" : "group"}`}>
-                  {match.label}
-                </span>
-                <div className="schedule-teams">
-                  {homeTeam ? (
-                    <>
-                      <span className="team-flag">{homeTeam.flag}</span>
-                      <span className="schedule-team-name home">{homeTeam.name}</span>
-                    </>
-                  ) : (
-                    <span className="schedule-team-name home pending">{match.id}</span>
-                  )}
-                  {bothKnown ? (
-                    <ScoreInput
-                      score={currentScore}
-                      onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
-                      isPrediction={isPrediction}
-                      readonlyScore={readonlyScore ?? undefined}
-                      allowPenalties={match.isKnockout}
-                    />
-                  ) : (
-                    <span className="score-separator">vs</span>
-                  )}
-                  {awayTeam ? (
-                    <>
-                      <span className="schedule-team-name">{awayTeam.name}</span>
-                      <span className="team-flag">{awayTeam.flag}</span>
-                    </>
-                  ) : (
-                    <span className="schedule-team-name pending">{match.id}</span>
-                  )}
-                </div>
-                <span className="schedule-venue">{match.venue}</span>
-              </div>
-            );
-          })}
+          {matches.map((match) => (
+            <ScheduleMatchCard
+              key={match.id}
+              match={match}
+              isPrediction={isPrediction}
+              onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
+            />
+          ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+function ScheduleMatchCard({ match, isPrediction, onScoreChange }: {
+  match: UnifiedMatch;
+  isPrediction: boolean;
+  onScoreChange: (score: Score | null) => void;
+}) {
+  const [homeStr, setHomeStr] = useState(match.currentScore?.home?.toString() ?? "");
+  const [awayStr, setAwayStr] = useState(match.currentScore?.away?.toString() ?? "");
+
+  useEffect(() => {
+    setHomeStr(match.currentScore?.home?.toString() ?? "");
+    setAwayStr(match.currentScore?.away?.toString() ?? "");
+  }, [match.currentScore]);
+
+  function commitScore(hStr: string, aStr: string) {
+    const h = parseInt(hStr, 10);
+    const a = parseInt(aStr, 10);
+    if (!isNaN(h) && !isNaN(a) && h >= 0 && a >= 0) {
+      onScoreChange({ home: h, away: a });
+    } else if (hStr === "" && aStr === "") {
+      onScoreChange(null);
+    }
+  }
+
+  const homeTeam = match.homeTeamId ? getTeam(match.homeTeamId) : null;
+  const awayTeam = match.awayTeamId ? getTeam(match.awayTeamId) : null;
+  const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
+
+  const time = new Date(match.dateUtc).toLocaleTimeString("en-US", {
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  });
+
+  let indicator: { className: string; text: string } | null = null;
+  if (isPrediction && match.realScore && match.currentScore) {
+    const r = match.realScore;
+    const p = match.currentScore;
+    if (r.home === p.home && r.away === p.away) {
+      indicator = { className: "exact", text: "✓" };
+    } else if (Math.sign(r.home - r.away) === Math.sign(p.home - p.away)) {
+      indicator = { className: "winner", text: "½" };
+    } else {
+      indicator = { className: "wrong", text: "✗" };
+    }
+  }
+
+  return (
+    <div className={`schedule-match-card ${match.isKnockout ? "knockout" : ""} ${match.hasResult ? "has-result" : ""}`}>
+      <div className="schedule-match-top">
+        <span>{time}</span>
+        <span className={`schedule-badge ${match.isKnockout ? "ko" : "group"}`}>{match.label}</span>
+        <span className="schedule-match-venue">{match.venue}</span>
+      </div>
+      <div className="schedule-team-row">
+        {homeTeam ? (
+          <>
+            <span className="team-flag">{homeTeam.flag}</span>
+            <span className="schedule-team-row-name">{homeTeam.name}</span>
+          </>
+        ) : (
+          <span className="schedule-team-row-name pending">{match.id}</span>
+        )}
+        {bothKnown && (
+          <input type="number" min="0" max="99"
+            className={`schedule-score-input ${isPrediction ? "prediction" : ""}`}
+            value={homeStr}
+            onChange={(e) => { setHomeStr(e.target.value); commitScore(e.target.value, awayStr); }} />
+        )}
+      </div>
+      <div className="schedule-team-row">
+        {awayTeam ? (
+          <>
+            <span className="team-flag">{awayTeam.flag}</span>
+            <span className="schedule-team-row-name">{awayTeam.name}</span>
+          </>
+        ) : (
+          <span className="schedule-team-row-name pending">{match.id}</span>
+        )}
+        {bothKnown && (
+          <input type="number" min="0" max="99"
+            className={`schedule-score-input ${isPrediction ? "prediction" : ""}`}
+            value={awayStr}
+            onChange={(e) => { setAwayStr(e.target.value); commitScore(homeStr, e.target.value); }} />
+        )}
+      </div>
+      {isPrediction && match.realScore && (
+        <div className="schedule-prediction-row">
+          Real: {match.realScore.home} - {match.realScore.away}
+          {indicator && <span className={`prediction-indicator ${indicator.className}`}>{indicator.text}</span>}
+        </div>
+      )}
     </div>
   );
 }

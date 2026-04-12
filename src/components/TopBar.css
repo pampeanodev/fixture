@@ -1,16 +1,22 @@
-.topbar-title { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
-.topbar-actions { display: flex; align-items: center; gap: 16px; }
+.topbar-title { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+.topbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .mode-toggle { display: flex; background: rgba(255,255,255,0.15); border-radius: 20px; overflow: hidden; }
 .mode-toggle button {
-  padding: 6px 16px; border: none; background: transparent;
+  padding: 6px 14px; border: none; background: transparent;
   color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 600; cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s; white-space: nowrap;
 }
 .mode-toggle button.active { background: rgba(255,255,255,0.25); color: #ffffff; }
 .topbar-btn {
-  padding: 6px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
-  background: transparent; color: #ffffff; font-size: 12px; cursor: pointer;
-  transition: background 0.15s;
+  padding: 5px 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
+  background: transparent; color: #ffffff; font-size: 11px; cursor: pointer;
+  transition: background 0.15s; white-space: nowrap;
 }
 .topbar-btn:hover { background: rgba(255,255,255,0.1); }
 .import-input { display: none; }
+
+@media (max-width: 480px) {
+  .topbar-title { font-size: 15px; }
+  .mode-toggle button { padding: 4px 10px; font-size: 11px; }
+  .topbar-btn { padding: 4px 8px; font-size: 10px; }
+}

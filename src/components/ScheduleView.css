@@ -6,33 +6,56 @@
   margin-bottom: 8px; margin-top: 20px;
   text-transform: uppercase; letter-spacing: 0.5px;
 }
-
 .schedule-day-header:first-of-type { margin-top: 0; }
 
-.schedule-match-row {
-  display: flex; align-items: center; gap: 12px; padding: 10px 16px;
-  background: var(--card-bg); border-radius: 6px; margin-bottom: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+/* Match card */
+.schedule-match-card {
+  background: var(--card-bg); border-radius: 8px; margin-bottom: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
   border-left: 3px solid transparent;
 }
+.schedule-match-card.knockout { border-left-color: var(--accent-gold); }
+.schedule-match-card.has-result { opacity: 0.7; }
 
-.schedule-match-row.knockout { border-left-color: var(--accent-gold); }
-.schedule-match-row.has-result { opacity: 0.75; }
-
-.schedule-time { font-size: 12px; font-weight: 600; color: #555; min-width: 50px; }
+.schedule-match-top {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px 4px; font-size: 11px; color: #888;
+}
 
 .schedule-badge {
   font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
   padding: 2px 6px; border-radius: 3px; text-transform: uppercase;
-  min-width: 50px; text-align: center;
+  white-space: nowrap;
 }
-
 .schedule-badge.group { background: var(--accent-qualify); color: var(--accent-green); }
 .schedule-badge.ko { background: var(--accent-maybe); color: #f57f17; }
 
-.schedule-teams { display: flex; align-items: center; gap: 8px; flex: 1; }
-.schedule-team-name { font-size: 13px; font-weight: 600; min-width: 110px; }
-.schedule-team-name.home { text-align: right; }
-.schedule-team-name.pending { color: #bbb; font-weight: 400; font-style: italic; }
+.schedule-match-venue { font-size: 10px; color: #aaa; margin-left: auto; }
 
-.schedule-venue { font-size: 10px; color: #aaa; min-width: 140px; text-align: right; }
+.schedule-team-row {
+  display: flex; align-items: center; padding: 5px 12px; gap: 8px;
+}
+.schedule-team-row .team-flag { font-size: 18px; }
+.schedule-team-row-name { flex: 1; font-size: 14px; font-weight: 600; }
+.schedule-team-row-name.pending { color: #bbb; font-weight: 400; font-style: italic; font-size: 12px; }
+
+.schedule-score-input {
+  width: 36px; height: 30px; text-align: center; font-size: 16px; font-weight: 700;
+  border: 1px solid var(--card-border); border-radius: 4px; background: var(--card-bg);
+  color: var(--content-text); outline: none;
+  -moz-appearance: textfield;
+}
+.schedule-score-input::-webkit-inner-spin-button,
+.schedule-score-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.schedule-score-input:focus { border-color: var(--accent-green); }
+.schedule-score-input.prediction { border-color: var(--prediction-blue); color: var(--prediction-blue); }
+
+.schedule-prediction-row {
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 12px 8px; font-size: 11px; color: #999;
+}
+
+/* Hide venue on small screens */
+@media (max-width: 600px) {
+  .schedule-match-venue { display: none; }
+}
