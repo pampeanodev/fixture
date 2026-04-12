@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { calculatePlayerScore, extractLocalPredictions, extractRivalPredictions } from "../utils/scoring";
 import "./RankingView.css";
@@ -47,10 +47,58 @@ export function RankingView() {
   }, [state.groupMatches, state.knockoutMatches, state.playerName, state.rivals]);
 
   const hasRivals = state.rivals.length > 0;
+  const [showRules, setShowRules] = useState(false);
 
   return (
     <div className="ranking-view">
-      <h2>Ranking del Prode</h2>
+      <div className="ranking-header">
+        <h2>Ranking del Prode</h2>
+        <button className="ranking-rules-btn" onClick={() => setShowRules((v) => !v)}>
+          {showRules ? "Cerrar" : "¿Cómo funciona?"}
+        </button>
+      </div>
+
+      {showRules && (
+        <div className="ranking-rules">
+          <h3>Puntuación</h3>
+          <div className="ranking-rules-grid">
+            <div className="ranking-rule-card exact">
+              <div className="ranking-rule-points">3 pts</div>
+              <div className="ranking-rule-icon">✓</div>
+              <div className="ranking-rule-label">Resultado exacto</div>
+              <div className="ranking-rule-example">Predecís 2-1 y sale 2-1</div>
+            </div>
+            <div className="ranking-rule-card winner">
+              <div className="ranking-rule-points">1 pt</div>
+              <div className="ranking-rule-icon">½</div>
+              <div className="ranking-rule-label">Ganador correcto</div>
+              <div className="ranking-rule-example">Predecís 2-0 pero sale 3-1</div>
+            </div>
+            <div className="ranking-rule-card wrong">
+              <div className="ranking-rule-points">0 pts</div>
+              <div className="ranking-rule-icon">✗</div>
+              <div className="ranking-rule-label">Resultado errado</div>
+              <div className="ranking-rule-example">Predecís victoria local y gana el visitante</div>
+            </div>
+          </div>
+
+          <h3>Desempate</h3>
+          <p>Si dos jugadores tienen los mismos puntos, se desempata por:</p>
+          <ol>
+            <li>Mayor cantidad de resultados exactos (✓)</li>
+            <li>Mayor cantidad de ganadores correctos (½)</li>
+          </ol>
+
+          <h3>¿Cómo competir?</h3>
+          <ol>
+            <li>Cada jugador pone su nombre y carga sus predicciones en modo "Predicciones"</li>
+            <li>Exporta su prode desde el menú ⋯ → "Exportar mi prode"</li>
+            <li>Comparte el archivo JSON con sus amigos</li>
+            <li>Cada uno importa los prodes de los demás desde ⋯ → "Importar prode rival"</li>
+            <li>A medida que se cargan los resultados reales, el ranking se actualiza solo</li>
+          </ol>
+        </div>
+      )}
 
       {!hasRivals ? (
         <div className="ranking-empty">
