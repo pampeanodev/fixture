@@ -56,8 +56,11 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
     if (!file) return;
     try {
       const rival = await importProde(file);
+      const isUpdate = state.rivals.some((r) => r.name === rival.name);
       dispatch({ type: "ADD_RIVAL", rival });
-      alert(`Prode de "${rival.name}" importado.`);
+      alert(isUpdate
+        ? `Prode de "${rival.name}" actualizado.`
+        : `Prode de "${rival.name}" importado.`);
     } catch { alert("Error al importar prode. Verificá el archivo."); }
     if (prodeInputRef.current) prodeInputRef.current.value = "";
     setMenuOpen(false);
