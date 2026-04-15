@@ -67,7 +67,9 @@ export type ViewTarget =
   | { type: "groups"; group: string }
   | { type: "knockout"; round: KnockoutRound }
   | { type: "schedule" }
-  | { type: "ranking" };
+  | { type: "ranking" }
+  | { type: "rooms" }
+  | { type: "room"; roomId: string };
 
 export type FixtureMode = "results" | "predictions";
 
