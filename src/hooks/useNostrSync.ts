@@ -43,18 +43,17 @@ export function useNostrSync(): void {
       payload: RevealPayload,
       peerCommitments: Record<string, string> | undefined,
     ): void => {
+      // Strict commit-reveal: without a committed hash for this peer, we cannot verify — reject all.
+      if (!peerCommitments) return;
+
       const groupPredictions: Record<string, Score> = {};
       const knockoutPredictions: Record<string, Score> = {};
 
       for (const [matchId, entry] of Object.entries(payload.predictions)) {
-        if (peerCommitments) {
-          const commitment = peerCommitments[matchId];
-          if (
-            commitment &&
-            !verifyReveal(matchId, entry.home, entry.away, entry.salt, commitment)
-          ) {
-            continue;
-          }
+        const commitment = peerCommitments[matchId];
+        if (!commitment) continue; // no commitment for this match — reject
+        if (!verifyReveal(matchId, entry.home, entry.away, entry.salt, commitment)) {
+          continue; // tampered — reject
         }
         const score: Score = { home: entry.home, away: entry.away };
         if (matchId.startsWith("G-")) {
@@ -62,6 +61,14 @@ export function useNostrSync(): void {
         } else {
           knockoutPredictions[matchId] = score;
         }
+      }
+
+      // If no predictions verified, don't create a rival at all
+      if (
+        Object.keys(groupPredictions).length === 0 &&
+        Object.keys(knockoutPredictions).length === 0
+      ) {
+        return;
       }
 
       const rivalName = payload.playerName || peerPubkey.slice(0, 8);
@@ -117,19 +124,22 @@ export function useNostrSync(): void {
       },
     );
 
-    // Also query existing events
-    queryEvents({ kinds: [NOSTR_KIND], "#d": [commitDTag] }).then((events) => {
-      for (const event of events) {
+    // Hydrate in order: collect commits first, then reveals, to avoid verification gaps.
+    let cancelled = false;
+
+    Promise.all([
+      queryEvents({ kinds: [NOSTR_KIND], "#d": [commitDTag] }),
+      queryEvents({ kinds: [NOSTR_KIND], "#d": [revealDTag] }),
+    ]).then(([commitEvents, revealEvents]) => {
+      if (cancelled) return;
+      for (const event of commitEvents) {
         if (event.pubkey === identity.pubkey) continue;
         const payload = parseEventContent<CommitmentPayload>(event.content);
         if (payload) {
           commitmentsCache.current.set(event.pubkey, payload.commitments);
         }
       }
-    });
-
-    queryEvents({ kinds: [NOSTR_KIND], "#d": [revealDTag] }).then((events) => {
-      for (const event of events) {
+      for (const event of revealEvents) {
         if (event.pubkey === identity.pubkey) continue;
         const payload = parseEventContent<RevealPayload>(event.content);
         if (!payload) continue;
@@ -139,6 +149,7 @@ export function useNostrSync(): void {
     });
 
     return () => {
+      cancelled = true;
       subRef.current?.close();
       subRef.current = null;
     };
