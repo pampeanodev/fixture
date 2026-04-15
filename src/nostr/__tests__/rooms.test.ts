@@ -7,6 +7,8 @@ import {
   addRoom,
   removeRoom,
   isValidMember,
+  persistManifests,
+  loadManifests,
 } from "../rooms";
 import type { RoomManifest, RoomMembership } from "../types";
 
@@ -107,5 +109,19 @@ describe("isValidMember", () => {
   it("rejects if invite code was claimed by someone else", () => {
     const claims = [{ pubkey: "pubkey3", inviteCode: "t8f2", claimedAt: 1000 }];
     expect(isValidMember(closedManifest, "pubkey2", "t8f2", claims)).toBe(false);
+  });
+});
+
+describe("manifest persistence", () => {
+  it("round-trips manifests through localStorage", () => {
+    const manifests: Record<string, RoomManifest> = {
+      abc12345: { roomId: "abc12345", mode: "open", creator: "pk1", validInvites: [] },
+    };
+    persistManifests(manifests);
+    expect(loadManifests()).toEqual(manifests);
+  });
+
+  it("returns empty object when nothing persisted", () => {
+    expect(loadManifests()).toEqual({});
   });
 });

@@ -21,6 +21,8 @@ import {
   loadRooms,
   addRoom,
   removeRoom,
+  persistManifests,
+  loadManifests,
 } from "../nostr/rooms";
 import { buildManifestEvent, buildClaimEvent } from "../nostr/events";
 import { publishEvent, flushOutbox, closePool } from "../nostr/relayPool";
@@ -49,7 +51,9 @@ export function NostrProvider({ children }: { children: ReactNode }) {
   const [rooms, setRooms] = useState<RoomMembership[]>(() => loadRooms());
   const [activeRoomId, setActiveRoom] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("offline");
-  const manifestsRef = useRef<Map<string, RoomManifest>>(new Map());
+  const manifestsRef = useRef<Map<string, RoomManifest>>(
+    new Map(Object.entries(loadManifests()))
+  );
 
   // Persist rooms on change
   useEffect(() => {
@@ -113,6 +117,7 @@ export function NostrProvider({ children }: { children: ReactNode }) {
       validInvites: [],
     };
     manifestsRef.current.set(roomId, manifest);
+    persistManifests(Object.fromEntries(manifestsRef.current));
 
     const event = buildManifestEvent(manifest);
     publishEvent(event, identity).catch(() => {
@@ -152,6 +157,7 @@ export function NostrProvider({ children }: { children: ReactNode }) {
     const manifest = manifestsRef.current.get(roomId);
     if (manifest && manifest.creator === identity.pubkey) {
       manifest.validInvites = [...manifest.validInvites, code];
+      persistManifests(Object.fromEntries(manifestsRef.current));
       const event = buildManifestEvent(manifest);
       publishEvent(event, identity).catch(() => {
         enqueueEvent({ eventTemplate: event, createdAt: Date.now() });

@@ -1,6 +1,25 @@
 import type { RoomManifest, RoomMembership } from "./types";
 
 const ROOMS_KEY = "wc2026-rooms";
+const MANIFESTS_KEY = "wc2026-manifests";
+
+export function persistManifests(manifests: Record<string, RoomManifest>): void {
+  try {
+    localStorage.setItem(MANIFESTS_KEY, JSON.stringify(manifests));
+  } catch {
+    /* storage full */
+  }
+}
+
+export function loadManifests(): Record<string, RoomManifest> {
+  try {
+    const raw = localStorage.getItem(MANIFESTS_KEY);
+    if (!raw) return {};
+    return JSON.parse(raw) as Record<string, RoomManifest>;
+  } catch {
+    return {};
+  }
+}
 
 export function createRoom(): string {
   return randomAlphanumeric(8);
