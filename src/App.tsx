@@ -6,7 +6,13 @@ import { GroupView } from "./components/GroupView";
 import { BracketView } from "./components/BracketView";
 import { ScheduleView } from "./components/ScheduleView";
 import { RankingView } from "./components/RankingView";
+import { useNostrSync } from "./hooks/useNostrSync";
 import "./App.css";
+
+function NostrSyncBridge() {
+  useNostrSync();
+  return null;
+}
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -35,7 +41,9 @@ export default function App() {
   }, [isMobile]);
 
   return (
-    <div className="app-layout">
+    <>
+      <NostrSyncBridge />
+      <div className="app-layout">
       {isMobile && sidebarOpen && (
         <div className="sidebar-overlay visible" onClick={() => setSidebarOpen(false)} />
       )}
@@ -53,6 +61,7 @@ export default function App() {
           {activeView.type === "ranking" && <RankingView />}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
