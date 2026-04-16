@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useFixture } from "./context/FixtureContext";
+import { useNostr } from "./context/NostrContext";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { GroupView } from "./components/GroupView";
@@ -11,6 +12,30 @@ import "./App.css";
 
 function NostrSyncBridge() {
   useNostrSync();
+  return null;
+}
+
+function InviteRouter() {
+  const { joinRoom, setActiveRoom, identity } = useNostr();
+  const { dispatch } = useFixture();
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    const match = path.match(/^\/r\/([a-z0-9]{8})$/);
+    if (!match) return;
+    if (!identity) return; // wait for identity before processing
+
+    const roomId = match[1];
+    const params = new URLSearchParams(window.location.search);
+    const inviteCode = params.get("i") ?? undefined;
+
+    joinRoom(roomId, inviteCode);
+    setActiveRoom(roomId);
+    dispatch({ type: "SET_VIEW", view: { type: "room", roomId } });
+
+    window.history.replaceState(null, "", "/");
+  }, [identity, joinRoom, setActiveRoom, dispatch]);
+
   return null;
 }
 
@@ -43,6 +68,7 @@ export default function App() {
   return (
     <>
       <NostrSyncBridge />
+      <InviteRouter />
       <div className="app-layout">
       {isMobile && sidebarOpen && (
         <div className="sidebar-overlay visible" onClick={() => setSidebarOpen(false)} />
