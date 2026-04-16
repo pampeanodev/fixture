@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { ReactNode } from "react";
 import type {
   NostrIdentity,
@@ -33,7 +33,7 @@ interface NostrContextValue {
   rooms: RoomMembership[];
   activeRoomId: string | null;
   connectionStatus: ConnectionStatus;
-  setupIdentity: (name?: string) => NostrIdentity;
+  setupIdentity: () => NostrIdentity;
   restoreIdentityFromMnemonic: (mnemonic: string) => void;
   exportIdentity: () => { mnemonic: string; nsec: string } | null;
   clearUserIdentity: () => void;
@@ -50,33 +50,39 @@ export function NostrProvider({ children }: { children: ReactNode }) {
   const [identity, setIdentity] = useState<NostrIdentity | null>(() => loadIdentity());
   const [rooms, setRooms] = useState<RoomMembership[]>(() => loadRooms());
   const [activeRoomId, setActiveRoom] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("offline");
+  const [relayConnected, setRelayConnected] = useState(false);
   const manifestsRef = useRef<Map<string, RoomManifest>>(
     new Map(Object.entries(loadManifests()))
   );
 
-  // Persist rooms on change
+  const hasRooms = rooms.length > 0;
+  const connectionStatus: ConnectionStatus = useMemo(() => {
+    if (!hasRooms || !identity) return "offline";
+    return relayConnected ? "connected" : "connecting";
+  }, [hasRooms, identity, relayConnected]);
+
   useEffect(() => {
     persistRooms(rooms);
   }, [rooms]);
 
-  // Manage connection status based on rooms
   useEffect(() => {
-    if (rooms.length === 0 || !identity) {
-      setConnectionStatus("offline");
+    if (!hasRooms || !identity) {
       closePool();
       return;
     }
-    setConnectionStatus("connecting");
-    // Flush any queued events
+    let cancelled = false;
     flushOutbox(identity).then(() => {
-      setConnectionStatus("connected");
+      if (!cancelled) setRelayConnected(true);
     }).catch(() => {
-      setConnectionStatus("offline");
+      if (!cancelled) setRelayConnected(false);
     });
-  }, [rooms.length, identity]);
+    return () => {
+      cancelled = true;
+      setRelayConnected(false);
+    };
+  }, [hasRooms, identity]);
 
-  const setupIdentity = useCallback((_name?: string) => {
+  const setupIdentity = useCallback(() => {
     const id = generateIdentity();
     persistIdentity(id);
     setIdentity(id);

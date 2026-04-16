@@ -59,17 +59,15 @@ export default function App() {
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
 
-  if (!identity) return <Onboarding />;
-
-  // Close sidebar on mobile when navigating
   const handleNavigation = useCallback(() => {
     if (isMobile) setSidebarOpen(false);
   }, [isMobile]);
 
-  // Sync sidebar state when crossing the breakpoint
   useEffect(() => {
     setSidebarOpen(!isMobile);
   }, [isMobile]);
+
+  if (!identity) return <Onboarding />;
 
   return (
     <>
