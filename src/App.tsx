@@ -7,6 +7,7 @@ import { GroupView } from "./components/GroupView";
 import { BracketView } from "./components/BracketView";
 import { ScheduleView } from "./components/ScheduleView";
 import { RankingView } from "./components/RankingView";
+import { Onboarding } from "./components/Onboarding";
 import { useNostrSync } from "./hooks/useNostrSync";
 import "./App.css";
 
@@ -50,10 +51,13 @@ function useIsMobile() {
 }
 
 export default function App() {
+  const { identity } = useNostr();
   const { state } = useFixture();
   const { activeView } = state;
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+
+  if (!identity) return <Onboarding />;
 
   // Close sidebar on mobile when navigating
   const handleNavigation = useCallback(() => {
