@@ -51,6 +51,11 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
           </span>
         )}
       </div>
+      <div
+        className={`sidebar-item ${activeView.type === "rooms" || activeView.type === "room" ? "active" : ""}`}
+        onClick={() => navigate({ type: "rooms" })}>
+        Salas
+      </div>
     </nav>
   );
 }

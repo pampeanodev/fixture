@@ -7,6 +7,8 @@ import { GroupView } from "./components/GroupView";
 import { BracketView } from "./components/BracketView";
 import { ScheduleView } from "./components/ScheduleView";
 import { RankingView } from "./components/RankingView";
+import { RoomList } from "./components/RoomList";
+import { RoomDetail } from "./components/RoomDetail";
 import { Onboarding } from "./components/Onboarding";
 import { useNostrSync } from "./hooks/useNostrSync";
 import "./App.css";
@@ -89,6 +91,8 @@ export default function App() {
           {activeView.type === "knockout" && <BracketView round={activeView.round} />}
           {activeView.type === "schedule" && <ScheduleView />}
           {activeView.type === "ranking" && <RankingView />}
+          {activeView.type === "rooms" && <RoomList />}
+          {activeView.type === "room" && <RoomDetail roomId={activeView.roomId} />}
         </div>
       </div>
       </div>

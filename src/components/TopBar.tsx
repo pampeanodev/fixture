@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
-import { exportToJson, exportProde, importFromJson, importProde } from "../utils/persistence";
+import { exportToJson, importFromJson } from "../utils/persistence";
+import { ConnectionStatus } from "./ConnectionStatus";
+import { AccountModal } from "./AccountModal";
 import "./TopBar.css";
 
 interface TopBarProps {
@@ -10,8 +12,8 @@ interface TopBarProps {
 export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { state, dispatch } = useFixture();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const prodeInputRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on click outside
@@ -31,15 +33,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
     setMenuOpen(false);
   }
 
-  function handleExportProde() {
-    if (!state.playerName.trim()) {
-      alert("Primero poné tu nombre en el campo del topbar.");
-      return;
-    }
-    exportProde(state.playerName, state.groupMatches, state.knockoutMatches);
-    setMenuOpen(false);
-  }
-
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -51,22 +44,8 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
     setMenuOpen(false);
   }
 
-  async function handleImportProde(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const rival = await importProde(file);
-      const isUpdate = state.rivals.some((r) => r.name === rival.name);
-      dispatch({ type: "ADD_RIVAL", rival });
-      alert(isUpdate
-        ? `Prode de "${rival.name}" actualizado.`
-        : `Prode de "${rival.name}" importado.`);
-    } catch { alert("Error al importar prode. Verificá el archivo."); }
-    if (prodeInputRef.current) prodeInputRef.current.value = "";
-    setMenuOpen(false);
-  }
-
   return (
+    <>
     <div className="topbar">
       <div className="topbar-left">
         <button className="sidebar-toggle" onClick={onToggleSidebar}>☰</button>
@@ -93,17 +72,15 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       </div>
 
       <div className="topbar-right" ref={menuRef}>
+        <ConnectionStatus />
         <button className="topbar-menu-btn" onClick={() => setMenuOpen((v) => !v)}>
           ⋯
         </button>
         {menuOpen && (
           <div className="topbar-dropdown">
-            <div className="dropdown-section">Prode</div>
-            <button className="dropdown-item" onClick={handleExportProde}>
-              <span className="dropdown-icon">↑</span> Exportar mi prode
-            </button>
-            <button className="dropdown-item" onClick={() => { prodeInputRef.current?.click(); }}>
-              <span className="dropdown-icon">↓</span> Importar prode rival
+            <div className="dropdown-section">Cuenta</div>
+            <button className="dropdown-item" onClick={() => { setShowAccount(true); setMenuOpen(false); }}>
+              <span className="dropdown-icon">&#9881;</span> Mi cuenta
             </button>
             <div className="dropdown-divider" />
             <div className="dropdown-section">Fixture</div>
@@ -116,8 +93,9 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
           </div>
         )}
         <input ref={fileInputRef} type="file" accept=".json" className="import-input" onChange={handleImport} />
-        <input ref={prodeInputRef} type="file" accept=".json" className="import-input" onChange={handleImportProde} />
       </div>
     </div>
+    {showAccount && <AccountModal onClose={() => setShowAccount(false)} />}
+  </>
   );
 }
