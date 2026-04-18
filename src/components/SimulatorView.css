@@ -129,3 +129,53 @@
   font-family: monospace;
   color: rgba(255, 255, 255, 0.9);
 }
+
+.sim-final-score {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #ffffff;
+  padding: 0 12px;
+}
+.sim-pen {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+}
+.simulator-winner {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+.simulator-deltas {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.simulator-deltas h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sim-symbol {
+  text-align: center;
+  width: 30px;
+  font-weight: 700;
+}
+.sim-delta {
+  text-align: right;
+  color: #4caf50;
+  font-weight: 600;
+  width: 50px;
+}
+.sim-arrow {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  width: 40px;
+}
