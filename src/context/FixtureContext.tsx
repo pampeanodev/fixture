@@ -15,7 +15,7 @@ import {
   saveRivals, loadRivals,
 } from "../utils/persistence";
 
-function fixtureReducer(state: FixtureState, action: FixtureAction): FixtureState {
+export function fixtureReducer(state: FixtureState, action: FixtureAction): FixtureState {
   switch (action.type) {
     case "SET_GROUP_SCORE": {
       const field = state.mode === "predictions" ? "prediction" : "result";
