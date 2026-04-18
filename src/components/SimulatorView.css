@@ -1,0 +1,88 @@
+.simulator-view {
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+  color: #ffffff;
+}
+
+.simulator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.simulator-header h2 { font-size: 20px; margin: 0; }
+.simulator-header-actions { display: flex; gap: 8px; }
+
+.simulator-match {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.simulator-match-meta {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.simulator-match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 16px;
+}
+.sim-team { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sim-team-flag { font-size: 36px; }
+.sim-team-name { font-weight: 600; }
+.sim-vs { color: rgba(255, 255, 255, 0.4); font-size: 14px; }
+
+.simulator-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.sim-btn {
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sim-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); }
+.sim-btn:disabled { opacity: 0.4; cursor: default; }
+.sim-btn.primary { background: rgba(255, 255, 255, 0.18); }
+.sim-btn.primary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.28); }
+.sim-btn.danger {
+  border-color: rgba(255, 80, 80, 0.3);
+  color: #ff6b6b;
+}
+.sim-btn.danger:hover { background: rgba(255, 80, 80, 0.1); }
+
+.simulator-manual {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.simulator-manual p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+.simulator-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+.simulator-empty h2 { font-size: 20px; margin: 0 0 12px; }
+.simulator-empty p { color: rgba(255, 255, 255, 0.6); margin: 0 0 20px; }
