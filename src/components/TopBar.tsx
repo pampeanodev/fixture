@@ -44,6 +44,20 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
     setMenuOpen(false);
   }
 
+  function handleStartSimulation() {
+    dispatch({ type: "ENTER_SIMULATION" });
+    dispatch({ type: "SET_VIEW", view: { type: "simulator" } });
+    setMenuOpen(false);
+  }
+
+  function handleExitSimulation() {
+    dispatch({ type: "EXIT_SIMULATION" });
+    if (state.activeView.type === "simulator") {
+      dispatch({ type: "SET_VIEW", view: { type: "ranking" } });
+    }
+    setMenuOpen(false);
+  }
+
   return (
     <>
     <div className="topbar">
@@ -82,6 +96,17 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
             <button className="dropdown-item" onClick={() => { setShowAccount(true); setMenuOpen(false); }}>
               <span className="dropdown-icon">&#9881;</span> Mi cuenta
             </button>
+            <div className="dropdown-divider" />
+            <div className="dropdown-section">Simulación</div>
+            {!state.simulationActive ? (
+              <button className="dropdown-item" onClick={handleStartSimulation}>
+                <span className="dropdown-icon">▶</span> Iniciar simulación
+              </button>
+            ) : (
+              <button className="dropdown-item" onClick={handleExitSimulation}>
+                <span className="dropdown-icon">■</span> Salir de simulación
+              </button>
+            )}
             <div className="dropdown-divider" />
             <div className="dropdown-section">Fixture</div>
             <button className="dropdown-item" onClick={handleExport}>

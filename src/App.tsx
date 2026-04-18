@@ -9,6 +9,7 @@ import { ScheduleView } from "./components/ScheduleView";
 import { RankingView } from "./components/RankingView";
 import { RoomList } from "./components/RoomList";
 import { RoomDetail } from "./components/RoomDetail";
+import { SimulatorView } from "./components/SimulatorView";
 import { Onboarding } from "./components/Onboarding";
 import { useNostrSync } from "./hooks/useNostrSync";
 import "./App.css";
@@ -91,6 +92,7 @@ export default function App() {
           {activeView.type === "ranking" && <RankingView />}
           {activeView.type === "rooms" && <RoomList />}
           {activeView.type === "room" && <RoomDetail roomId={activeView.roomId} />}
+          {activeView.type === "simulator" && <SimulatorView />}
         </div>
       </div>
       </div>

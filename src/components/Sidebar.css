@@ -17,3 +17,13 @@
 .sidebar-divider {
   height: 1px; background: rgba(255,255,255,0.1); margin: 8px 16px;
 }
+
+.sim-dot {
+  color: #f5a623;
+  margin-right: 4px;
+  animation: sim-pulse 2s ease-in-out infinite;
+}
+@keyframes sim-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
