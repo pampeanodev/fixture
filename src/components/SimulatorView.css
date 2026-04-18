@@ -86,3 +86,46 @@
 }
 .simulator-empty h2 { font-size: 20px; margin: 0 0 12px; }
 .simulator-empty p { color: rgba(255, 255, 255, 0.6); margin: 0 0 20px; }
+
+.simulator-predictions {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.simulator-predictions h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.simulator-predictions-empty {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  margin: 0;
+  text-align: center;
+}
+.simulator-predictions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.simulator-predictions-table td {
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.simulator-predictions-table tr:last-child td { border-bottom: none; }
+.simulator-predictions-table tr.local td { font-weight: 600; }
+.simulator-predictions-table .local-tag {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+}
+.simulator-predictions-table .pred-score {
+  text-align: right;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.9);
+}

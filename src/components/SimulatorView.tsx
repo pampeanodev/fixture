@@ -94,6 +94,22 @@ export function SimulatorView() {
       ? `Grupo ${(match as { group?: string }).group ?? ""}`
       : (match as { round: string }).round;
 
+  const matchId = match.id;
+  const localName = state.playerName.trim() || "Yo";
+  const localPrediction: Score | null = match.prediction;
+  type PredRow = { name: string; isLocal: boolean; score: Score | null };
+  const predictionRows: PredRow[] = [
+    { name: localName, isLocal: true, score: localPrediction },
+    ...state.rivals.map((r) => ({
+      name: r.name,
+      isLocal: false,
+      score:
+        pending.kind === "group"
+          ? (r.groupPredictions[matchId] ?? null)
+          : (r.knockoutPredictions[matchId] ?? null),
+    })),
+  ];
+
   return (
     <div className="simulator-view">
       <div className="simulator-header">
@@ -143,17 +159,38 @@ export function SimulatorView() {
           </div>
         </div>
       ) : (
-        <div className="simulator-actions">
-          <button className="sim-btn primary" onClick={handleSimulate}>
-            ▶ Simular random
-          </button>
-          <button className="sim-btn" onClick={() => setManualEntry(true)}>
-            ✎ Ingresar manual
-          </button>
-          <button className="sim-btn" onClick={handleSkip}>
-            ⏭ Saltar
-          </button>
-        </div>
+        <>
+          <div className="simulator-predictions">
+            <h3>Predicciones del prode</h3>
+            {predictionRows.length === 0 ? (
+              <p className="simulator-predictions-empty">Nadie predijo este partido.</p>
+            ) : (
+              <table className="simulator-predictions-table">
+                <tbody>
+                  {predictionRows.map((row) => (
+                    <tr key={row.name} className={row.isLocal ? "local" : ""}>
+                      <td>{row.name}{row.isLocal && <span className="local-tag"> (vos)</span>}</td>
+                      <td className="pred-score">
+                        {row.score ? `${row.score.home} - ${row.score.away}` : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+          <div className="simulator-actions">
+            <button className="sim-btn primary" onClick={handleSimulate}>
+              ▶ Simular random
+            </button>
+            <button className="sim-btn" onClick={() => setManualEntry(true)}>
+              ✎ Ingresar manual
+            </button>
+            <button className="sim-btn" onClick={handleSkip}>
+              ⏭ Saltar
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
