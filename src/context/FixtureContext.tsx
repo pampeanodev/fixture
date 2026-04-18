@@ -43,6 +43,35 @@ function fixtureReducer(state: FixtureState, action: FixtureAction): FixtureStat
     }
     case "REMOVE_RIVAL":
       return { ...state, rivals: state.rivals.filter((r) => r.name !== action.name) };
+    case "ENTER_SIMULATION": {
+      return {
+        ...state,
+        mode: "results",
+        simulationActive: true,
+        simulationSnapshot: {
+          groupMatches: state.groupMatches,
+          knockoutMatches: state.knockoutMatches,
+        },
+      };
+    }
+    case "EXIT_SIMULATION": {
+      if (!state.simulationSnapshot) return state;
+      return {
+        ...state,
+        groupMatches: state.simulationSnapshot.groupMatches,
+        knockoutMatches: state.simulationSnapshot.knockoutMatches,
+        simulationActive: false,
+        simulationSnapshot: null,
+      };
+    }
+    case "RESET_SIMULATION": {
+      if (!state.simulationSnapshot) return state;
+      return {
+        ...state,
+        groupMatches: state.simulationSnapshot.groupMatches,
+        knockoutMatches: state.simulationSnapshot.knockoutMatches,
+      };
+    }
     default:
       return state;
   }
@@ -58,6 +87,8 @@ function buildInitialState(): FixtureState {
     activeView: { type: "groups", group: "A" },
     playerName: loadPlayerName(),
     rivals: loadRivals(),
+    simulationActive: false,
+    simulationSnapshot: null,
   };
 }
 
@@ -105,12 +136,13 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
   // Persist match data
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
+    if (state.simulationActive) return;
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       saveToLocalStorage({ groupMatches: state.groupMatches, knockoutMatches: state.knockoutMatches });
     }, 500);
     return () => clearTimeout(saveTimerRef.current);
-  }, [state.groupMatches, state.knockoutMatches]);
+  }, [state.groupMatches, state.knockoutMatches, state.simulationActive]);
 
   // Persist player name
   useEffect(() => { savePlayerName(state.playerName); }, [state.playerName]);
