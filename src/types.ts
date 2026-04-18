@@ -69,7 +69,8 @@ export type ViewTarget =
   | { type: "schedule" }
   | { type: "ranking" }
   | { type: "rooms" }
-  | { type: "room"; roomId: string };
+  | { type: "room"; roomId: string }
+  | { type: "simulator" };
 
 export type FixtureMode = "results" | "predictions";
 
@@ -81,6 +82,13 @@ export interface FixtureState {
   activeView: ViewTarget;
   playerName: string;
   rivals: Rival[];
+  simulationActive: boolean;
+  simulationSnapshot: SimulationSnapshot | null;
+}
+
+export interface SimulationSnapshot {
+  groupMatches: GroupMatch[];
+  knockoutMatches: KnockoutMatch[];
 }
 
 export type FixtureAction =
@@ -91,4 +99,7 @@ export type FixtureAction =
   | { type: "IMPORT_STATE"; groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] }
   | { type: "SET_PLAYER_NAME"; name: string }
   | { type: "ADD_RIVAL"; rival: Rival }
-  | { type: "REMOVE_RIVAL"; name: string };
+  | { type: "REMOVE_RIVAL"; name: string }
+  | { type: "ENTER_SIMULATION" }
+  | { type: "EXIT_SIMULATION" }
+  | { type: "RESET_SIMULATION" };
