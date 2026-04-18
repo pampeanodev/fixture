@@ -1,4 +1,4 @@
-import type { Score, GroupMatch, KnockoutMatch, Rival } from "../types";
+import type { Score, GroupMatch, KnockoutMatch, Rival, FixtureState } from "../types";
 
 /**
  * Score a single prediction against the real result.
@@ -84,4 +84,37 @@ export function extractRivalPredictions(
     group: rival.groupPredictions,
     knockout: rival.knockoutPredictions,
   };
+}
+
+export interface RankedPlayer {
+  name: string;
+  isLocal: boolean;
+  total: number;
+  exact: number;
+  winner: number;
+  wrong: number;
+  pending: number;
+}
+
+export function computeRanking(state: FixtureState): RankedPlayer[] {
+  const players: RankedPlayer[] = [];
+
+  const localName = state.playerName.trim() || "Yo";
+  const localPreds = extractLocalPredictions(state.groupMatches, state.knockoutMatches);
+  const localScore = calculatePlayerScore(state.groupMatches, state.knockoutMatches, localPreds);
+  players.push({ name: localName, isLocal: true, ...localScore });
+
+  for (const rival of state.rivals) {
+    const rivalPreds = extractRivalPredictions(rival);
+    const rivalScore = calculatePlayerScore(state.groupMatches, state.knockoutMatches, rivalPreds);
+    players.push({ name: rival.name, isLocal: false, ...rivalScore });
+  }
+
+  players.sort((a, b) => {
+    if (b.total !== a.total) return b.total - a.total;
+    if (b.exact !== a.exact) return b.exact - a.exact;
+    return b.winner - a.winner;
+  });
+
+  return players;
 }
