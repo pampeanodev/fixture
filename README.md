@@ -29,7 +29,7 @@ Fixture interactivo del Mundial 2026 con sistema de predicciones y competencia e
 
 - **Salas online** — abiertas o con invitación de un solo uso
 - **Link compartible + QR** — invitás con un link o escaneando
-- **Sin backend** — sincronización por relays públicos de Nostr (6 relays, redundancia)
+- **Sin backend** — sincronización por relays públicos de Nostr (9 relays, redundancia)
 - **Commit-reveal criptográfico** — tus predicciones quedan selladas hasta 1 hora antes del partido; nadie las puede ver antes del cierre
 - **Identidad criptográfica** — seed phrase BIP-39 + QR para backup/migración entre dispositivos
 

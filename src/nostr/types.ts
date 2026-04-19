@@ -67,6 +67,9 @@ export const DEFAULT_RELAYS = [
   "wss://relay.primal.net",
   "wss://offchain.pub",
   "wss://nostr.mom",
+  "wss://nostr.jcloud.es",
+  "wss://btc.klendazu.com",
+  "wss://relay.orangepill.ovh",
 ];
 
 /** Prefix for all d-tags to namespace our events */
