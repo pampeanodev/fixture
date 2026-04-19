@@ -20,6 +20,7 @@ function getLoser(homeTeamId: string | null, awayTeamId: string | null, score: S
 
 function resolveSlot(
   slot: KnockoutSlot,
+  matchId: string,
   standingsByGroup: Record<string, StandingRow[]>,
   thirdAssignment: ThirdPlaceAssignment,
   matchMap: Map<string, KnockoutMatch>,
@@ -33,11 +34,11 @@ function resolveSlot(
     }
     case "best_third": {
       for (const group of slot.possibleGroups) {
-        if (thirdAssignment[group]) {
-          const groupStandings = standingsByGroup[group];
-          if (groupStandings && groupStandings.length >= 3 && qualifyingThirdGroups.includes(group)) {
-            return groupStandings[2].teamId;
-          }
+        if (thirdAssignment[group] !== matchId) continue;
+        if (!qualifyingThirdGroups.includes(group)) continue;
+        const groupStandings = standingsByGroup[group];
+        if (groupStandings && groupStandings.length >= 3) {
+          return groupStandings[2].teamId;
         }
       }
       return null;
@@ -69,8 +70,8 @@ export function resolveKnockoutTeams(
 
   for (const round of roundOrder) {
     for (const match of resolved.filter((m) => m.round === round)) {
-      const newHome = resolveSlot(match.homeSlot, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups);
-      const newAway = resolveSlot(match.awaySlot, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups);
+      const newHome = resolveSlot(match.homeSlot, match.id, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups);
+      const newAway = resolveSlot(match.awaySlot, match.id, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups);
 
       const resolvedHome = newHome ?? match.homeTeamId;
       const resolvedAway = newAway ?? match.awayTeamId;

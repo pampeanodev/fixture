@@ -54,10 +54,19 @@ export type ConnectionStatus = "offline" | "connecting" | "connected";
 /** Nostr event kind for all fixture app events (NIP-78 arbitrary app data) */
 export const NOSTR_KIND = 30078;
 
+/**
+ * Public Nostr relays used for sync. Publishing writes to all of them; reads
+ * use the first that responds. More relays = more redundancy at the cost of
+ * slightly more connection overhead. Criteria for inclusion: free, public,
+ * NIP-33 replaceable event support, stable uptime.
+ */
 export const DEFAULT_RELAYS = [
   "wss://relay.damus.io",
   "wss://nos.lol",
   "wss://relay.nostr.band",
+  "wss://relay.primal.net",
+  "wss://offchain.pub",
+  "wss://nostr.mom",
 ];
 
 /** Prefix for all d-tags to namespace our events */
