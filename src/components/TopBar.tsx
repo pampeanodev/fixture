@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { exportToJson, importFromJson } from "../utils/persistence";
 import { AccountModal } from "./AccountModal";
+import { randomizePredictions } from "../simulator/randomize";
 import "./TopBar.css";
 
 interface TopBarProps {
@@ -40,6 +41,16 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       dispatch({ type: "IMPORT_STATE", groupMatches: data.groupMatches, knockoutMatches: data.knockoutMatches });
     } catch { alert("Error al importar. Verificá que sea un JSON válido."); }
     if (fileInputRef.current) fileInputRef.current.value = "";
+    setMenuOpen(false);
+  }
+
+  function handleRandomize() {
+    const { groupMatches, knockoutMatches } = randomizePredictions(
+      state.groupMatches,
+      state.knockoutMatches,
+      state.teams,
+    );
+    dispatch({ type: "IMPORT_STATE", groupMatches, knockoutMatches });
     setMenuOpen(false);
   }
 
@@ -94,6 +105,15 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
             <button className="dropdown-item" onClick={() => { setShowAccount(true); setMenuOpen(false); }}>
               <span className="dropdown-icon">&#9881;</span> Mi cuenta
             </button>
+            {state.mode === "predictions" && (
+              <>
+                <div className="dropdown-divider" />
+                <div className="dropdown-section">Predicciones</div>
+                <button className="dropdown-item" onClick={handleRandomize}>
+                  <span className="dropdown-icon">🎲</span> Regenerar random
+                </button>
+              </>
+            )}
             <div className="dropdown-divider" />
             <div className="dropdown-section">Simulación</div>
             {!state.simulationActive ? (
