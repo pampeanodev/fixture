@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { exportToJson, importFromJson } from "../utils/persistence";
-import { ConnectionStatus } from "./ConnectionStatus";
 import { AccountModal } from "./AccountModal";
 import "./TopBar.css";
 
@@ -86,7 +85,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       </div>
 
       <div className="topbar-right" ref={menuRef}>
-        <ConnectionStatus />
         <button className="topbar-menu-btn" onClick={() => setMenuOpen((v) => !v)}>
           ⋯
         </button>

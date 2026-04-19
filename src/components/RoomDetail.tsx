@@ -3,6 +3,7 @@ import { useNostr } from "../context/NostrContext";
 import { useFixture } from "../context/FixtureContext";
 import { RankingView } from "./RankingView";
 import { InviteModal } from "./InviteModal";
+import { ConnectionStatus } from "./ConnectionStatus";
 import "./RoomDetail.css";
 
 interface RoomDetailProps {
@@ -37,7 +38,10 @@ export function RoomDetail({ roomId }: RoomDetailProps) {
           <button className="room-btn danger" onClick={handleLeave}>Salir</button>
         </div>
       </div>
-      <div className="room-detail-code">Codigo: <code>{roomId}</code></div>
+      <div className="room-detail-meta">
+        <span className="room-detail-code">Código: <code>{roomId}</code></span>
+        <ConnectionStatus />
+      </div>
       <RankingView />
       {showInvite && <InviteModal roomId={roomId} onClose={() => setShowInvite(false)} />}
     </div>
