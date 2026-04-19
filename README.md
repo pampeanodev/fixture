@@ -1,5 +1,8 @@
 # Mundial 2026 — Fixture & Prode
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)](./LICENSE)
+[![Repo](https://img.shields.io/badge/GitHub-pampeanodev%2Ffixture-181717?logo=github)](https://github.com/pampeanodev/fixture)
+
 Fixture interactivo del Mundial 2026 con sistema de predicciones y competencia entre amigos. Inspirado en la clásica planilla de Excel que se pasaba entre amigos, pero en formato web, con sincronización peer-to-peer vía Nostr, y sin backend propio.
 
 **Guía de usuario completa: [`docs/playing-guide.md`](docs/playing-guide.md)** — cómo jugar, competir con amigos, simular el mundial, y hacer backup de tu cuenta.
@@ -134,3 +137,9 @@ Config de Cloudflare:
 - Output directory: `dist`
 - SPA routing: `_redirects` ya incluido
 - HTTPS: automático
+
+## Licencia
+
+Copyright © 2026 Pampeano Dev
+
+Este proyecto se distribuye bajo [**GNU General Public License v3.0 o posterior**](./LICENSE). En resumen: podés usarlo, modificarlo y redistribuirlo libremente, pero cualquier trabajo derivado debe mantenerse bajo la misma licencia (copyleft fuerte). Ver `LICENSE` para el texto completo.

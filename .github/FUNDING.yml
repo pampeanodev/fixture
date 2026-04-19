@@ -1,0 +1,13 @@
+# GitHub Sponsors / funding options for this repo.
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+#
+# TODO: elegir uno o varios. Opciones para este proyecto:
+#   - github: [pampeanodev]           # GitHub Sponsors (requiere onboarding en GH)
+#   - ko_fi: pampeanodev              # Ko-fi (internacional, sin onboarding)
+#   - buy_me_a_coffee: pampeanodev    # Buy Me a Coffee
+#   - custom: ["https://cafecito.app/pampeanodev", "lightning:<lnurl>"]
+#     # custom acepta hasta 4 URLs arbitrarias (Cafecito, LNURL, Mercado Pago, etc.)
+#
+# Nota: Lightning / Nostr zaps son temáticamente coherentes con este proyecto
+# (ya usa Nostr para sync). Podés publicar un lud16 en tu profile Nostr y
+# agregar el LNURL acá como URL custom.

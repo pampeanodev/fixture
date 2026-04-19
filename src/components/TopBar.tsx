@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { exportToJson, importFromJson } from "../utils/persistence";
-import { AccountModal } from "./AccountModal";
 import { randomizePredictions } from "../simulator/randomize";
 import "./TopBar.css";
 
@@ -13,7 +12,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { state, dispatch } = useFixture();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showAccount, setShowAccount] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on click outside
@@ -69,7 +67,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   }
 
   return (
-    <>
     <div className="topbar">
       <div className="topbar-left">
         <button className="sidebar-toggle" onClick={onToggleSidebar}>☰</button>
@@ -101,20 +98,15 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
         </button>
         {menuOpen && (
           <div className="topbar-dropdown">
-            <div className="dropdown-section">Cuenta</div>
-            <button className="dropdown-item" onClick={() => { setShowAccount(true); setMenuOpen(false); }}>
-              <span className="dropdown-icon">&#9881;</span> Mi cuenta
-            </button>
             {state.mode === "predictions" && (
               <>
-                <div className="dropdown-divider" />
                 <div className="dropdown-section">Predicciones</div>
                 <button className="dropdown-item" onClick={handleRandomize}>
                   <span className="dropdown-icon">🎲</span> Regenerar random
                 </button>
+                <div className="dropdown-divider" />
               </>
             )}
-            <div className="dropdown-divider" />
             <div className="dropdown-section">Simulación</div>
             {!state.simulationActive ? (
               <button className="dropdown-item" onClick={handleStartSimulation}>
@@ -138,7 +130,5 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
         <input ref={fileInputRef} type="file" accept=".json" className="import-input" onChange={handleImport} />
       </div>
     </div>
-    {showAccount && <AccountModal onClose={() => setShowAccount(false)} />}
-  </>
   );
 }

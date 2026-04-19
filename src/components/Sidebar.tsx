@@ -1,4 +1,5 @@
 import { useFixture } from "../context/FixtureContext";
+import { SidebarFooter } from "./SidebarFooter";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -25,44 +26,47 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
   return (
     <nav className={className}>
       <div className="sidebar-brand">Mundial 2026</div>
-      <div
-        className={`sidebar-item ${activeView.type === "schedule" ? "active" : ""}`}
-        onClick={() => navigate({ type: "schedule" })}>
-        Calendario
-      </div>
-      <div
-        className={`sidebar-item ${activeView.type === "groups" ? "active" : ""}`}
-        onClick={() => navigate({ type: "groups", group: activeView.type === "groups" ? activeView.group : "A" })}>
-        Grupos
-      </div>
-      <div
-        className={`sidebar-item ${activeView.type === "knockout" ? "active" : ""}`}
-        onClick={() => navigate({ type: "knockout", round: activeView.type === "knockout" ? activeView.round : "R32" })}>
-        Eliminatorias
-      </div>
-      <div className="sidebar-divider" />
-      <div
-        className={`sidebar-item ${activeView.type === "ranking" ? "active" : ""}`}
-        onClick={() => navigate({ type: "ranking" })}>
-        Ranking
-        {state.rivals.length > 0 && (
-          <span style={{ fontSize: "10px", opacity: 0.6, marginLeft: "6px" }}>
-            {state.rivals.length + 1}
-          </span>
+      <div className="sidebar-nav">
+        <div
+          className={`sidebar-item ${activeView.type === "schedule" ? "active" : ""}`}
+          onClick={() => navigate({ type: "schedule" })}>
+          Calendario
+        </div>
+        <div
+          className={`sidebar-item ${activeView.type === "groups" ? "active" : ""}`}
+          onClick={() => navigate({ type: "groups", group: activeView.type === "groups" ? activeView.group : "A" })}>
+          Grupos
+        </div>
+        <div
+          className={`sidebar-item ${activeView.type === "knockout" ? "active" : ""}`}
+          onClick={() => navigate({ type: "knockout", round: activeView.type === "knockout" ? activeView.round : "R32" })}>
+          Eliminatorias
+        </div>
+        <div className="sidebar-divider" />
+        <div
+          className={`sidebar-item ${activeView.type === "ranking" ? "active" : ""}`}
+          onClick={() => navigate({ type: "ranking" })}>
+          Ranking
+          {state.rivals.length > 0 && (
+            <span style={{ fontSize: "10px", opacity: 0.6, marginLeft: "6px" }}>
+              {state.rivals.length + 1}
+            </span>
+          )}
+        </div>
+        <div
+          className={`sidebar-item ${activeView.type === "rooms" || activeView.type === "room" ? "active" : ""}`}
+          onClick={() => navigate({ type: "rooms" })}>
+          Salas
+        </div>
+        {state.simulationActive && (
+          <div
+            className={`sidebar-item ${activeView.type === "simulator" ? "active" : ""}`}
+            onClick={() => navigate({ type: "simulator" })}>
+            <span className="sim-dot">●</span> Simulación
+          </div>
         )}
       </div>
-      <div
-        className={`sidebar-item ${activeView.type === "rooms" || activeView.type === "room" ? "active" : ""}`}
-        onClick={() => navigate({ type: "rooms" })}>
-        Salas
-      </div>
-      {state.simulationActive && (
-        <div
-          className={`sidebar-item ${activeView.type === "simulator" ? "active" : ""}`}
-          onClick={() => navigate({ type: "simulator" })}>
-          <span className="sim-dot">●</span> Simulación
-        </div>
-      )}
+      <SidebarFooter />
     </nav>
   );
 }

@@ -3,6 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Mundial 2026 — Fixture interactivo con prode y sync P2P via Nostr",
+  "license": "GPL-3.0-or-later",
+  "author": "Pampeano Dev <pampeanobtc@gmail.com>",
+  "homepage": "https://github.com/pampeanodev/fixture",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pampeanodev/fixture.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pampeanodev/fixture/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
