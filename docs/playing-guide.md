@@ -146,6 +146,10 @@ Sí, podés cargar predicciones y simular mundial localmente sin Nostr. Es el mo
 
 Tus predicciones antes de cierre: sí (commit-reveal con SHA-256). Después del cierre del partido, son públicas en el relay (cualquiera que conozca el roomId puede verlas). Tu seed phrase nunca sale del dispositivo.
 
+**¿Qué pasa si comparto el browser con otra persona?**
+
+El app asume **1 persona = 1 browser profile**. Tu identidad, tus predicciones y tus salas viven en el `localStorage` de ese browser — no hay login ni logout. Si compartís la computadora con alguien, abrí el app desde modo incógnito o un perfil separado de Chrome/Firefox. Sino la otra persona va a ver (y poder modificar) tus predicciones y operar como vos en las salas. En mobile no suele ser un problema porque el celu es personal.
+
 ---
 
 ## Checklist para empezar a competir hoy

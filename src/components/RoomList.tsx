@@ -41,10 +41,10 @@ export function RoomList() {
       <div className="room-list-header">
         <h2>Mis Salas</h2>
         <div className="room-list-actions">
-          <button className="room-btn" onClick={() => { setShowCreate(true); setShowJoin(false); }}>
+          <button data-tour="room-create" className="room-btn" onClick={() => { setShowCreate(true); setShowJoin(false); }}>
             Crear sala
           </button>
-          <button className="room-btn" onClick={() => { setShowJoin(true); setShowCreate(false); }}>
+          <button data-tour="room-join" className="room-btn" onClick={() => { setShowJoin(true); setShowCreate(false); }}>
             Unirme
           </button>
         </div>

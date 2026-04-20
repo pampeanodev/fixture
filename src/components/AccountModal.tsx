@@ -29,6 +29,9 @@ export function AccountModal({ onClose }: AccountModalProps) {
           <h2>Mi cuenta</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
+        <div className="modal-note">
+          Tu identidad vive en este browser. Si compartís la computadora con otra persona, usá modo incógnito o un perfil separado — sino van a ver (y poder modificar) tus predicciones y salas.
+        </div>
         <div className="modal-section">
           <h3>Seed phrase</h3>
           <p className="modal-warning">No la compartas con nadie. Quien tenga estas palabras puede acceder a tu identidad.</p>

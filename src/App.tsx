@@ -11,12 +11,32 @@ import { RoomList } from "./components/RoomList";
 import { RoomDetail } from "./components/RoomDetail";
 import { SimulatorView } from "./components/SimulatorView";
 import { Onboarding } from "./components/Onboarding";
+import { HelpButton } from "./components/HelpButton";
 import { useNostrSync } from "./hooks/useNostrSync";
+import { useTour } from "./tour/useTour";
+import type { TourId } from "./tour/steps";
+import type { ViewTarget } from "./types";
 import "./App.css";
+
+function contextTour(activeView: ViewTarget): TourId {
+  switch (activeView.type) {
+    case "groups": return "groups";
+    case "knockout": return "knockout";
+    case "rooms":
+    case "room": return "rooms";
+    case "simulator": return "simulator";
+    default: return "overview";
+  }
+}
 
 function NostrSyncBridge() {
   useNostrSync();
   return null;
+}
+
+function TourBridge({ activeView }: { activeView: ViewTarget }) {
+  const { startTour } = useTour();
+  return <HelpButton onStart={() => startTour(contextTour(activeView))} />;
 }
 
 function InviteRouter() {
@@ -74,6 +94,7 @@ export default function App() {
     <>
       <NostrSyncBridge />
       <InviteRouter />
+      <TourBridge activeView={activeView} />
       <div className="app-layout">
       {isMobile && sidebarOpen && (
         <div className="sidebar-overlay visible" onClick={() => setSidebarOpen(false)} />

@@ -33,11 +33,13 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
           Calendario
         </div>
         <div
+          data-tour="nav-groups"
           className={`sidebar-item ${activeView.type === "groups" ? "active" : ""}`}
           onClick={() => navigate({ type: "groups", group: activeView.type === "groups" ? activeView.group : "A" })}>
           Grupos
         </div>
         <div
+          data-tour="nav-knockout"
           className={`sidebar-item ${activeView.type === "knockout" ? "active" : ""}`}
           onClick={() => navigate({ type: "knockout", round: activeView.type === "knockout" ? activeView.round : "R32" })}>
           Eliminatorias
@@ -54,6 +56,7 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
           )}
         </div>
         <div
+          data-tour="nav-rooms"
           className={`sidebar-item ${activeView.type === "rooms" || activeView.type === "room" ? "active" : ""}`}
           onClick={() => navigate({ type: "rooms" })}>
           Salas

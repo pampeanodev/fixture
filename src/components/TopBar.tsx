@@ -80,7 +80,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       </div>
 
       <div className="topbar-center">
-        <div className="mode-toggle">
+        <div className="mode-toggle" data-tour="mode-toggle">
           <button className={state.mode === "results" ? "active" : ""}
             onClick={() => state.mode !== "results" && dispatch({ type: "TOGGLE_MODE" })}>
             Resultados

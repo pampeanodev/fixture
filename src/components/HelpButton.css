@@ -1,0 +1,39 @@
+.help-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  color: #fff;
+  border: none;
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.help-fab:hover {
+  background: #1b5e20;
+  transform: scale(1.05);
+}
+
+.help-fab:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 768px) {
+  .help-fab {
+    right: 14px;
+    bottom: 14px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+}

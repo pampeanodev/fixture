@@ -32,7 +32,7 @@ export function GroupView({ group }: GroupViewProps) {
 
   return (
     <div className="group-view">
-      <div className="group-tabs">
+      <div className="group-tabs" data-tour="group-tabs">
         {GROUPS.map((g) => (
           <button key={g}
             className={`group-tab ${g === group ? "active" : ""}`}
@@ -42,7 +42,7 @@ export function GroupView({ group }: GroupViewProps) {
         ))}
       </div>
       <h2>Grupo {group}</h2>
-      <table className="standings-table">
+      <table className="standings-table" data-tour="standings-table">
         <thead>
           <tr><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr>
         </thead>
@@ -63,7 +63,7 @@ export function GroupView({ group }: GroupViewProps) {
       </table>
 
       <div className="group-matches-title">Partidos</div>
-      <div className="group-matches-grid">
+      <div className="group-matches-grid" data-tour="match-cards">
       {matches.map((match) => (
         <MatchCard
           key={match.id}

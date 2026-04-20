@@ -1,0 +1,60 @@
+@import "driver.js/dist/driver.css";
+
+.fixture-tour-popover.driver-popover {
+  background: var(--card-bg);
+  color: var(--content-text);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-family: inherit;
+  max-width: 340px;
+}
+
+.fixture-tour-popover .driver-popover-title {
+  color: var(--accent-green);
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.fixture-tour-popover .driver-popover-description {
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.fixture-tour-popover .driver-popover-progress-text {
+  color: var(--sidebar-section-title);
+  font-size: 12px;
+}
+
+.fixture-tour-popover .driver-popover-footer button {
+  text-shadow: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+}
+
+.fixture-tour-popover .driver-popover-next-btn,
+.fixture-tour-popover .driver-popover-next-btn:hover {
+  background: var(--accent-green);
+  color: #fff;
+}
+
+.fixture-tour-popover .driver-popover-prev-btn,
+.fixture-tour-popover .driver-popover-prev-btn:hover {
+  background: transparent;
+  color: var(--content-text);
+  border: 1px solid var(--card-border);
+}
+
+.fixture-tour-popover .driver-popover-close-btn {
+  color: var(--content-text);
+  opacity: 0.6;
+}
+.fixture-tour-popover .driver-popover-close-btn:hover { opacity: 1; }
+
+.fixture-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow { border-top-color: var(--card-bg); }
+.fixture-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow { border-bottom-color: var(--card-bg); }
+.fixture-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow { border-left-color: var(--card-bg); }
+.fixture-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow { border-right-color: var(--card-bg); }

@@ -35,7 +35,7 @@ export function BracketView({ round }: { round: KnockoutRound }) {
 
   return (
     <div className="bracket-view">
-      <div className="round-tabs">
+      <div className="round-tabs" data-tour="round-tabs">
         {ROUND_TABS.map((t) => (
           <button key={t.round}
             className={`round-tab ${t.round === round ? "active" : ""}`}
