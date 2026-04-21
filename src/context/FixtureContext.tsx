@@ -126,7 +126,7 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
 function buildInitialState(): FixtureState {
   const saved = loadFromLocalStorage();
   return {
-    mode: "results",
+    mode: "predictions",
     teams: TEAMS,
     groupMatches: saved?.groupMatches ?? INITIAL_GROUP_MATCHES,
     knockoutMatches: saved?.knockoutMatches ?? INITIAL_KNOCKOUT_MATCHES,

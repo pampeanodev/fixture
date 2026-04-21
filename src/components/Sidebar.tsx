@@ -25,7 +25,10 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
 
   return (
     <nav className={className}>
-      <div className="sidebar-brand">Mundial 2026</div>
+      <div className="sidebar-brand">
+        <img src="/favicon.svg" alt="" className="sidebar-brand-logo" aria-hidden="true" />
+        <span>Mundial 2026</span>
+      </div>
       <div className="sidebar-nav">
         <div
           className={`sidebar-item ${activeView.type === "schedule" ? "active" : ""}`}
