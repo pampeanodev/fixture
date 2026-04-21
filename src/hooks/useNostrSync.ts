@@ -41,6 +41,7 @@ export function useNostrSync(): void {
   const commitmentsCache = useRef<Map<string, Record<string, string>>>(new Map());
   const nostrRivalsRef = useRef<Set<string>>(new Set());
   const creatorRef = useRef<string | null>(null);
+  const lastPublishedResultsRef = useRef<string>("");
 
   function memberNameFor(pubkey: string, claimed: string | undefined): string {
     const trimmed = claimed?.trim();
@@ -266,6 +267,7 @@ export function useNostrSync(): void {
 
     resultsSubRef.current?.close();
     resultsSubRef.current = null;
+    lastPublishedResultsRef.current = "";
     dispatch({ type: "CLEAR_SYNCED_RESULTS" });
 
     // Fast path: I created this room locally, so I know I'm the creator.
@@ -352,14 +354,17 @@ export function useNostrSync(): void {
       }
     }
 
-    if (Object.keys(groupResults).length === 0 && Object.keys(knockoutResults).length === 0) {
-      return;
-    }
+    // Dedup: only publish when the result set changed (covers clears too).
+    // This also ensures a cleared state on fresh mount re-publishes if the
+    // previous session's clear didn't reach all relays.
+    const serialized = JSON.stringify({ groupResults, knockoutResults });
+    if (serialized === lastPublishedResultsRef.current) return;
 
     const event = buildResultsEvent(activeRoomId, groupResults, knockoutResults);
     publishEvent(event, identity).catch(() => {
       enqueueEvent({ eventTemplate: event, createdAt: Date.now() });
     });
+    lastPublishedResultsRef.current = serialized;
   }, [identity, activeRoomId, connectionStatus, state.groupMatches, state.knockoutMatches, state.simulationActive]);
 
   // Debounce commitment publishing on prediction changes

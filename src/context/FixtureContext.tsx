@@ -72,20 +72,25 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
     case "CLEAR_MEMBERS":
       return { ...state, members: [] };
     case "APPLY_SYNCED_RESULTS": {
+      // Matches previously synced from admin but missing from the new payload were cleared.
+      const previouslySynced = new Set(state.syncedResultIds);
       const groupMatches = state.groupMatches.map((m) => {
         const incoming = action.groupResults[m.id];
-        return incoming ? { ...m, result: incoming } : m;
+        if (incoming) return { ...m, result: incoming };
+        if (previouslySynced.has(m.id)) return { ...m, result: null };
+        return m;
       });
       const knockoutMatches = state.knockoutMatches.map((m) => {
         const incoming = action.knockoutResults[m.id];
-        return incoming ? { ...m, result: incoming } : m;
+        if (incoming) return { ...m, result: incoming };
+        if (previouslySynced.has(m.id)) return { ...m, result: null };
+        return m;
       });
-      const ids = new Set([
-        ...state.syncedResultIds,
+      const syncedResultIds = [
         ...Object.keys(action.groupResults),
         ...Object.keys(action.knockoutResults),
-      ]);
-      return { ...state, groupMatches, knockoutMatches, syncedResultIds: Array.from(ids) };
+      ];
+      return { ...state, groupMatches, knockoutMatches, syncedResultIds };
     }
     case "CLEAR_SYNCED_RESULTS":
       return { ...state, syncedResultIds: [] };
