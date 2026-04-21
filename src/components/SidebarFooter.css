@@ -31,6 +31,26 @@
   line-height: 1;
 }
 
+.sidebar-footer-donate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(253, 216, 53, 0.08);
+  border: 1px solid rgba(253, 216, 53, 0.25);
+  border-radius: 6px;
+  color: var(--accent-gold);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.sidebar-footer-donate:hover {
+  background: rgba(253, 216, 53, 0.16);
+}
+
 .sidebar-footer-meta {
   display: flex;
   align-items: center;

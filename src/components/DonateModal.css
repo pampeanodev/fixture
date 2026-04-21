@@ -1,0 +1,33 @@
+.donate-intro {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.donate-address {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(253, 216, 53, 0.06);
+  border: 1px solid rgba(253, 216, 53, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+}
+
+.donate-address-text {
+  flex: 1;
+  color: var(--accent-gold);
+  font-size: 14px;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.donate-help {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  text-align: center;
+  margin: 12px 0 0;
+  line-height: 1.5;
+}

@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { AccountModal } from "./AccountModal";
+import { DonateModal } from "./DonateModal";
 import "./SidebarFooter.css";
 
 const REPO_URL = "https://github.com/pampeanodev/fixture";
 const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE`;
+const DONATION_LN_ADDRESS = "noisyfox5@primal.net";
 
 export function SidebarFooter() {
   const [showAccount, setShowAccount] = useState(false);
+  const [showDonate, setShowDonate] = useState(false);
 
   return (
     <>
@@ -20,6 +23,15 @@ export function SidebarFooter() {
             &#9881;
           </span>
           <span>Mi cuenta</span>
+        </button>
+
+        <button
+          type="button"
+          className="sidebar-footer-donate"
+          onClick={() => setShowDonate(true)}
+        >
+          <span aria-hidden="true">⚡</span>
+          <span>Donar</span>
         </button>
 
         <div className="sidebar-footer-meta">
@@ -49,6 +61,12 @@ export function SidebarFooter() {
         </div>
       </div>
       {showAccount && <AccountModal onClose={() => setShowAccount(false)} />}
+      {showDonate && (
+        <DonateModal
+          lightningAddress={DONATION_LN_ADDRESS}
+          onClose={() => setShowDonate(false)}
+        />
+      )}
     </>
   );
 }
