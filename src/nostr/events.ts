@@ -5,6 +5,7 @@ import type {
   CommitmentPayload,
   RevealPayload,
   RevealEntry,
+  ResultsPayload,
 } from "./types";
 
 interface UnsignedEventTemplate {
@@ -44,8 +45,9 @@ export function buildClaimEvent(roomId: string, inviteCode: string): UnsignedEve
 export function buildCommitmentEvent(
   roomId: string,
   commitments: Record<string, string>,
+  playerName?: string,
 ): UnsignedEventTemplate {
-  const payload: CommitmentPayload = { commitments };
+  const payload: CommitmentPayload = { commitments, playerName };
   return {
     kind: NOSTR_KIND,
     created_at: now(),
@@ -64,6 +66,20 @@ export function buildRevealEvent(
     kind: NOSTR_KIND,
     created_at: now(),
     tags: [["d", getDTag(roomId, "reveal")]],
+    content: JSON.stringify(payload),
+  };
+}
+
+export function buildResultsEvent(
+  roomId: string,
+  groupResults: ResultsPayload["groupResults"],
+  knockoutResults: ResultsPayload["knockoutResults"],
+): UnsignedEventTemplate {
+  const payload: ResultsPayload = { groupResults, knockoutResults };
+  return {
+    kind: NOSTR_KIND,
+    created_at: now(),
+    tags: [["d", getDTag(roomId, "results")]],
     content: JSON.stringify(payload),
   };
 }

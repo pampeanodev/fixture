@@ -1,8 +1,10 @@
-import type { GroupMatch, KnockoutMatch, Rival } from "../types";
+import type { GroupMatch, KnockoutMatch, Member, Rival } from "../types";
 
 const STORAGE_KEY = "wc2026-fixture";
 const PLAYER_NAME_KEY = "wc2026-player-name";
 const RIVALS_KEY = "wc2026-rivals";
+const MEMBERS_KEY = "wc2026-members";
+const SYNCED_RESULTS_KEY = "wc2026-synced-result-ids";
 
 interface PersistedData {
   groupMatches: GroupMatch[];
@@ -44,6 +46,30 @@ export function loadRivals(): Rival[] {
     const raw = localStorage.getItem(RIVALS_KEY);
     if (!raw) return [];
     return JSON.parse(raw) as Rival[];
+  } catch { return []; }
+}
+
+export function saveMembers(members: Member[]): void {
+  try { localStorage.setItem(MEMBERS_KEY, JSON.stringify(members)); } catch { /* */ }
+}
+
+export function loadMembers(): Member[] {
+  try {
+    const raw = localStorage.getItem(MEMBERS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as Member[];
+  } catch { return []; }
+}
+
+export function saveSyncedResultIds(ids: string[]): void {
+  try { localStorage.setItem(SYNCED_RESULTS_KEY, JSON.stringify(ids)); } catch { /* */ }
+}
+
+export function loadSyncedResultIds(): string[] {
+  try {
+    const raw = localStorage.getItem(SYNCED_RESULTS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as string[];
   } catch { return []; }
 }
 

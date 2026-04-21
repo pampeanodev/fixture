@@ -8,9 +8,11 @@ interface ScoreInputProps {
   isPrediction?: boolean;
   readonlyScore?: Score | null;
   allowPenalties?: boolean;
+  locked?: boolean;
+  synced?: boolean;
 }
 
-export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, allowPenalties }: ScoreInputProps) {
+export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, allowPenalties, locked, synced }: ScoreInputProps) {
   const [homeStr, setHomeStr] = useState(score?.home?.toString() ?? "");
   const [awayStr, setAwayStr] = useState(score?.away?.toString() ?? "");
   const homeRef = useRef<HTMLInputElement>(null);
@@ -56,14 +58,18 @@ export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, 
         </>
       )}
       <input ref={homeRef} type="number" min="0" max="99"
-        className={`score-field ${isPrediction ? "prediction" : ""}`}
+        className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+        disabled={locked}
         value={homeStr} onChange={(e) => setHomeStr(e.target.value)}
         onBlur={commitScore} onKeyDown={handleKeyDown} />
       <span className="score-separator">-</span>
       <input type="number" min="0" max="99"
-        className={`score-field ${isPrediction ? "prediction" : ""}`}
+        className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+        disabled={locked}
         value={awayStr} onChange={(e) => setAwayStr(e.target.value)}
         onBlur={commitScore} onKeyDown={handleKeyDown} />
+      {locked && <span className="locked-badge" title="Cerrado: ya no se puede modificar">🔒 Cerrado</span>}
+      {synced && <span className="synced-badge" title="Resultado publicado por el admin de la sala">↻</span>}
       {indicator && <span className={`prediction-indicator ${indicator.className}`}>{indicator.symbol}</span>}
       {allowPenalties && score && score.home === score.away && (
         <div className="penalties-input">

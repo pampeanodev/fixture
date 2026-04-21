@@ -1,3 +1,5 @@
+import { getEffectiveNow } from "./devClock";
+
 const LOCK_OFFSET_MS = 60 * 60 * 1000; // 1 hour
 
 export function getMatchLockTime(dateUtc: string): number {
@@ -5,5 +7,5 @@ export function getMatchLockTime(dateUtc: string): number {
 }
 
 export function isMatchLocked(dateUtc: string): boolean {
-  return Date.now() >= getMatchLockTime(dateUtc);
+  return getEffectiveNow() >= getMatchLockTime(dateUtc);
 }

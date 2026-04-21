@@ -18,6 +18,7 @@ export interface InviteClaim {
 
 export interface CommitmentPayload {
   commitments: Record<string, string>; // matchId -> SHA-256 hash hex
+  playerName?: string; // display name; optional for backwards compat
 }
 
 export interface RevealEntry {
@@ -29,6 +30,11 @@ export interface RevealEntry {
 export interface RevealPayload {
   playerName: string;  // display name of the player
   predictions: Record<string, RevealEntry>; // matchId -> prediction + salt
+}
+
+export interface ResultsPayload {
+  groupResults: Record<string, { home: number; away: number }>;
+  knockoutResults: Record<string, { home: number; away: number; penalties?: { home: number; away: number } }>;
 }
 
 export interface RoomMembership {
@@ -63,13 +69,9 @@ export const NOSTR_KIND = 30078;
 export const DEFAULT_RELAYS = [
   "wss://relay.damus.io",
   "wss://nos.lol",
-  "wss://relay.nostr.band",
   "wss://relay.primal.net",
   "wss://offchain.pub",
   "wss://nostr.mom",
-  "wss://nostr.jcloud.es",
-  "wss://btc.klendazu.com",
-  "wss://relay.orangepill.ovh",
 ];
 
 /** Prefix for all d-tags to namespace our events */

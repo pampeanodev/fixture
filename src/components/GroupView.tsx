@@ -2,20 +2,23 @@ import { useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam, GROUPS } from "../data/teams";
 import { formatMatchDate } from "../utils/formatDate";
+import { isMatchLocked } from "../utils/lockTime";
 import type { Score } from "../types";
 import "./GroupView.css";
 
 interface GroupViewProps { group: string; }
 
-function ScoreField({ value, onChange, isPrediction }: {
+function ScoreField({ value, onChange, isPrediction, locked }: {
   value: string;
   onChange: (v: string) => void;
   isPrediction?: boolean;
+  locked?: boolean;
 }) {
   return (
     <input
       type="number" min="0" max="99"
-      className={`group-match-score-input ${isPrediction ? "prediction" : ""}`}
+      className={`group-match-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+      disabled={locked}
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />
@@ -73,6 +76,8 @@ export function GroupView({ group }: GroupViewProps) {
           result={match.result}
           prediction={match.prediction}
           isPrediction={isPrediction}
+          locked={isPrediction && isMatchLocked(match.dateUtc)}
+          synced={!isPrediction && state.syncedResultIds.includes(match.id)}
           onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
         />
       ))}
@@ -81,13 +86,15 @@ export function GroupView({ group }: GroupViewProps) {
   );
 }
 
-function MatchCard({ homeTeamId, awayTeamId, dateUtc, result, prediction, isPrediction, onScoreChange }: {
+function MatchCard({ homeTeamId, awayTeamId, dateUtc, result, prediction, isPrediction, locked, synced, onScoreChange }: {
   homeTeamId: string;
   awayTeamId: string;
   dateUtc: string;
   result: Score | null;
   prediction: Score | null;
   isPrediction: boolean;
+  locked?: boolean;
+  synced?: boolean;
   onScoreChange: (score: Score | null) => void;
 }) {
   const currentScore = isPrediction ? prediction : result;
@@ -132,15 +139,17 @@ function MatchCard({ homeTeamId, awayTeamId, dateUtc, result, prediction, isPred
       <div className="group-match-team-row">
         <span className="team-flag">{homeTeam?.flag}</span>
         <span className="group-match-team-name">{homeTeam?.name}</span>
-        <ScoreField value={homeStr} isPrediction={isPrediction}
+        <ScoreField value={homeStr} isPrediction={isPrediction} locked={locked}
           onChange={(v) => { setHomeStr(v); commitScore(v, awayStr); }} />
       </div>
       <div className="group-match-team-row">
         <span className="team-flag">{awayTeam?.flag}</span>
         <span className="group-match-team-name">{awayTeam?.name}</span>
-        <ScoreField value={awayStr} isPrediction={isPrediction}
+        <ScoreField value={awayStr} isPrediction={isPrediction} locked={locked}
           onChange={(v) => { setAwayStr(v); commitScore(homeStr, v); }} />
       </div>
+      {locked && <div className="group-match-locked">🔒 Cerrado</div>}
+      {synced && <div className="group-match-synced" title="Resultado publicado por el admin de la sala">↻ Sincronizado</div>}
       {isPrediction && result && (
         <div className="group-match-prediction-row">
           Real: {result.home} - {result.away}

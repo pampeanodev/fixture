@@ -63,6 +63,11 @@ export interface Rival {
   knockoutPredictions: Record<string, Score>; // matchId -> Score
 }
 
+export interface Member {
+  pubkey: string;  // hex
+  name: string;    // display name; fallback to pubkey.slice(0, 8) if unknown
+}
+
 export type ViewTarget =
   | { type: "groups"; group: string }
   | { type: "knockout"; round: KnockoutRound }
@@ -82,6 +87,8 @@ export interface FixtureState {
   activeView: ViewTarget;
   playerName: string;
   rivals: Rival[];
+  members: Member[];
+  syncedResultIds: string[];  // match IDs whose result came from admin broadcast
   simulationActive: boolean;
   simulationSnapshot: SimulationSnapshot | null;
 }
@@ -100,6 +107,11 @@ export type FixtureAction =
   | { type: "SET_PLAYER_NAME"; name: string }
   | { type: "ADD_RIVAL"; rival: Rival }
   | { type: "REMOVE_RIVAL"; name: string }
+  | { type: "SET_MEMBERS"; members: Member[] }
+  | { type: "UPSERT_MEMBER"; member: Member }
+  | { type: "CLEAR_MEMBERS" }
+  | { type: "APPLY_SYNCED_RESULTS"; groupResults: Record<string, Score>; knockoutResults: Record<string, Score> }
+  | { type: "CLEAR_SYNCED_RESULTS" }
   | { type: "ENTER_SIMULATION" }
   | { type: "EXIT_SIMULATION" }
   | { type: "RESET_SIMULATION" };

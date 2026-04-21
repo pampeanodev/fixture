@@ -55,6 +55,15 @@
 .schedule-score-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .schedule-score-input:focus { border-color: var(--accent-green); }
 .schedule-score-input.prediction { border-color: var(--prediction-blue); color: var(--prediction-blue); }
+.schedule-score-input.locked, .schedule-score-input:disabled {
+  background: #f2f2f2; color: #999; cursor: not-allowed; opacity: 0.7;
+}
+.schedule-locked {
+  padding: 0 12px 8px; font-size: 11px; color: #888;
+}
+.schedule-synced {
+  padding: 0 12px 8px; font-size: 11px; color: var(--accent-green, #2e7d32);
+}
 
 .schedule-prediction-row {
   display: flex; align-items: center; gap: 4px;

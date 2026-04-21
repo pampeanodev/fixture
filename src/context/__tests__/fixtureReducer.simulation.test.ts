@@ -24,6 +24,8 @@ function makeState(overrides: Partial<FixtureState> = {}): FixtureState {
     activeView: { type: "ranking" },
     playerName: "test",
     rivals: [],
+    members: [],
+    syncedResultIds: [],
     simulationActive: false,
     simulationSnapshot: null,
     ...overrides,

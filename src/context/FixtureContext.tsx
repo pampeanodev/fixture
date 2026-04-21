@@ -9,25 +9,45 @@ import { selectBestThirds } from "../utils/bestThirds";
 import type { ThirdPlaceEntry } from "../utils/bestThirds";
 import { assignThirdPlaceSlots } from "../data/thirdPlaceMapping";
 import { resolveKnockoutTeams } from "../utils/knockout";
+import { isMatchLocked } from "../utils/lockTime";
 import {
   saveToLocalStorage, loadFromLocalStorage,
   savePlayerName, loadPlayerName,
   saveRivals, loadRivals,
+  saveMembers, loadMembers,
+  saveSyncedResultIds, loadSyncedResultIds,
 } from "../utils/persistence";
 
 export function fixtureReducer(state: FixtureState, action: FixtureAction): FixtureState {
   switch (action.type) {
     case "SET_GROUP_SCORE": {
+      const match = state.groupMatches.find((m) => m.id === action.matchId);
+      if (state.mode === "predictions" && match && isMatchLocked(match.dateUtc)) {
+        return state;
+      }
       const field = state.mode === "predictions" ? "prediction" : "result";
+      // Manual edit in results mode = local override; drop synced flag for this match.
+      const syncedResultIds =
+        state.mode === "results"
+          ? state.syncedResultIds.filter((id) => id !== action.matchId)
+          : state.syncedResultIds;
       return { ...state, groupMatches: state.groupMatches.map((m) =>
         m.id === action.matchId ? { ...m, [field]: action.score } : m
-      )};
+      ), syncedResultIds };
     }
     case "SET_KNOCKOUT_SCORE": {
+      const match = state.knockoutMatches.find((m) => m.id === action.matchId);
+      if (state.mode === "predictions" && match && isMatchLocked(match.dateUtc)) {
+        return state;
+      }
       const field = state.mode === "predictions" ? "prediction" : "result";
+      const syncedResultIds =
+        state.mode === "results"
+          ? state.syncedResultIds.filter((id) => id !== action.matchId)
+          : state.syncedResultIds;
       return { ...state, knockoutMatches: state.knockoutMatches.map((m) =>
         m.id === action.matchId ? { ...m, [field]: action.score } : m
-      )};
+      ), syncedResultIds };
     }
     case "TOGGLE_MODE":
       return { ...state, mode: state.mode === "results" ? "predictions" : "results" };
@@ -43,6 +63,32 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
     }
     case "REMOVE_RIVAL":
       return { ...state, rivals: state.rivals.filter((r) => r.name !== action.name) };
+    case "SET_MEMBERS":
+      return { ...state, members: action.members };
+    case "UPSERT_MEMBER": {
+      const others = state.members.filter((m) => m.pubkey !== action.member.pubkey);
+      return { ...state, members: [...others, action.member] };
+    }
+    case "CLEAR_MEMBERS":
+      return { ...state, members: [] };
+    case "APPLY_SYNCED_RESULTS": {
+      const groupMatches = state.groupMatches.map((m) => {
+        const incoming = action.groupResults[m.id];
+        return incoming ? { ...m, result: incoming } : m;
+      });
+      const knockoutMatches = state.knockoutMatches.map((m) => {
+        const incoming = action.knockoutResults[m.id];
+        return incoming ? { ...m, result: incoming } : m;
+      });
+      const ids = new Set([
+        ...state.syncedResultIds,
+        ...Object.keys(action.groupResults),
+        ...Object.keys(action.knockoutResults),
+      ]);
+      return { ...state, groupMatches, knockoutMatches, syncedResultIds: Array.from(ids) };
+    }
+    case "CLEAR_SYNCED_RESULTS":
+      return { ...state, syncedResultIds: [] };
     case "ENTER_SIMULATION": {
       return {
         ...state,
@@ -84,9 +130,11 @@ function buildInitialState(): FixtureState {
     teams: TEAMS,
     groupMatches: saved?.groupMatches ?? INITIAL_GROUP_MATCHES,
     knockoutMatches: saved?.knockoutMatches ?? INITIAL_KNOCKOUT_MATCHES,
-    activeView: { type: "groups", group: "A" },
+    activeView: { type: "schedule" },
     playerName: loadPlayerName(),
     rivals: loadRivals(),
+    members: loadMembers(),
+    syncedResultIds: loadSyncedResultIds(),
     simulationActive: false,
     simulationSnapshot: null,
   };
@@ -149,6 +197,12 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
 
   // Persist rivals
   useEffect(() => { saveRivals(state.rivals); }, [state.rivals]);
+
+  // Persist members
+  useEffect(() => { saveMembers(state.members); }, [state.members]);
+
+  // Persist synced result ids
+  useEffect(() => { saveSyncedResultIds(state.syncedResultIds); }, [state.syncedResultIds]);
 
   const value = useMemo(
     () => ({ state, dispatch, standingsByGroup, resolvedKnockout, bestThirds }),

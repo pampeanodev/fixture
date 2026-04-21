@@ -46,10 +46,24 @@ interface NostrContextValue {
 
 const NostrContext = createContext<NostrContextValue | null>(null);
 
+const ACTIVE_ROOM_KEY = "wc2026-active-room";
+
 export function NostrProvider({ children }: { children: ReactNode }) {
   const [identity, setIdentity] = useState<NostrIdentity | null>(() => loadIdentity());
   const [rooms, setRooms] = useState<RoomMembership[]>(() => loadRooms());
-  const [activeRoomId, setActiveRoom] = useState<string | null>(null);
+  const [activeRoomId, setActiveRoom] = useState<string | null>(() => {
+    const loaded = loadRooms();
+    try {
+      const saved = localStorage.getItem(ACTIVE_ROOM_KEY);
+      if (saved && loaded.some((r) => r.roomId === saved)) return saved;
+    } catch {
+      /* storage unavailable */
+    }
+    // Fallback: if member of any rooms, auto-activate most recently joined.
+    if (loaded.length === 0) return null;
+    const mostRecent = [...loaded].sort((a, b) => b.joinedAt - a.joinedAt)[0];
+    return mostRecent.roomId;
+  });
   const [relayConnected, setRelayConnected] = useState(false);
   const manifestsRef = useRef<Map<string, RoomManifest>>(
     new Map(Object.entries(loadManifests()))
@@ -64,6 +78,13 @@ export function NostrProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     persistRooms(rooms);
   }, [rooms]);
+
+  useEffect(() => {
+    try {
+      if (activeRoomId) localStorage.setItem(ACTIVE_ROOM_KEY, activeRoomId);
+      else localStorage.removeItem(ACTIVE_ROOM_KEY);
+    } catch { /* storage full */ }
+  }, [activeRoomId]);
 
   useEffect(() => {
     if (!hasRooms || !identity) {

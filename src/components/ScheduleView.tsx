@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam } from "../data/teams";
+import { isMatchLocked } from "../utils/lockTime";
 import type { KnockoutRound, Score } from "../types";
 import "./ScheduleView.css";
 
@@ -88,6 +89,8 @@ export function ScheduleView() {
               key={match.id}
               match={match}
               isPrediction={isPrediction}
+              locked={isPrediction && isMatchLocked(match.dateUtc)}
+              synced={!isPrediction && state.syncedResultIds.includes(match.id)}
               onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
             />
           ))}
@@ -98,9 +101,11 @@ export function ScheduleView() {
   );
 }
 
-function ScheduleMatchCard({ match, isPrediction, onScoreChange }: {
+function ScheduleMatchCard({ match, isPrediction, locked, synced, onScoreChange }: {
   match: UnifiedMatch;
   isPrediction: boolean;
+  locked?: boolean;
+  synced?: boolean;
   onScoreChange: (score: Score | null) => void;
 }) {
   const [homeStr, setHomeStr] = useState(match.currentScore?.home?.toString() ?? "");
@@ -160,7 +165,8 @@ function ScheduleMatchCard({ match, isPrediction, onScoreChange }: {
         )}
         {bothKnown && (
           <input type="number" min="0" max="99"
-            className={`schedule-score-input ${isPrediction ? "prediction" : ""}`}
+            className={`schedule-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+            disabled={locked}
             value={homeStr}
             onChange={(e) => { setHomeStr(e.target.value); commitScore(e.target.value, awayStr); }} />
         )}
@@ -176,11 +182,14 @@ function ScheduleMatchCard({ match, isPrediction, onScoreChange }: {
         )}
         {bothKnown && (
           <input type="number" min="0" max="99"
-            className={`schedule-score-input ${isPrediction ? "prediction" : ""}`}
+            className={`schedule-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+            disabled={locked}
             value={awayStr}
             onChange={(e) => { setAwayStr(e.target.value); commitScore(homeStr, e.target.value); }} />
         )}
       </div>
+      {locked && <div className="schedule-locked">🔒 Cerrado</div>}
+      {synced && <div className="schedule-synced" title="Resultado publicado por el admin de la sala">↻ Sincronizado</div>}
       {isPrediction && match.realScore && (
         <div className="schedule-prediction-row">
           Real: {match.realScore.home} - {match.realScore.away}

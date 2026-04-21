@@ -2,6 +2,7 @@ import { useFixture } from "../context/FixtureContext";
 import { ScoreInput } from "./ScoreInput";
 import { getTeam } from "../data/teams";
 import { formatMatchDate } from "../utils/formatDate";
+import { isMatchLocked } from "../utils/lockTime";
 import type { KnockoutRound, KnockoutMatch } from "../types";
 import "./BracketView.css";
 
@@ -70,7 +71,9 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                       {bothKnown ? (
                         <ScoreInput score={currentScore}
                           onScoreChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score })}
-                          isPrediction={isPrediction} readonlyScore={readonlyScore ?? undefined} allowPenalties />
+                          isPrediction={isPrediction} readonlyScore={readonlyScore ?? undefined} allowPenalties
+                          locked={isPrediction && isMatchLocked(match.dateUtc)}
+                          synced={!isPrediction && state.syncedResultIds.includes(match.id)} />
                       ) : <span className="score-separator">vs</span>}
                       <div className={`bracket-team ${!awayTeam ? "pending" : ""}`}>
                         {awayTeam ? (<><span className="team-flag">{awayTeam.flag}</span><span>{awayTeam.name}</span></>) : <span>{slotLabel(match, "away")}</span>}

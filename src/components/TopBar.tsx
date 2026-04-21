@@ -117,6 +117,16 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
                 <span className="dropdown-icon">■</span> Salir de simulación
               </button>
             )}
+            {state.mode === "results" && (
+              <>
+                <div className="dropdown-divider" />
+                <div className="dropdown-section">Resultados</div>
+                <button className="dropdown-item disabled" disabled
+                  title="Integración con API externa: próximamente">
+                  <span className="dropdown-icon">↻</span> Fetch desde API (próximamente)
+                </button>
+              </>
+            )}
             <div className="dropdown-divider" />
             <div className="dropdown-section">Fixture</div>
             <button className="dropdown-item" onClick={handleExport}>

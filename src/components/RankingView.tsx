@@ -1,14 +1,31 @@
 import { useMemo, useState } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { computeRanking } from "../utils/scoring";
+import type { RankedPlayer } from "../utils/scoring";
 import "./RankingView.css";
 
 export function RankingView() {
   const { state, dispatch } = useFixture();
 
-  const ranking = useMemo(() => computeRanking(state), [state]);
+  const ranking = useMemo(() => {
+    const base = computeRanking(state);
+    const totalMatches = state.groupMatches.length + state.knockoutMatches.length;
+    const existingNames = new Set(base.map((p) => p.name));
+    const extras: RankedPlayer[] = state.members
+      .filter((m) => !existingNames.has(m.name))
+      .map((m) => ({
+        name: m.name,
+        isLocal: false,
+        total: 0,
+        exact: 0,
+        winner: 0,
+        wrong: 0,
+        pending: totalMatches,
+      }));
+    return [...base, ...extras];
+  }, [state]);
 
-  const hasRivals = state.rivals.length > 0;
+  const hasPlayers = ranking.length > 1;
   const [showRules, setShowRules] = useState(false);
 
   return (
@@ -62,13 +79,13 @@ export function RankingView() {
         </div>
       )}
 
-      {!hasRivals ? (
+      {!hasPlayers ? (
         <div className="ranking-empty">
           <p>Todavía no hay rivales.</p>
-          <p><strong>1.</strong> Cada amigo carga sus predicciones en su app</p>
-          <p><strong>2.</strong> Exporta su prode con "Exportar Prode"</p>
-          <p><strong>3.</strong> Importá los prodes de tus amigos con "Importar Prode"</p>
-          <p><strong>4.</strong> El ranking se arma solo comparando contra los resultados reales</p>
+          <p><strong>1.</strong> Creá o uníte a una sala desde el menú lateral</p>
+          <p><strong>2.</strong> Compartí el link con tus amigos</p>
+          <p><strong>3.</strong> A medida que cada uno cargue predicciones, aparecen acá</p>
+          <p><strong>4.</strong> El ranking se arma solo cuando empiezan a jugarse los partidos</p>
         </div>
       ) : (
         <table className="ranking-table">

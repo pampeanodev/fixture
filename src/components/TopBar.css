@@ -65,7 +65,8 @@
   font-size: 13px; color: #333; cursor: pointer; text-align: left;
   transition: background 0.1s;
 }
-.dropdown-item:hover { background: #f5f5f5; }
+.dropdown-item:hover:not(.disabled) { background: #f5f5f5; }
+.dropdown-item.disabled { color: #aaa; cursor: not-allowed; }
 
 .dropdown-icon {
   width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
