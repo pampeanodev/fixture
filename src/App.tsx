@@ -1,6 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useFixture } from "./context/FixtureContext";
 import { useNostr } from "./context/NostrContext";
+import { SidebarProvider, useSidebar } from "./context/SidebarContext";
 import { Sidebar } from "./components/Sidebar";
 import { TopBar } from "./components/TopBar";
 import { GroupView } from "./components/GroupView";
@@ -45,7 +46,7 @@ function InviteRouter() {
     const path = window.location.pathname;
     const match = path.match(/^\/r\/([a-z0-9]{8})$/);
     if (!match) return;
-    if (!identity) return; // wait for identity before processing
+    if (!identity) return;
 
     const roomId = match[1];
     const params = new URLSearchParams(window.location.search);
@@ -61,32 +62,14 @@ function InviteRouter() {
   return null;
 }
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-  return isMobile;
-}
-
-export default function App() {
-  const { identity } = useNostr();
+function AppContent() {
   const { state } = useFixture();
   const { activeView } = state;
-  const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const { isOpen, isMobile, setOpen, toggle } = useSidebar();
 
-  const handleNavigation = useCallback(() => {
-    if (isMobile) setSidebarOpen(false);
-  }, [isMobile]);
-
-  useEffect(() => {
-    setSidebarOpen(!isMobile);
-  }, [isMobile]);
-
-  if (!identity) return <Onboarding />;
+  function handleNavigation() {
+    if (isMobile) setOpen(false);
+  }
 
   return (
     <>
@@ -94,27 +77,39 @@ export default function App() {
       <InviteRouter />
       <TourBridge activeView={activeView} />
       <div className="app-layout">
-      {isMobile && sidebarOpen && (
-        <div className="sidebar-overlay visible" onClick={() => setSidebarOpen(false)} />
-      )}
-      <Sidebar
-        collapsed={!sidebarOpen}
-        isMobile={isMobile}
-        onNavigate={handleNavigation}
-      />
-      <div className="main-area">
-        <TopBar onToggleSidebar={() => setSidebarOpen((v) => !v)} />
-        <div className="main-content">
-          {activeView.type === "groups" && <GroupView group={activeView.group} />}
-          {activeView.type === "knockout" && <BracketView round={activeView.round} />}
-          {activeView.type === "schedule" && <ScheduleView />}
-          {activeView.type === "ranking" && <RankingView />}
-          {activeView.type === "rooms" && <RoomList />}
-          {activeView.type === "room" && <RoomDetail roomId={activeView.roomId} />}
-          {activeView.type === "simulator" && <SimulatorView />}
+        {isMobile && isOpen && (
+          <div className="sidebar-overlay visible" onClick={() => setOpen(false)} />
+        )}
+        <Sidebar
+          collapsed={!isOpen}
+          isMobile={isMobile}
+          onNavigate={handleNavigation}
+        />
+        <div className="main-area">
+          <TopBar onToggleSidebar={toggle} />
+          <div className="main-content">
+            {activeView.type === "groups" && <GroupView group={activeView.group} />}
+            {activeView.type === "knockout" && <BracketView round={activeView.round} />}
+            {activeView.type === "schedule" && <ScheduleView />}
+            {activeView.type === "ranking" && <RankingView />}
+            {activeView.type === "rooms" && <RoomList />}
+            {activeView.type === "room" && <RoomDetail roomId={activeView.roomId} />}
+            {activeView.type === "simulator" && <SimulatorView />}
+          </div>
         </div>
       </div>
-      </div>
     </>
+  );
+}
+
+export default function App() {
+  const { identity } = useNostr();
+
+  if (!identity) return <Onboarding />;
+
+  return (
+    <SidebarProvider>
+      <AppContent />
+    </SidebarProvider>
   );
 }

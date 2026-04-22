@@ -3,6 +3,11 @@ import type { TFunction } from "../i18n/translate";
 
 export type TourId = "overview" | "groups" | "knockout" | "rooms" | "simulator";
 
+export interface TourOptions {
+  isMobile: boolean;
+  setSidebarOpen: (open: boolean) => void;
+}
+
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
@@ -14,13 +19,19 @@ function renderTourHtml(template: string): string {
   );
 }
 
-export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
+export function buildTours(t: TFunction, opts: TourOptions): Record<TourId, DriveStep[]> {
+  function mobileHook(open: boolean): Partial<DriveStep> {
+    if (!opts.isMobile) return {};
+    return { onHighlightStarted: () => opts.setSidebarOpen(open) };
+  }
+
   const overview: DriveStep[] = [
     {
       popover: {
         title: t("tour.overview.welcomeTitle"),
         description: renderTourHtml(t("tour.overview.welcomeBody")),
       },
+      ...mobileHook(false),
     },
     {
       element: '[data-tour="mode-toggle"]',
@@ -28,6 +39,7 @@ export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
         title: t("tour.overview.modeTitle"),
         description: t("tour.overview.modeBody"),
       },
+      ...mobileHook(false),
     },
     {
       element: '[data-tour="nav-groups"]',
@@ -35,6 +47,7 @@ export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
         title: t("tour.overview.groupsTitle"),
         description: t("tour.overview.groupsBody"),
       },
+      ...mobileHook(true),
     },
     {
       element: '[data-tour="nav-knockout"]',
@@ -42,6 +55,7 @@ export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
         title: t("tour.overview.knockoutTitle"),
         description: t("tour.overview.knockoutBody"),
       },
+      ...mobileHook(true),
     },
     {
       element: '[data-tour="nav-rooms"]',
@@ -49,6 +63,7 @@ export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
         title: t("tour.overview.roomsTitle"),
         description: t("tour.overview.roomsBody"),
       },
+      ...mobileHook(true),
     },
     {
       element: '[data-tour="help-button"]',
@@ -57,6 +72,7 @@ export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
         description: t("tour.overview.helpBody"),
         side: "left",
       },
+      ...mobileHook(false),
     },
   ];
 
