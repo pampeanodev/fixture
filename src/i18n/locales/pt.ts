@@ -311,6 +311,85 @@ export const pt = {
       safeBody: "Quando você sai da simulação, tudo volta ao estado real. Seus palpites ficam intactos. Se recarregar o navegador, também volta ao real.",
     },
   },
+  howToPlay: {
+    menuItem: "Como se joga",
+    helpMenu: {
+      tour: "Tour guiado",
+      howTo: "Como se joga",
+    },
+    modeSelect: {
+      title: "Como você vai jogar?",
+      subtitle: "Escolha um modo para ver como funciona.",
+      individualCard: {
+        title: "Sozinho",
+        subtitle: "Apenas neste dispositivo.",
+      },
+      roomCard: {
+        title: "Em Sala",
+        subtitle: "Com amigos, sincronizado.",
+      },
+    },
+    individual: {
+      step1: {
+        title: "Jogue sozinho",
+        body: "Seus palpites ficam neste dispositivo. Sem conta e sem conexão compartilhada.",
+      },
+      step2: {
+        title: "Palpite a fase de grupos",
+        body: "Escolha o placar de cada partida. A tabela é recalculada em tempo real.",
+      },
+      step3: {
+        title: "Como os times avançam",
+        body: "O <1>1º</1> e o <2>2º</2> de cada grupo classificam. Os <3>8 melhores terceiros</3> também passam.",
+      },
+      step4: {
+        title: "Chaves eliminatórias",
+        body: "As chaves se montam sozinhas com seus palpites dos grupos. Você escolhe os vencedores até a final.",
+      },
+      step5: {
+        title: "Ranking e simulador",
+        body: "Veja sua pontuação com resultados reais ou simulados. O simulador resolve no aleatório os jogos que faltam.",
+      },
+      step6: {
+        title: "Compartilhe com amigos (offline)",
+        body: "Exporte seu fixture, mande a um amigo, ele importa e aparece no seu ranking como rival. Sem precisar de internet em comum.",
+      },
+      step7: {
+        title: "Ou jogue em Sala (online)",
+        body: "Para sincronização automática com amigos: crie sua Sala ou entre na de alguém.",
+      },
+      ctaRooms: "Ir para Salas",
+    },
+    room: {
+      step1: {
+        title: "O que é uma sala?",
+        body: "Um grupo de amigos palpitando juntos. Sem servidor central — usamos uma rede P2P descentralizada.",
+      },
+      step2: {
+        title: "Crie ou entre",
+        body: "Abra sua própria sala e seja o admin, ou entre na de alguém via link de convite.",
+      },
+      step3: {
+        title: "Convide seus amigos",
+        body: "Cada sala gera um link e um QR. Compartilhe onde quiser — seus amigos entram com um clique.",
+      },
+      step4: {
+        title: "Seladas antes do jogo",
+        body: "Seus palpites são <1>selados</1> 1 hora antes do kickoff. Não dá mais pra mudar, e são revelados a todos ao mesmo tempo. Ninguém copia.",
+      },
+      step5: {
+        title: "Ranking compartilhado",
+        body: "Todos os membros veem o mesmo ranking atualizado em tempo real. O admin preenche os resultados reais.",
+      },
+    },
+    nav: {
+      back: "Voltar",
+      next: "Próximo",
+      done: "Entendi",
+      close: "Fechar",
+      stepCounter: "{current} / {total}",
+    },
+  },
   teams: {
     MEX: "México", RSA: "África do Sul", KOR: "Coreia do Sul", CZE: "Tchéquia",
     CAN: "Canadá", SUI: "Suíça", QAT: "Catar", BIH: "Bósnia e Herzegovina",

@@ -1,0 +1,130 @@
+.htp-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 180px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.htp-illustration svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.htp-illustration-fallback {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+/* Shared mini-UI primitives used across mockup illustrations. */
+.htp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  color: #fff;
+}
+
+.htp-table th, .htp-table td {
+  padding: 4px 6px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.htp-table th {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.htp-row-highlight {
+  background: rgba(76, 175, 80, 0.12);
+}
+
+.htp-groups-predict {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.htp-score-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+  padding: 10px;
+  background: #1e1e3a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 11px;
+}
+
+.htp-flag {
+  width: 18px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.htp-score-input {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(76,175,80,0.2);
+  border: 1px solid rgba(76,175,80,0.5);
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.htp-score-dash {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.htp-ranking-wrap {
+  width: 100%;
+  max-width: 300px;
+}
+
+.htp-live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  background: var(--accent-green, #4caf50);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+  animation: htp-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes htp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.htp-ranking-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.htp-you {
+  color: var(--accent-gold, #fdd835);
+  font-weight: 700;
+}

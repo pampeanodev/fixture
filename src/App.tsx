@@ -11,9 +11,8 @@ import { RoomList } from "./components/RoomList";
 import { RoomDetail } from "./components/RoomDetail";
 import { SimulatorView } from "./components/SimulatorView";
 import { Onboarding } from "./components/Onboarding";
-import { HelpButton } from "./components/HelpButton";
+import { HelpMenu } from "./components/HelpMenu";
 import { useNostrSync } from "./hooks/useNostrSync";
-import { useTour } from "./tour/useTour";
 import type { TourId } from "./tour/steps";
 import type { ViewTarget } from "./types";
 import "./App.css";
@@ -35,8 +34,7 @@ function NostrSyncBridge() {
 }
 
 function TourBridge({ activeView }: { activeView: ViewTarget }) {
-  const { startTour } = useTour();
-  return <HelpButton onStart={() => startTour(contextTour(activeView))} />;
+  return <HelpMenu tourId={contextTour(activeView)} />;
 }
 
 function InviteRouter() {

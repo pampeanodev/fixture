@@ -311,6 +311,85 @@ export const en = {
       safeBody: "When you exit simulation, everything goes back to the real state. Your predictions stay intact. If you reload the browser, you also go back to the real one.",
     },
   },
+  howToPlay: {
+    menuItem: "How to play",
+    helpMenu: {
+      tour: "Guided tour",
+      howTo: "How to play",
+    },
+    modeSelect: {
+      title: "How will you play?",
+      subtitle: "Pick a mode to see how it works.",
+      individualCard: {
+        title: "Solo",
+        subtitle: "Alone, on this device.",
+      },
+      roomCard: {
+        title: "In a Room",
+        subtitle: "With friends, synced.",
+      },
+    },
+    individual: {
+      step1: {
+        title: "Play on your own",
+        body: "Your predictions live on this device. No account, no shared connection required.",
+      },
+      step2: {
+        title: "Predict group stage",
+        body: "Pick a score for each match. The standings recalculate live as you go.",
+      },
+      step3: {
+        title: "How teams advance",
+        body: "The <1>1st</1> and <2>2nd</2> of each group qualify. The <3>8 best third-placed teams</3> also go through.",
+      },
+      step4: {
+        title: "Knockout bracket",
+        body: "The bracket fills itself from your group predictions. You pick the winners all the way to the final.",
+      },
+      step5: {
+        title: "Ranking and simulator",
+        body: "See your score against real or simulated results. The simulator randomly resolves any pending match.",
+      },
+      step6: {
+        title: "Share with friends (offline)",
+        body: "Export your fixture, send it to a friend, they import it, and they show up in your ranking as a rival. No shared internet needed.",
+      },
+      step7: {
+        title: "Or play in a Room (online)",
+        body: "For automatic sync with friends: create your own Room or join someone else's.",
+      },
+      ctaRooms: "Take me to Rooms",
+    },
+    room: {
+      step1: {
+        title: "What is a Room?",
+        body: "A group of friends predicting together. No central server — we use a decentralized P2P network.",
+      },
+      step2: {
+        title: "Create or join",
+        body: "Open your own room and become its admin, or enter someone else's via an invite link.",
+      },
+      step3: {
+        title: "Invite your friends",
+        body: "Each room generates a link and a QR. Share them anywhere — your friends join with one click.",
+      },
+      step4: {
+        title: "Sealed before kickoff",
+        body: "Your predictions are <1>sealed</1> 1 hour before kickoff. You can't change them anymore, and they're revealed to everyone at the same time. Nobody can copy.",
+      },
+      step5: {
+        title: "Shared ranking",
+        body: "All members see the same live-updated ranking. The admin can enter real results as matches end.",
+      },
+    },
+    nav: {
+      back: "Back",
+      next: "Next",
+      done: "Got it",
+      close: "Close",
+      stepCounter: "{current} / {total}",
+    },
+  },
   teams: {
     MEX: "Mexico", RSA: "South Africa", KOR: "South Korea", CZE: "Czechia",
     CAN: "Canada", SUI: "Switzerland", QAT: "Qatar", BIH: "Bosnia and Herzegovina",

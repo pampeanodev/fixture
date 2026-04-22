@@ -309,6 +309,85 @@ export const es = {
       safeBody: "Cuando salís de simulación, todo vuelve al estado real. Tus predicciones quedan intactas. Si recargás el browser, también volvés al real.",
     },
   },
+  howToPlay: {
+    menuItem: "Cómo se juega",
+    helpMenu: {
+      tour: "Tour guiado",
+      howTo: "Cómo se juega",
+    },
+    modeSelect: {
+      title: "¿Cómo vas a jugar?",
+      subtitle: "Elegí un modo para ver cómo funciona.",
+      individualCard: {
+        title: "Individual",
+        subtitle: "Solo, en este dispositivo.",
+      },
+      roomCard: {
+        title: "En Sala",
+        subtitle: "Con amigos, sincronizado.",
+      },
+    },
+    individual: {
+      step1: {
+        title: "Jugá en solitario",
+        body: "Tus predicciones viven en este dispositivo. No necesitás cuenta ni conexión con nadie.",
+      },
+      step2: {
+        title: "Predecí los grupos",
+        body: "Elegí el resultado de cada partido. La tabla se recalcula en vivo.",
+      },
+      step3: {
+        title: "Cómo avanzan los equipos",
+        body: "Pasan los <1>1°</1> y <2>2°</2> de cada grupo. Los <3>8 mejores terceros</3> también clasifican.",
+      },
+      step4: {
+        title: "Llaves eliminatorias",
+        body: "Los cruces se arman solos con tus predicciones de grupos. Vos decidís los ganadores hasta la final.",
+      },
+      step5: {
+        title: "Ranking y simulador",
+        body: "Mirá tu puntaje con resultados reales o simulados. El simulador resuelve los partidos pendientes al azar.",
+      },
+      step6: {
+        title: "Compartí con amigos (offline)",
+        body: "Exportás tu fixture, se lo mandás a un amigo, él lo importa y aparece en tu ranking como rival. Sin internet común.",
+      },
+      step7: {
+        title: "O jugá en Sala (online)",
+        body: "Para sincronización automática con amigos: creá tu Sala o unite a la de alguien.",
+      },
+      ctaRooms: "Llevame a Salas",
+    },
+    room: {
+      step1: {
+        title: "¿Qué es una sala?",
+        body: "Un grupo de amigos que predice junto. Sin servidor central — usamos una red P2P descentralizada.",
+      },
+      step2: {
+        title: "Creá o unite",
+        body: "Abrí tu propia sala y sos el admin, o entrá a la de alguien con un link de invitación.",
+      },
+      step3: {
+        title: "Invitá a tus amigos",
+        body: "Cada sala genera un link y un QR. Compartilo por donde quieras — tus amigos entran con un click.",
+      },
+      step4: {
+        title: "Sellado antes del partido",
+        body: "Tus predicciones se <1>sellan</1> 1 hora antes del kickoff. Ya no podés cambiarlas, y se revelan a todos a la vez. Nadie copia a nadie.",
+      },
+      step5: {
+        title: "Ranking compartido",
+        body: "Todos los miembros ven el mismo ranking actualizado en vivo. El admin puede cargar los resultados reales.",
+      },
+    },
+    nav: {
+      back: "Atrás",
+      next: "Siguiente",
+      done: "Entendido",
+      close: "Cerrar",
+      stepCounter: "{current} / {total}",
+    },
+  },
   teams: {
     MEX: "México", RSA: "Sudáfrica", KOR: "Corea del Sur", CZE: "Chequia",
     CAN: "Canadá", SUI: "Suiza", QAT: "Qatar", BIH: "Bosnia y Herzegovina",

@@ -1,0 +1,52 @@
+.help-menu-wrap {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.help-menu-wrap .help-fab {
+  position: static;
+  right: auto;
+  bottom: auto;
+}
+
+.help-menu-popover {
+  background: #1e1e3a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  animation: modal-in 0.12s ease-out;
+}
+
+.help-menu-item {
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.help-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .help-menu-wrap {
+    right: 14px;
+    bottom: 14px;
+  }
+}
