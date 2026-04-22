@@ -1,4 +1,5 @@
 import { useFixture } from "../context/FixtureContext";
+import { useLocale } from "../i18n";
 import { SidebarFooter } from "./SidebarFooter";
 import "./Sidebar.css";
 
@@ -10,6 +11,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
   const { state, dispatch } = useFixture();
+  const { t } = useLocale();
   const { activeView } = state;
 
   function navigate(view: typeof activeView) {
@@ -27,31 +29,31 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
     <nav className={className}>
       <div className="sidebar-brand">
         <img src="/favicon.svg" alt="" className="sidebar-brand-logo" aria-hidden="true" />
-        <span>Mundial 2026</span>
+        <span>{t("brand.short")}</span>
       </div>
       <div className="sidebar-nav">
         <div
           className={`sidebar-item ${activeView.type === "schedule" ? "active" : ""}`}
           onClick={() => navigate({ type: "schedule" })}>
-          Calendario
+          {t("sidebar.nav.schedule")}
         </div>
         <div
           data-tour="nav-groups"
           className={`sidebar-item ${activeView.type === "groups" ? "active" : ""}`}
           onClick={() => navigate({ type: "groups", group: activeView.type === "groups" ? activeView.group : "A" })}>
-          Grupos
+          {t("sidebar.nav.groups")}
         </div>
         <div
           data-tour="nav-knockout"
           className={`sidebar-item ${activeView.type === "knockout" ? "active" : ""}`}
           onClick={() => navigate({ type: "knockout", round: activeView.type === "knockout" ? activeView.round : "R32" })}>
-          Eliminatorias
+          {t("sidebar.nav.knockout")}
         </div>
         <div className="sidebar-divider" />
         <div
           className={`sidebar-item ${activeView.type === "ranking" ? "active" : ""}`}
           onClick={() => navigate({ type: "ranking" })}>
-          Ranking
+          {t("sidebar.nav.ranking")}
           {state.rivals.length > 0 && (
             <span style={{ fontSize: "10px", opacity: 0.6, marginLeft: "6px" }}>
               {state.rivals.length + 1}
@@ -62,13 +64,13 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
           data-tour="nav-rooms"
           className={`sidebar-item ${activeView.type === "rooms" || activeView.type === "room" ? "active" : ""}`}
           onClick={() => navigate({ type: "rooms" })}>
-          Salas
+          {t("sidebar.nav.rooms")}
         </div>
         {state.simulationActive && (
           <div
             className={`sidebar-item ${activeView.type === "simulator" ? "active" : ""}`}
             onClick={() => navigate({ type: "simulator" })}>
-            <span className="sim-dot">●</span> Simulación
+            <span className="sim-dot">●</span> {t("sidebar.nav.simulation")}
           </div>
         )}
       </div>

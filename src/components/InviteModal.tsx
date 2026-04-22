@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNostr } from "../context/NostrContext";
+import { useLocale } from "../i18n";
 import { QRDisplay } from "./QRDisplay";
 import "./InviteModal.css";
 
@@ -10,6 +11,7 @@ interface InviteModalProps {
 
 export function InviteModal({ roomId, onClose }: InviteModalProps) {
   const { createInvite, rooms } = useNostr();
+  const { t } = useLocale();
   const room = rooms.find((r) => r.roomId === roomId);
   const isCreator = room?.role === "creator";
   const [inviteCode, setInviteCode] = useState<string | null>(null);
@@ -35,21 +37,21 @@ export function InviteModal({ roomId, onClose }: InviteModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Invitar</h2>
+          <h2>{t("rooms.invite.title")}</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
         {isCreator && (
           <div className="modal-section">
             <button className="modal-btn" onClick={handleGenerate}>
-              Generar nuevo invite
+              {t("rooms.invite.generateNew")}
             </button>
           </div>
         )}
         <div className="modal-section">
-          <p className="invite-link-label">Link de invitacion:</p>
+          <p className="invite-link-label">{t("rooms.invite.linkLabel")}</p>
           <code className="invite-link">{displayLink}</code>
           <button className="modal-btn" onClick={handleCopy}>
-            {copied ? "Copiado" : "Copiar link"}
+            {copied ? t("common.copied") : t("rooms.invite.copyLink")}
           </button>
         </div>
         <div className="modal-section invite-qr">

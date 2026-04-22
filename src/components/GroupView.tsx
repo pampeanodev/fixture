@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam, GROUPS } from "../data/teams";
-import { formatMatchDate } from "../utils/formatDate";
 import { isMatchLocked } from "../utils/lockTime";
+import { useLocale } from "../i18n";
 import type { Score } from "../types";
 import "./GroupView.css";
 
@@ -27,6 +27,7 @@ function ScoreField({ value, onChange, isPrediction, locked }: {
 
 export function GroupView({ group }: GroupViewProps) {
   const { state, dispatch, standingsByGroup } = useFixture();
+  const { t } = useLocale();
   const standings = standingsByGroup[group] ?? [];
   const matches = state.groupMatches
     .filter((m) => m.group === group)
@@ -44,17 +45,27 @@ export function GroupView({ group }: GroupViewProps) {
           </button>
         ))}
       </div>
-      <h2>Grupo {group}</h2>
+      <h2>{t("groups.title", { group })}</h2>
       <table className="standings-table" data-tour="standings-table">
         <thead>
-          <tr><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr>
+          <tr>
+            <th>{t("groups.standings.team")}</th>
+            <th>{t("groups.standings.played")}</th>
+            <th>{t("groups.standings.won")}</th>
+            <th>{t("groups.standings.drawn")}</th>
+            <th>{t("groups.standings.lost")}</th>
+            <th>{t("groups.standings.goalsFor")}</th>
+            <th>{t("groups.standings.goalsAgainst")}</th>
+            <th>{t("groups.standings.goalDifference")}</th>
+            <th>{t("groups.standings.points")}</th>
+          </tr>
         </thead>
         <tbody>
           {standings.map((row, i) => {
             const team = getTeam(row.teamId);
             return (
               <tr key={row.teamId} className={i < 2 ? "qualify" : i === 2 ? "maybe-qualify" : ""}>
-                <td><div className="team-cell"><span className="team-flag">{team?.flag}</span><span>{team?.name ?? row.teamId}</span></div></td>
+                <td><div className="team-cell"><span className="team-flag">{team?.flag}</span><span>{team ? t(`teams.${team.id}`) : row.teamId}</span></div></td>
                 <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
                 <td>{row.goalsFor}</td><td>{row.goalsAgainst}</td>
                 <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
@@ -65,7 +76,7 @@ export function GroupView({ group }: GroupViewProps) {
         </tbody>
       </table>
 
-      <div className="group-matches-title">Partidos</div>
+      <div className="group-matches-title">{t("groups.matches")}</div>
       <div className="group-matches-grid" data-tour="match-cards">
       {matches.map((match) => (
         <MatchCard
@@ -97,6 +108,7 @@ function MatchCard({ homeTeamId, awayTeamId, dateUtc, result, prediction, isPred
   synced?: boolean;
   onScoreChange: (score: Score | null) => void;
 }) {
+  const { t, formatDate } = useLocale();
   const currentScore = isPrediction ? prediction : result;
   const [homeStr, setHomeStr] = useState(currentScore?.home?.toString() ?? "");
   const [awayStr, setAwayStr] = useState(currentScore?.away?.toString() ?? "");
@@ -123,36 +135,36 @@ function MatchCard({ homeTeamId, awayTeamId, dateUtc, result, prediction, isPred
   let indicator: { className: string; symbol: string } | null = null;
   if (isPrediction && result && prediction) {
     if (result.home === prediction.home && result.away === prediction.away) {
-      indicator = { className: "exact", symbol: "✓ Exacto" };
+      indicator = { className: "exact", symbol: t("groups.matchCard.exact") };
     } else {
       const realOut = Math.sign(result.home - result.away);
       const predOut = Math.sign(prediction.home - prediction.away);
       indicator = realOut === predOut
-        ? { className: "winner", symbol: "½ Ganador" }
-        : { className: "wrong", symbol: "✗ Errado" };
+        ? { className: "winner", symbol: t("groups.matchCard.winner") }
+        : { className: "wrong", symbol: t("groups.matchCard.wrong") };
     }
   }
 
   return (
     <div className="group-match-card">
-      <div className="group-match-date">{formatMatchDate(dateUtc)}</div>
+      <div className="group-match-date">{formatDate(dateUtc)}</div>
       <div className="group-match-team-row">
         <span className="team-flag">{homeTeam?.flag}</span>
-        <span className="group-match-team-name">{homeTeam?.name}</span>
+        <span className="group-match-team-name">{homeTeam ? t(`teams.${homeTeam.id}`) : ""}</span>
         <ScoreField value={homeStr} isPrediction={isPrediction} locked={locked}
           onChange={(v) => { setHomeStr(v); commitScore(v, awayStr); }} />
       </div>
       <div className="group-match-team-row">
         <span className="team-flag">{awayTeam?.flag}</span>
-        <span className="group-match-team-name">{awayTeam?.name}</span>
+        <span className="group-match-team-name">{awayTeam ? t(`teams.${awayTeam.id}`) : ""}</span>
         <ScoreField value={awayStr} isPrediction={isPrediction} locked={locked}
           onChange={(v) => { setAwayStr(v); commitScore(homeStr, v); }} />
       </div>
-      {locked && <div className="group-match-locked">🔒 Cerrado</div>}
-      {synced && <div className="group-match-synced" title="Resultado publicado por el admin de la sala">↻ Sincronizado</div>}
+      {locked && <div className="group-match-locked">{t("groups.matchCard.locked")}</div>}
+      {synced && <div className="group-match-synced" title={t("groups.matchCard.syncedTitle")}>{t("groups.matchCard.synced")}</div>}
       {isPrediction && result && (
         <div className="group-match-prediction-row">
-          Real: {result.home} - {result.away}
+          {t("groups.matchCard.real")}: {result.home} - {result.away}
           {indicator && <span className={`prediction-indicator ${indicator.className}`}>{indicator.symbol}</span>}
         </div>
       )}

@@ -1,0 +1,124 @@
+.locale-switcher {
+  position: relative;
+  width: 100%;
+}
+
+.locale-switcher-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  font-size: 13px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.locale-switcher-toggle:hover,
+.locale-switcher.open .locale-switcher-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-active-text);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.locale-switcher-toggle-icon {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.locale-switcher-toggle-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.locale-switcher-toggle-caret {
+  font-size: 10px;
+  opacity: 0.55;
+  transition: transform 0.15s;
+}
+
+.locale-switcher.open .locale-switcher-toggle-caret {
+  transform: rotate(180deg);
+  opacity: 0.85;
+}
+
+.locale-switcher-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--sidebar-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  z-index: 100;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.locale-switcher-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--sidebar-text);
+  font-size: 13px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.locale-switcher-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--sidebar-active-text);
+}
+
+.locale-switcher-item.active {
+  background: rgba(253, 216, 53, 0.1);
+  color: var(--sidebar-active-text);
+}
+
+.locale-switcher-item.active:hover {
+  background: rgba(253, 216, 53, 0.16);
+}
+
+.locale-switcher-code {
+  min-width: 26px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--sidebar-section-title);
+  opacity: 0.8;
+}
+
+.locale-switcher-item.active .locale-switcher-code {
+  color: var(--accent-gold);
+  opacity: 1;
+}
+
+.locale-switcher-name {
+  flex: 1;
+}
+
+.locale-switcher-check {
+  font-size: 11px;
+  color: var(--accent-gold);
+  line-height: 1;
+}

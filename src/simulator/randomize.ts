@@ -24,7 +24,7 @@ const ROUNDS: KnockoutRound[] = ["R32", "R16", "QF", "SF", "3P", "F"];
 export function randomizePredictions(
   groupMatches: GroupMatch[],
   knockoutMatches: KnockoutMatch[],
-  teams: Team[],
+  teams: readonly Team[],
 ): { groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] } {
   // Phase 1: randomize all group predictions.
   const newGroupMatches: GroupMatch[] = groupMatches.map((m) => ({

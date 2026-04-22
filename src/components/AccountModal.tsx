@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNostr } from "../context/NostrContext";
+import { useLocale } from "../i18n";
 import { QRDisplay } from "./QRDisplay";
 import "./AccountModal.css";
 
@@ -9,6 +10,7 @@ interface AccountModalProps {
 
 export function AccountModal({ onClose }: AccountModalProps) {
   const { exportIdentity } = useNostr();
+  const { t } = useLocale();
   const exported = exportIdentity();
   const [showSeed, setShowSeed] = useState(false);
   const [showQR, setShowQR] = useState(false);
@@ -26,38 +28,38 @@ export function AccountModal({ onClose }: AccountModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Mi cuenta</h2>
+          <h2>{t("account.title")}</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
         <div className="modal-note">
-          Tu identidad vive en este browser. Si compartís la computadora con otra persona, usá modo incógnito o un perfil separado — sino van a ver (y poder modificar) tus predicciones y salas.
+          {t("account.note")}
         </div>
         <div className="modal-section">
-          <h3>Seed phrase</h3>
-          <p className="modal-warning">No la compartas con nadie. Quien tenga estas palabras puede acceder a tu identidad.</p>
+          <h3>{t("account.seedSectionTitle")}</h3>
+          <p className="modal-warning">{t("account.warning")}</p>
           {showSeed ? (
             <div className="seed-display">
               <code className="seed-words">{exported.mnemonic}</code>
               <button className="modal-btn" onClick={handleCopy}>
-                {copied ? "Copiado" : "Copiar"}
+                {copied ? t("common.copied") : t("common.copy")}
               </button>
             </div>
           ) : (
             <button className="modal-btn" onClick={() => setShowSeed(true)}>
-              Mostrar seed phrase
+              {t("account.showSeed")}
             </button>
           )}
         </div>
         <div className="modal-section">
-          <h3>QR code</h3>
-          <p className="modal-warning">Este QR contiene tu clave privada. Solo usalo para migrar a otro dispositivo.</p>
+          <h3>{t("account.qrTitle")}</h3>
+          <p className="modal-warning">{t("account.qrWarning")}</p>
           {showQR ? (
             <div className="qr-display">
               <QRDisplay value={exported.nsec} size={200} />
             </div>
           ) : (
             <button className="modal-btn" onClick={() => setShowQR(true)}>
-              Mostrar QR
+              {t("account.showQR")}
             </button>
           )}
         </div>

@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { exportToJson, importFromJson } from "../utils/persistence";
 import { randomizePredictions } from "../simulator/randomize";
+import { useLocale } from "../i18n";
 import "./TopBar.css";
 
 interface TopBarProps {
@@ -10,6 +11,7 @@ interface TopBarProps {
 
 export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { state, dispatch } = useFixture();
+  const { t } = useLocale();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -37,7 +39,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
     try {
       const data = await importFromJson(file);
       dispatch({ type: "IMPORT_STATE", groupMatches: data.groupMatches, knockoutMatches: data.knockoutMatches });
-    } catch { alert("Error al importar. Verificá que sea un JSON válido."); }
+    } catch { alert(t("topbar.importError")); }
     if (fileInputRef.current) fileInputRef.current.value = "";
     setMenuOpen(false);
   }
@@ -73,7 +75,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
         <input
           className="topbar-name-input"
           type="text"
-          placeholder="Tu nombre"
+          placeholder={t("topbar.namePlaceholder")}
           value={state.playerName}
           onChange={(e) => dispatch({ type: "SET_PLAYER_NAME", name: e.target.value })}
         />
@@ -83,11 +85,11 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
         <div className="mode-toggle" data-tour="mode-toggle">
           <button className={state.mode === "results" ? "active" : ""}
             onClick={() => state.mode !== "results" && dispatch({ type: "TOGGLE_MODE" })}>
-            Resultados
+            {t("topbar.mode.results")}
           </button>
           <button className={state.mode === "predictions" ? "active" : ""}
             onClick={() => state.mode !== "predictions" && dispatch({ type: "TOGGLE_MODE" })}>
-            Predicciones
+            {t("topbar.mode.predictions")}
           </button>
         </div>
       </div>
@@ -100,40 +102,40 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
           <div className="topbar-dropdown">
             {state.mode === "predictions" && (
               <>
-                <div className="dropdown-section">Predicciones</div>
+                <div className="dropdown-section">{t("topbar.menu.sectionPredictions")}</div>
                 <button className="dropdown-item" onClick={handleRandomize}>
-                  <span className="dropdown-icon">🎲</span> Regenerar random
+                  <span className="dropdown-icon">🎲</span> {t("topbar.menu.randomize")}
                 </button>
                 <div className="dropdown-divider" />
               </>
             )}
-            <div className="dropdown-section">Simulación</div>
+            <div className="dropdown-section">{t("topbar.menu.sectionSimulation")}</div>
             {!state.simulationActive ? (
               <button className="dropdown-item" onClick={handleStartSimulation}>
-                <span className="dropdown-icon">▶</span> Iniciar simulación
+                <span className="dropdown-icon">▶</span> {t("topbar.menu.startSimulation")}
               </button>
             ) : (
               <button className="dropdown-item" onClick={handleExitSimulation}>
-                <span className="dropdown-icon">■</span> Salir de simulación
+                <span className="dropdown-icon">■</span> {t("topbar.menu.exitSimulation")}
               </button>
             )}
             {state.mode === "results" && (
               <>
                 <div className="dropdown-divider" />
-                <div className="dropdown-section">Resultados</div>
+                <div className="dropdown-section">{t("topbar.menu.sectionResults")}</div>
                 <button className="dropdown-item disabled" disabled
-                  title="Integración con API externa: próximamente">
-                  <span className="dropdown-icon">↻</span> Fetch desde API (próximamente)
+                  title={t("topbar.menu.fetchApiTitle")}>
+                  <span className="dropdown-icon">↻</span> {t("topbar.menu.fetchApi")}
                 </button>
               </>
             )}
             <div className="dropdown-divider" />
-            <div className="dropdown-section">Fixture</div>
+            <div className="dropdown-section">{t("topbar.menu.sectionFixture")}</div>
             <button className="dropdown-item" onClick={handleExport}>
-              <span className="dropdown-icon">↑</span> Exportar todo
+              <span className="dropdown-icon">↑</span> {t("topbar.menu.exportAll")}
             </button>
             <button className="dropdown-item" onClick={() => { fileInputRef.current?.click(); }}>
-              <span className="dropdown-icon">↓</span> Importar todo
+              <span className="dropdown-icon">↓</span> {t("topbar.menu.importAll")}
             </button>
           </div>
         )}

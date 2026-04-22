@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNostr } from "../context/NostrContext";
 import { useFixture } from "../context/FixtureContext";
+import { useLocale } from "../i18n";
 import "./RoomList.css";
 
 export function RoomList() {
   const { rooms, createRoom, joinRoom, setActiveRoom } = useNostr();
   const { dispatch } = useFixture();
+  const { t } = useLocale();
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [newName, setNewName] = useState("");
@@ -39,45 +41,45 @@ export function RoomList() {
   return (
     <div className="room-list">
       <div className="room-list-header">
-        <h2>Mis Salas</h2>
+        <h2>{t("rooms.list.title")}</h2>
         <div className="room-list-actions">
           <button data-tour="room-create" className="room-btn" onClick={() => { setShowCreate(true); setShowJoin(false); }}>
-            Crear sala
+            {t("rooms.list.createCta")}
           </button>
           <button data-tour="room-join" className="room-btn" onClick={() => { setShowJoin(true); setShowCreate(false); }}>
-            Unirme
+            {t("rooms.list.joinButton")}
           </button>
         </div>
       </div>
       {showCreate && (
         <div className="room-form">
-          <input type="text" placeholder="Nombre de la sala" value={newName}
+          <input type="text" placeholder={t("rooms.list.namePlaceholder")} value={newName}
             onChange={(e) => setNewName(e.target.value)} className="room-input" />
           <div className="room-mode-select">
-            <label><input type="radio" checked={newMode === "open"} onChange={() => setNewMode("open")} /> Abierta</label>
-            <label><input type="radio" checked={newMode === "closed"} onChange={() => setNewMode("closed")} /> Solo con invitacion</label>
+            <label><input type="radio" checked={newMode === "open"} onChange={() => setNewMode("open")} /> {t("rooms.list.modeOpen")}</label>
+            <label><input type="radio" checked={newMode === "closed"} onChange={() => setNewMode("closed")} /> {t("rooms.list.modeClosed")}</label>
           </div>
-          <button className="room-btn primary" onClick={handleCreate} disabled={!newName.trim()}>Crear</button>
+          <button className="room-btn primary" onClick={handleCreate} disabled={!newName.trim()}>{t("rooms.list.createSubmit")}</button>
         </div>
       )}
       {showJoin && (
         <div className="room-form">
-          <input type="text" placeholder="Codigo de sala (8 caracteres)" value={joinCode}
+          <input type="text" placeholder={t("rooms.list.joinPlaceholder")} value={joinCode}
             onChange={(e) => setJoinCode(e.target.value)} maxLength={8} className="room-input" />
-          <button className="room-btn primary" onClick={handleJoin} disabled={!joinCode.trim()}>Unirme</button>
+          <button className="room-btn primary" onClick={handleJoin} disabled={!joinCode.trim()}>{t("rooms.list.joinButton")}</button>
         </div>
       )}
       {rooms.length === 0 ? (
         <div className="room-list-empty">
-          <p>No estas en ninguna sala.</p>
-          <p>Crea una para competir con tus amigos, o unite con un codigo.</p>
+          <p>{t("rooms.list.emptyLine1")}</p>
+          <p>{t("rooms.list.emptyLine2")}</p>
         </div>
       ) : (
         <div className="room-list-items">
           {rooms.map((room) => (
             <button key={room.roomId} className="room-list-item" onClick={() => handleSelectRoom(room.roomId)}>
               <span className="room-item-name">{room.name}</span>
-              <span className="room-item-role">{room.role === "creator" ? "Creador" : "Miembro"}</span>
+              <span className="room-item-role">{room.role === "creator" ? t("rooms.list.roleCreator") : t("rooms.list.roleMember")}</span>
               <span className="room-item-arrow">&rsaquo;</span>
             </button>
           ))}

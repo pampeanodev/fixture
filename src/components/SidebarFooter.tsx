@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AccountModal } from "./AccountModal";
 import { DonateModal } from "./DonateModal";
+import { LocaleSwitcher } from "./LocaleSwitcher";
+import { useLocale } from "../i18n";
 import "./SidebarFooter.css";
 
 const REPO_URL = "https://github.com/pampeanodev/fixture";
@@ -8,6 +10,7 @@ const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE`;
 const DONATION_LN_ADDRESS = "noisyfox5@primal.net";
 
 export function SidebarFooter() {
+  const { t } = useLocale();
   const [showAccount, setShowAccount] = useState(false);
   const [showDonate, setShowDonate] = useState(false);
 
@@ -22,7 +25,7 @@ export function SidebarFooter() {
           <span className="sidebar-footer-account-icon" aria-hidden="true">
             &#9881;
           </span>
-          <span>Mi cuenta</span>
+          <span>{t("sidebar.footer.myAccount")}</span>
         </button>
 
         <button
@@ -31,8 +34,12 @@ export function SidebarFooter() {
           onClick={() => setShowDonate(true)}
         >
           <span aria-hidden="true">⚡</span>
-          <span>Donar</span>
+          <span>{t("sidebar.footer.donate")}</span>
         </button>
+
+        <div className="sidebar-footer-locale">
+          <LocaleSwitcher />
+        </div>
 
         <div className="sidebar-footer-meta">
           <a
@@ -40,10 +47,10 @@ export function SidebarFooter() {
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Repositorio en GitHub"
+            aria-label={t("sidebar.footer.githubAria")}
           >
             <GithubIcon />
-            <span>GitHub</span>
+            <span>{t("sidebar.footer.github")}</span>
           </a>
           <span className="sidebar-footer-sep" aria-hidden="true">·</span>
           <a
@@ -52,12 +59,12 @@ export function SidebarFooter() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            GPL-3.0
+            {t("sidebar.footer.license")}
           </a>
         </div>
 
         <div className="sidebar-footer-copy">
-          © 2026 Pampeano Dev
+          {t("sidebar.footer.copy")}
         </div>
       </div>
       {showAccount && <AccountModal onClose={() => setShowAccount(false)} />}

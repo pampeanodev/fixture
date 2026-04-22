@@ -77,6 +77,10 @@
   opacity: 0.4;
 }
 
+.sidebar-footer-locale {
+  display: flex;
+}
+
 .sidebar-footer-copy {
   font-size: 10px;
   opacity: 0.5;

@@ -1,10 +1,12 @@
 // src/types.ts
+import { TEAM_IDS } from "./data/teams";
+
+export type TeamId = (typeof TEAM_IDS)[number];
 
 export interface Team {
-  id: string;       // FIFA 3-letter code: "ARG"
-  name: string;     // "Argentina"
-  flag: string;     // "🇦🇷"
-  group: string;    // "A" through "L"
+  id: TeamId;      // FIFA 3-letter code, union literal
+  flag: string;    // "🇦🇷"
+  group: string;   // "A" through "L"
 }
 
 export interface Score {
@@ -81,7 +83,7 @@ export type FixtureMode = "results" | "predictions";
 
 export interface FixtureState {
   mode: FixtureMode;
-  teams: Team[];
+  teams: readonly Team[];
   groupMatches: GroupMatch[];
   knockoutMatches: KnockoutMatch[];
   activeView: ViewTarget;

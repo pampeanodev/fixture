@@ -96,10 +96,10 @@ export interface RankedPlayer {
   pending: number;
 }
 
-export function computeRanking(state: FixtureState): RankedPlayer[] {
+export function computeRanking(state: FixtureState, localNameFallback = "Yo"): RankedPlayer[] {
   const players: RankedPlayer[] = [];
 
-  const localName = state.playerName.trim() || "Yo";
+  const localName = state.playerName.trim() || localNameFallback;
   const localPreds = extractLocalPredictions(state.groupMatches, state.knockoutMatches);
   const localScore = calculatePlayerScore(state.groupMatches, state.knockoutMatches, localPreds);
   players.push({ name: localName, isLocal: true, ...localScore });

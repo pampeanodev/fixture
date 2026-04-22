@@ -1,157 +1,148 @@
 import type { DriveStep } from "driver.js";
+import type { TFunction } from "../i18n/translate";
 
 export type TourId = "overview" | "groups" | "knockout" | "rooms" | "simulator";
 
-const overview: DriveStep[] = [
-  {
-    popover: {
-      title: "Bienvenido al Prode 2026",
-      description:
-        "Predecís los 104 partidos del Mundial y ganás puntos cuando acertás." +
-        "<br><br>" +
-        "<strong>3 pts</strong> resultado exacto · <strong>1 pt</strong> solo ganador · <strong>0</strong> errado.",
-    },
-  },
-  {
-    element: '[data-tour="mode-toggle"]',
-    popover: {
-      title: "Resultados vs Predicciones",
-      description:
-        "Cambiás entre cargar lo que pensás que va a pasar (Predicciones) y lo que pasó realmente (Resultados). Tus puntos salen de comparar ambos.",
-    },
-  },
-  {
-    element: '[data-tour="nav-groups"]',
-    popover: {
-      title: "Grupos",
-      description:
-        "72 partidos de fase de grupos divididos en 12 grupos (A a L). La tabla se recalcula sola con tus predicciones.",
-    },
-  },
-  {
-    element: '[data-tour="nav-knockout"]',
-    popover: {
-      title: "Eliminatorias",
-      description:
-        "32 partidos desde 32avos hasta la final. Los cruces se arman automáticamente según tus predicciones de grupos — no los definís a mano.",
-    },
-  },
-  {
-    element: '[data-tour="nav-rooms"]',
-    popover: {
-      title: "Salas",
-      description:
-        "Competí con amigos. Creás una sala, compartís el link, y los rankings se sincronizan peer-to-peer (sin backend).",
-    },
-  },
-  {
-    element: '[data-tour="help-button"]',
-    popover: {
-      title: "¿Dudas más adelante?",
-      description:
-        "Tocá este botón en cualquier pantalla para abrir un tour específico de lo que estás viendo.",
-      side: "left",
-    },
-  },
-];
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 
-const groups: DriveStep[] = [
-  {
-    element: '[data-tour="group-tabs"]',
-    popover: {
-      title: "Grupos A–L",
-      description: "Cambiás entre los 12 grupos desde estos tabs.",
-    },
-  },
-  {
-    element: '[data-tour="standings-table"]',
-    popover: {
-      title: "Tabla de posiciones",
-      description:
-        "Se recalcula en vivo con tus predicciones. Verde = clasifica directo a 32avos. Amarillo = 3er puesto, puede pasar como mejor tercero junto a otros 7 de otros grupos.",
-    },
-  },
-  {
-    element: '[data-tour="match-cards"]',
-    popover: {
-      title: "Cargar predicción",
-      description:
-        "Escribí el score de cada partido. Se guarda solo. Si estás en modo Resultados, cargás el resultado real. Desde el menú ⋯ podés regenerar todas las predicciones random de un toque.",
-    },
-  },
-];
+function renderTourHtml(template: string): string {
+  return template.replace(
+    /<(\d+)>([\s\S]*?)<\/\1>/g,
+    (_, _id, content: string) => `<strong>${escapeHtml(content)}</strong>`,
+  );
+}
 
-const knockout: DriveStep[] = [
-  {
-    element: '[data-tour="round-tabs"]',
-    popover: {
-      title: "Rondas de eliminatorias",
-      description: "Navegás entre 32avos, Octavos, Cuartos, Semis y Final desde estos tabs.",
+export function buildTours(t: TFunction): Record<TourId, DriveStep[]> {
+  const overview: DriveStep[] = [
+    {
+      popover: {
+        title: t("tour.overview.welcomeTitle"),
+        description: renderTourHtml(t("tour.overview.welcomeBody")),
+      },
     },
-  },
-  {
-    popover: {
-      title: "Cruces automáticos",
-      description:
-        "Los equipos que aparecen en cada cruce salen de tus predicciones de grupos (1° de A, 2° de B, mejores terceros, etc.). Cuando cargás un partido, el ganador pasa solo al siguiente cruce.",
+    {
+      element: '[data-tour="mode-toggle"]',
+      popover: {
+        title: t("tour.overview.modeTitle"),
+        description: t("tour.overview.modeBody"),
+      },
     },
-  },
-];
+    {
+      element: '[data-tour="nav-groups"]',
+      popover: {
+        title: t("tour.overview.groupsTitle"),
+        description: t("tour.overview.groupsBody"),
+      },
+    },
+    {
+      element: '[data-tour="nav-knockout"]',
+      popover: {
+        title: t("tour.overview.knockoutTitle"),
+        description: t("tour.overview.knockoutBody"),
+      },
+    },
+    {
+      element: '[data-tour="nav-rooms"]',
+      popover: {
+        title: t("tour.overview.roomsTitle"),
+        description: t("tour.overview.roomsBody"),
+      },
+    },
+    {
+      element: '[data-tour="help-button"]',
+      popover: {
+        title: t("tour.overview.helpTitle"),
+        description: t("tour.overview.helpBody"),
+        side: "left",
+      },
+    },
+  ];
 
-const rooms: DriveStep[] = [
-  {
-    element: '[data-tour="room-create"]',
-    popover: {
-      title: "Crear sala",
-      description:
-        "Ponele nombre y elegí el tipo: abierta (cualquiera con el link entra) o cerrada (generás invites de un solo uso). Te da un código de 8 caracteres y un link para compartir.",
+  const groups: DriveStep[] = [
+    {
+      element: '[data-tour="group-tabs"]',
+      popover: {
+        title: t("tour.groups.tabsTitle"),
+        description: t("tour.groups.tabsBody"),
+      },
     },
-  },
-  {
-    element: '[data-tour="room-join"]',
-    popover: {
-      title: "Unirme con código",
-      description:
-        "Si alguien te pasó un código de 8 caracteres, pegalo acá. Lo más cómodo igual es abrir el link de invitación que te manden — te mete solo.",
+    {
+      element: '[data-tour="standings-table"]',
+      popover: {
+        title: t("tour.groups.standingsTitle"),
+        description: t("tour.groups.standingsBody"),
+      },
     },
-  },
-  {
-    popover: {
-      title: "Commit-reveal",
-      description:
-        "Tus predicciones se publican encriptadas hasta 1 hora antes del kickoff de cada partido. Nadie las puede ver antes (ni el relay ni los rivales).",
+    {
+      element: '[data-tour="match-cards"]',
+      popover: {
+        title: t("tour.groups.matchesTitle"),
+        description: t("tour.groups.matchesBody"),
+      },
     },
-  },
-];
+  ];
 
-const simulator: DriveStep[] = [
-  {
-    popover: {
-      title: "Modo simulación",
-      description:
-        "Jugá el mundial entero antes que empiece. Para cada partido podés simular random, cargar un score manual, o saltarlo.",
+  const knockout: DriveStep[] = [
+    {
+      element: '[data-tour="round-tabs"]',
+      popover: {
+        title: t("tour.knockout.tabsTitle"),
+        description: t("tour.knockout.tabsBody"),
+      },
     },
-  },
-  {
-    popover: {
-      title: "Ranking en vivo",
-      description:
-        "Después de cada partido ves el ranking actualizado con flechas (↑↓) según quién subió o bajó.",
+    {
+      popover: {
+        title: t("tour.knockout.autoTitle"),
+        description: t("tour.knockout.autoBody"),
+      },
     },
-  },
-  {
-    popover: {
-      title: "No afecta tu prode real",
-      description:
-        "Cuando salís de simulación, todo vuelve al estado real. Tus predicciones quedan intactas. Si recargás el browser, también volvés al real.",
-    },
-  },
-];
+  ];
 
-export const TOURS: Record<TourId, DriveStep[]> = {
-  overview,
-  groups,
-  knockout,
-  rooms,
-  simulator,
-};
+  const rooms: DriveStep[] = [
+    {
+      element: '[data-tour="room-create"]',
+      popover: {
+        title: t("tour.rooms.createTitle"),
+        description: t("tour.rooms.createBody"),
+      },
+    },
+    {
+      element: '[data-tour="room-join"]',
+      popover: {
+        title: t("tour.rooms.joinTitle"),
+        description: t("tour.rooms.joinBody"),
+      },
+    },
+    {
+      popover: {
+        title: t("tour.rooms.commitTitle"),
+        description: t("tour.rooms.commitBody"),
+      },
+    },
+  ];
+
+  const simulator: DriveStep[] = [
+    {
+      popover: {
+        title: t("tour.simulator.modeTitle"),
+        description: t("tour.simulator.modeBody"),
+      },
+    },
+    {
+      popover: {
+        title: t("tour.simulator.rankingTitle"),
+        description: t("tour.simulator.rankingBody"),
+      },
+    },
+    {
+      popover: {
+        title: t("tour.simulator.safeTitle"),
+        description: t("tour.simulator.safeBody"),
+      },
+    },
+  ];
+
+  return { overview, groups, knockout, rooms, simulator };
+}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocale } from "../i18n";
 import { QRDisplay } from "./QRDisplay";
 import "./DonateModal.css";
 
@@ -8,6 +9,7 @@ interface DonateModalProps {
 }
 
 export function DonateModal({ lightningAddress, onClose }: DonateModalProps) {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -20,19 +22,19 @@ export function DonateModal({ lightningAddress, onClose }: DonateModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>⚡ Apoyar el proyecto</h2>
+          <h2>{t("donate.title")}</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
 
         <div className="modal-section">
           <p className="donate-intro">
-            Si el proyecto te sirve, podés dejar un tip con cualquier wallet Lightning.
+            {t("donate.intro")}
           </p>
 
           <div className="donate-address">
             <code className="donate-address-text">{lightningAddress}</code>
             <button className="modal-btn" onClick={handleCopy}>
-              {copied ? "Copiado" : "Copiar"}
+              {copied ? t("common.copied") : t("common.copy")}
             </button>
           </div>
 
@@ -41,8 +43,7 @@ export function DonateModal({ lightningAddress, onClose }: DonateModalProps) {
           </div>
 
           <p className="donate-help">
-            Escaneá el QR con tu wallet, o pegá la dirección en el campo "Send".
-            También funciona como zap desde cualquier cliente Nostr.
+            {t("donate.help")}
           </p>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { useLocale } from "../i18n";
 import "./HelpButton.css";
 
 interface HelpButtonProps {
@@ -5,12 +6,13 @@ interface HelpButtonProps {
 }
 
 export function HelpButton({ onStart }: HelpButtonProps) {
+  const { t } = useLocale();
   return (
     <button
       className="help-fab"
       data-tour="help-button"
-      aria-label="Abrir tour de ayuda"
-      title="Tour de esta pantalla"
+      aria-label={t("common.helpAria")}
+      title={t("common.helpTitle")}
       onClick={onStart}
     >
       ?
