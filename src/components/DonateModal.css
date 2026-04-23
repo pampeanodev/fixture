@@ -1,5 +1,7 @@
+/* Donate-specific styles. Shared modal primitives live in src/styles/modal.css. */
+
 .donate-intro {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-on-dark-muted);
   font-size: 13px;
   line-height: 1.5;
   margin: 0 0 16px;
@@ -9,9 +11,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(253, 216, 53, 0.06);
-  border: 1px solid rgba(253, 216, 53, 0.2);
-  border-radius: 8px;
+  background: var(--accent-gold-soft);
+  border: 1px solid var(--accent-gold-border);
+  border-radius: var(--radius-md);
   padding: 10px 12px;
   margin-bottom: 16px;
 }
@@ -25,7 +27,7 @@
 }
 
 .donate-help {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-on-dark-subtle);
   font-size: 11px;
   text-align: center;
   margin: 12px 0 0;

@@ -1,0 +1,54 @@
+/* Design tokens. Component CSS reads from here; never hardcode hex values. */
+:root {
+  /* Brand — greens/gold of the tournament palette */
+  --sidebar-bg: #0d3311;
+  --sidebar-text: #a5d6a7;
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-border: #fdd835;
+  --sidebar-section-title: #66bb6a;
+  --topbar-bg: #1b5e20;
+  --topbar-text: #ffffff;
+  --content-bg: #f5f5f0;
+  --content-text: #333333;
+  --accent-green: #2e7d32;
+  --accent-gold: #fdd835;
+  --accent-qualify: #c8e6c9;
+  --accent-maybe: #fff9c4;
+  --accent-eliminated: #ffcdd2;
+  --card-bg: #ffffff;
+  --card-border: #e0e0e0;
+  --prediction-blue: #1565c0;
+  --result-green: #2e7d32;
+
+  /* Surfaces on dark backgrounds (modals, popovers) — derived from brand */
+  --surface-overlay: rgba(0, 0, 0, 0.6);
+  --surface-modal: #14401a;
+  --surface-raised: rgba(255, 255, 255, 0.06);
+  --surface-raised-hover: rgba(255, 255, 255, 0.12);
+  --surface-inset: rgba(0, 0, 0, 0.25);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-muted: rgba(255, 255, 255, 0.18);
+
+  /* Text on dark surfaces */
+  --text-on-dark: #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.7);
+  --text-on-dark-subtle: rgba(255, 255, 255, 0.5);
+  --text-on-dark-faint: rgba(255, 255, 255, 0.4);
+
+  /* Accent in alpha forms — for soft backgrounds and borders */
+  --accent-gold-soft: rgba(253, 216, 53, 0.15);
+  --accent-gold-soft-hover: rgba(253, 216, 53, 0.25);
+  --accent-gold-border: rgba(253, 216, 53, 0.45);
+
+  /* Semantic status colors (used on dark surfaces) */
+  --status-success: #6ad599;
+  --status-danger: #ff8b8b;
+  --status-danger-bg: rgba(220, 60, 60, 0.15);
+  --status-danger-border: rgba(220, 60, 60, 0.4);
+
+  /* Layout */
+  --sidebar-width: 200px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}

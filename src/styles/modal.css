@@ -1,0 +1,105 @@
+/* Modal primitives — shared by every dialog in the app.
+   Consumers: AccountModal, InviteModal, DonateModal, SettingsModal. */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--surface-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 20px;
+}
+
+.modal-card {
+  background: var(--surface-modal);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  animation: modal-in 0.15s ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  color: var(--text-on-dark);
+  font-size: 18px;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-on-dark-subtle);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text-on-dark);
+}
+
+.modal-section {
+  margin-bottom: 20px;
+}
+
+.modal-section h3 {
+  color: var(--text-on-dark);
+  font-size: 14px;
+  margin: 0 0 6px;
+}
+
+.modal-note {
+  background: var(--surface-raised);
+  border-left: 3px solid var(--accent-gold-border);
+  color: var(--text-on-dark-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.modal-warning {
+  color: var(--accent-gold);
+  font-size: 12px;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.modal-btn {
+  padding: 10px 16px;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--text-on-dark);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.modal-btn:hover:not(:disabled) {
+  background: var(--surface-raised-hover);
+}
+
+.modal-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

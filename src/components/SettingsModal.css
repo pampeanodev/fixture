@@ -1,12 +1,11 @@
-/* Inherits .modal-overlay, .modal-card, .modal-header, .modal-close,
-   .modal-section, .modal-btn from AccountModal.css — only add the bits
-   specific to this modal. */
+/* Shared modal primitives live in src/styles/modal.css.
+   This file holds only what's specific to the settings modal. */
 
 .settings-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #ffffff;
+  color: var(--text-on-dark);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -16,12 +15,12 @@
 .settings-toggle input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #f5a623;
+  accent-color: var(--accent-gold);
   cursor: pointer;
 }
 
 .settings-help {
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--text-on-dark-muted);
   font-size: 12px;
   line-height: 1.5;
   margin: 8px 0 0;
@@ -33,46 +32,46 @@
 }
 
 .settings-meta-label {
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-on-dark-subtle);
   font-size: 12px;
 }
 
 .settings-breaker {
-  background: rgba(245, 166, 35, 0.08);
-  border: 1px solid rgba(245, 166, 35, 0.3);
-  border-radius: 8px;
+  background: var(--accent-gold-soft);
+  border: 1px solid var(--accent-gold-border);
+  border-radius: var(--radius-md);
   padding: 12px 14px;
 }
 
 .settings-breaker strong {
   display: block;
-  color: #f5a623;
+  color: var(--accent-gold);
   font-size: 13px;
   margin-bottom: 4px;
 }
 
 .settings-breaker p {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-on-dark-muted);
   font-size: 12px;
   line-height: 1.4;
   margin: 0 0 10px;
 }
 
 .settings-report {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   padding: 12px 14px;
 }
 
 .settings-report h3 {
-  color: #ffffff;
+  color: var(--text-on-dark);
   font-size: 13px;
   margin: 0 0 6px;
 }
 
 .settings-report p {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-on-dark-muted);
   font-size: 12px;
   margin: 0;
 }
@@ -89,10 +88,10 @@
 }
 
 .settings-report-list li {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-on-dark-muted);
   font-size: 11px;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  background: var(--surface-inset);
+  border-radius: var(--radius-sm);
 }
