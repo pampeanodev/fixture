@@ -1,0 +1,28 @@
+.autosync-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  background: rgba(200, 80, 0, 0.95);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 92vw;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  z-index: 150;
+  font-size: 0.9rem;
+}
+.autosync-banner button {
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+.autosync-banner button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

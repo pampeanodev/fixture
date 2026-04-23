@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AccountModal } from "./AccountModal";
 import { DonateModal } from "./DonateModal";
+import { SettingsModal } from "./SettingsModal";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { useLocale } from "../i18n";
 import "./SidebarFooter.css";
@@ -13,10 +14,20 @@ export function SidebarFooter() {
   const { t } = useLocale();
   const [showAccount, setShowAccount] = useState(false);
   const [showDonate, setShowDonate] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <>
       <div className="sidebar-footer">
+        <button
+          type="button"
+          className="sidebar-footer-settings"
+          onClick={() => setShowSettings(true)}
+        >
+          <span aria-hidden="true">⚙</span>
+          <span>{t("autoSync.sidebarEntry")}</span>
+        </button>
+
         <button
           type="button"
           className="sidebar-footer-account"
@@ -74,6 +85,7 @@ export function SidebarFooter() {
           onClose={() => setShowDonate(false)}
         />
       )}
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </>
   );
 }

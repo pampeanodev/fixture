@@ -1,0 +1,311 @@
+.autosync-inspector {
+  position: fixed;
+  inset: 0;
+  background: #14142a;
+  color: #eaeaf3;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 500;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+}
+
+.asi-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.asi-header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.asi-dev {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(245, 166, 35, 0.2);
+  color: #f5a623;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.asi-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.asi-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.asi-controls select,
+.asi-controls input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  min-width: 180px;
+}
+
+.asi-controls select:focus,
+.asi-controls input:focus {
+  outline: none;
+  border-color: rgba(245, 166, 35, 0.5);
+}
+
+.asi-fetch {
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 166, 35, 0.5);
+  background: rgba(245, 166, 35, 0.2);
+  color: #f5a623;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  align-self: stretch;
+}
+
+.asi-fetch:hover:not(:disabled) {
+  background: rgba(245, 166, 35, 0.3);
+}
+
+.asi-fetch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.asi-error {
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgba(220, 60, 60, 0.15);
+  border: 1px solid rgba(220, 60, 60, 0.4);
+  color: #ff8b8b;
+  margin-bottom: 14px;
+}
+
+.asi-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+.asi-summary span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.asi-summary b {
+  color: #ffffff;
+  margin-left: 4px;
+  font-weight: 700;
+}
+
+.asi-summary-ok b { color: #6ad599; }
+.asi-summary-idem b { color: rgba(255, 255, 255, 0.55); }
+.asi-summary-skip b { color: #ff8b8b; }
+
+.asi-summary-copy {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.asi-summary-copy:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.asi-rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.asi-empty {
+  padding: 20px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+.asi-row {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.asi-row--ok {
+  border-left: 3px solid #6ad599;
+}
+
+.asi-row--idempotent {
+  border-left: 3px solid rgba(255, 255, 255, 0.25);
+}
+
+.asi-row--skip {
+  border-left: 3px solid #ff8b8b;
+}
+
+.asi-row-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.asi-row-icon {
+  font-weight: 700;
+  font-size: 15px;
+  width: 16px;
+  display: inline-block;
+  text-align: center;
+}
+
+.asi-row--ok .asi-row-icon { color: #6ad599; }
+.asi-row--idempotent .asi-row-icon { color: rgba(255, 255, 255, 0.45); }
+.asi-row--skip .asi-row-icon { color: #ff8b8b; }
+
+.asi-row-score {
+  font-weight: 600;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3px;
+}
+
+.asi-row-status {
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.asi-row-verdict {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.asi-row-verdict code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.asi-row-meta {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.asi-row-meta code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.asi-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.asi-row-actions button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.asi-row-actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.asi-row-json {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  background: #0b0b1a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  max-height: 320px;
+  overflow: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #c6c6de;
+}
+
+.asi-row-json--norm {
+  color: #a8e8c3;
+}
+
+.asi-scoreboard {
+  margin-top: 18px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.asi-scoreboard summary {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  user-select: none;
+}
+
+.asi-scoreboard pre {
+  margin: 10px 0 0;
+  padding: 10px;
+  background: #0b0b1a;
+  border-radius: 6px;
+  max-height: 40vh;
+  overflow: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #c6c6de;
+}

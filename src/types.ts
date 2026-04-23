@@ -116,4 +116,9 @@ export type FixtureAction =
   | { type: "CLEAR_SYNCED_RESULTS" }
   | { type: "ENTER_SIMULATION" }
   | { type: "EXIT_SIMULATION" }
-  | { type: "RESET_SIMULATION" };
+  | { type: "RESET_SIMULATION" }
+  | {
+      type: "APPLY_AUTOSYNC_RESULTS";
+      groupResults: Record<string, Score>;
+      knockoutResults: Record<string, Score>;
+    };

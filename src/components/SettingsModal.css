@@ -1,0 +1,98 @@
+/* Inherits .modal-overlay, .modal-card, .modal-header, .modal-close,
+   .modal-section, .modal-btn from AccountModal.css — only add the bits
+   specific to this modal. */
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #f5a623;
+  cursor: pointer;
+}
+
+.settings-help {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+.settings-meta {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.settings-meta-label {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+.settings-breaker {
+  background: rgba(245, 166, 35, 0.08);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.settings-breaker strong {
+  display: block;
+  color: #f5a623;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.settings-breaker p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+
+.settings-report {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.settings-report h3 {
+  color: #ffffff;
+  font-size: 13px;
+  margin: 0 0 6px;
+}
+
+.settings-report p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  margin: 0;
+}
+
+.settings-report-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.settings-report-list li {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}

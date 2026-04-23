@@ -14,6 +14,9 @@ import { SimulatorView } from "./components/SimulatorView";
 import { Onboarding } from "./components/Onboarding";
 import { HelpMenu } from "./components/HelpMenu";
 import { useNostrSync } from "./hooks/useNostrSync";
+import { useAutoResultSync } from "./hooks/useAutoResultSync";
+import { AutoSyncBanner } from "./components/AutoSyncBanner";
+import { AutoSyncInspector } from "./components/AutoSyncInspector";
 import type { TourId } from "./tour/steps";
 import type { ViewTarget } from "./types";
 import "./App.css";
@@ -31,6 +34,7 @@ function contextTour(activeView: ViewTarget): TourId {
 
 function NostrSyncBridge() {
   useNostrSync();
+  useAutoResultSync();
   return null;
 }
 
@@ -66,6 +70,10 @@ function AppContent() {
   const { state } = useFixture();
   const { activeView } = state;
   const { isOpen, isMobile, setOpen, toggle } = useSidebar();
+  const showInspector =
+    import.meta.env.DEV &&
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("devSync");
 
   function handleNavigation() {
     if (isMobile) setOpen(false);
@@ -76,6 +84,8 @@ function AppContent() {
       <NostrSyncBridge />
       <InviteRouter />
       <TourBridge activeView={activeView} />
+      <AutoSyncBanner />
+      {showInspector && <AutoSyncInspector />}
       <div className="app-layout">
         {isMobile && isOpen && (
           <div className="sidebar-overlay visible" onClick={() => setOpen(false)} />

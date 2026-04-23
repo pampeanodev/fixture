@@ -1,0 +1,17 @@
+{
+  "events": [
+    {
+      "id": "synthetic-unknown-1",
+      "date": "2026-06-15T18:00:00Z",
+      "status": { "type": { "name": "STATUS_FULL_TIME", "completed": true, "state": "post" } },
+      "competitions": [
+        {
+          "competitors": [
+            { "homeAway": "home", "score": "2", "team": { "abbreviation": "ZZZ" } },
+            { "homeAway": "away", "score": "1", "team": { "abbreviation": "ARG" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

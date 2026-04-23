@@ -11,10 +11,20 @@ interface ScoreInputProps {
   allowPenalties?: boolean;
   locked?: boolean;
   synced?: boolean;
+  disabled?: boolean;
+  lockedReason?: string;
+  autoSyncedAt?: number;
 }
 
-export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, allowPenalties, locked, synced }: ScoreInputProps) {
+export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, allowPenalties, locked, synced, disabled, lockedReason, autoSyncedAt }: ScoreInputProps) {
   const { t } = useLocale();
+  const autoSyncTooltip = autoSyncedAt
+    ? t("autoSync.autoSyncedTooltip", { datetime: new Date(autoSyncedAt).toLocaleString() })
+    : undefined;
+  const effectiveDisabled = locked || disabled;
+  const inputTitle = effectiveDisabled
+    ? (locked ? undefined : (lockedReason ?? autoSyncTooltip))
+    : autoSyncTooltip;
   const [homeStr, setHomeStr] = useState(score?.home?.toString() ?? "");
   const [awayStr, setAwayStr] = useState(score?.away?.toString() ?? "");
   const homeRef = useRef<HTMLInputElement>(null);
@@ -61,14 +71,16 @@ export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, 
       )}
       <input ref={homeRef} type="number" min="0" max="99"
         className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-        disabled={locked}
+        disabled={locked || disabled}
+        title={inputTitle}
         value={homeStr} onChange={(e) => setHomeStr(e.target.value)}
         onBlur={commitScore} onKeyDown={handleKeyDown}
         aria-label={t("scoreInput.ariaHome", { team: "home" })} />
       <span className="score-separator">-</span>
       <input type="number" min="0" max="99"
         className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-        disabled={locked}
+        disabled={locked || disabled}
+        title={inputTitle}
         value={awayStr} onChange={(e) => setAwayStr(e.target.value)}
         onBlur={commitScore} onKeyDown={handleKeyDown}
         aria-label={t("scoreInput.ariaAway", { team: "away" })} />

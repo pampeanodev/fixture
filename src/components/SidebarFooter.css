@@ -7,7 +7,8 @@
   color: var(--sidebar-text);
 }
 
-.sidebar-footer-account {
+.sidebar-footer-account,
+.sidebar-footer-settings {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -22,9 +23,14 @@
   font-family: inherit;
   transition: background 0.15s, color 0.15s;
 }
-.sidebar-footer-account:hover {
+.sidebar-footer-account:hover,
+.sidebar-footer-settings:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--sidebar-active-text);
+}
+.sidebar-footer-settings > span:first-child {
+  font-size: 14px;
+  line-height: 1;
 }
 .sidebar-footer-account-icon {
   font-size: 14px;

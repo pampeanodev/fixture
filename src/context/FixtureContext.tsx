@@ -123,6 +123,21 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
         knockoutMatches: state.simulationSnapshot.knockoutMatches,
       };
     }
+    case "APPLY_AUTOSYNC_RESULTS": {
+      // Auto-sync: only fill voids. Never overwrite an existing result, regardless of source.
+      // Never touch predictions. Never touch syncedResultIds (that's for Nostr admin push).
+      const groupMatches = state.groupMatches.map((m) => {
+        if (m.result !== null) return m;
+        const incoming = action.groupResults[m.id];
+        return incoming ? { ...m, result: incoming } : m;
+      });
+      const knockoutMatches = state.knockoutMatches.map((m) => {
+        if (m.result !== null) return m;
+        const incoming = action.knockoutResults[m.id];
+        return incoming ? { ...m, result: incoming } : m;
+      });
+      return { ...state, groupMatches, knockoutMatches };
+    }
     default:
       return state;
   }

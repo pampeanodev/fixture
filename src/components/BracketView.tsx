@@ -2,6 +2,10 @@ import { useFixture } from "../context/FixtureContext";
 import { ScoreInput } from "./ScoreInput";
 import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
+import { isMatchEditable } from "../espn/graceLock";
+import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
+import { loadBreakerState } from "../espn/circuitBreaker";
+import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
 import type { TFunction } from "../i18n/translate";
 import type { KnockoutRound, KnockoutMatch } from "../types";
@@ -30,6 +34,10 @@ export function BracketView({ round }: { round: KnockoutRound }) {
   const { t, formatDate } = useLocale();
   const isPrediction = state.mode === "predictions";
   const roundsToShow: KnockoutRound[] = round === "F" ? ["F", "3P"] : [round];
+  const autoSyncEnabled = loadAutoSyncEnabled();
+  const breakerState = loadBreakerState();
+  const now = getEffectiveNow();
+  const autoSyncMeta = loadAutoSyncMeta();
 
   return (
     <div className="bracket-view">
@@ -55,6 +63,11 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                 const currentScore = isPrediction ? match.prediction : match.result;
                 const readonlyScore = isPrediction ? match.result : undefined;
                 const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
+                const editable = isMatchEditable(match, {
+                  autoSyncEnabled,
+                  circuitBreakerTripped: breakerState.tripped,
+                  now,
+                });
                 return (
                   <div key={match.id} className={`bracket-match-card ${r === "3P" ? "third-place" : ""}`}>
                     <div className="bracket-match-header">
@@ -70,7 +83,10 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                           onScoreChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score })}
                           isPrediction={isPrediction} readonlyScore={readonlyScore ?? undefined} allowPenalties
                           locked={isPrediction && isMatchLocked(match.dateUtc)}
-                          synced={!isPrediction && state.syncedResultIds.includes(match.id)} />
+                          synced={!isPrediction && state.syncedResultIds.includes(match.id)}
+                          disabled={!editable && !isPrediction}
+                          lockedReason={t("autoSync.waitingResult")}
+                          autoSyncedAt={autoSyncMeta.autoSyncedAt[match.id]} />
                       ) : <span className="score-separator">{t("knockout.vs")}</span>}
                       <div className={`bracket-team ${!awayTeam ? "pending" : ""}`}>
                         {awayTeam ? (<><span className="team-flag">{awayTeam.flag}</span><span>{t(`teams.${awayTeam.id}`)}</span></>) : <span>{slotLabel(t, match, "away")}</span>}

@@ -1,0 +1,16 @@
+{
+  "events": [
+    {
+      "id": "synthetic-malformed-1",
+      "date": "2026-06-15T18:00:00Z",
+      "status": { "type": { "name": "STATUS_FULL_TIME" } },
+      "competitions": [
+        {
+          "competitors": [
+            { "homeAway": "home", "score": "2", "team": { "abbreviation": "ARG" } }
+          ]
+        }
+      ]
+    }
+  ]
+}

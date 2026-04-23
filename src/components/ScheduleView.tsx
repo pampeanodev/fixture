@@ -2,6 +2,10 @@ import { useMemo, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
+import { isMatchEditable } from "../espn/graceLock";
+import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
+import { loadBreakerState } from "../espn/circuitBreaker";
+import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
 import type { KnockoutRound, Score } from "../types";
 import "./ScheduleView.css";
@@ -18,6 +22,7 @@ interface UnifiedMatch {
   hasResult: boolean;
   currentScore: Score | null;
   realScore: Score | null;
+  editable: boolean;
 }
 
 export function ScheduleView() {
@@ -27,6 +32,14 @@ export function ScheduleView() {
   const scoreField = isPrediction ? "prediction" : "result";
 
   const allMatches = useMemo(() => {
+    const autoSyncEnabled = loadAutoSyncEnabled();
+    const breakerState = loadBreakerState();
+    const now = getEffectiveNow();
+    const ctx = {
+      autoSyncEnabled,
+      circuitBreakerTripped: breakerState.tripped,
+      now,
+    };
     const matches: UnifiedMatch[] = [];
     for (const m of state.groupMatches) {
       matches.push({
@@ -36,6 +49,7 @@ export function ScheduleView() {
         hasResult: m[scoreField] !== null,
         currentScore: m[scoreField],
         realScore: m.result,
+        editable: isMatchEditable(m, ctx),
       });
     }
     for (const m of resolvedKnockout) {
@@ -46,6 +60,7 @@ export function ScheduleView() {
         hasResult: m[scoreField] !== null,
         currentScore: m[scoreField],
         realScore: m.result,
+        editable: isMatchEditable(m, ctx),
       });
     }
     matches.sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
@@ -72,6 +87,8 @@ export function ScheduleView() {
     return groups;
   }, [allMatches, dayFormatter]);
 
+  const autoSyncMeta = loadAutoSyncMeta();
+
   function handleScoreChange(matchId: string, isKnockout: boolean, score: Score | null) {
     if (isKnockout) {
       dispatch({ type: "SET_KNOCKOUT_SCORE", matchId, score });
@@ -94,17 +111,26 @@ export function ScheduleView() {
         <div key={day}>
           <div className="schedule-day-header">{day}</div>
           <div className="schedule-day-matches">
-          {matches.map((match) => (
-            <ScheduleMatchCard
-              key={match.id}
-              match={match}
-              label={stageLabelFor(match)}
-              isPrediction={isPrediction}
-              locked={isPrediction && isMatchLocked(match.dateUtc)}
-              synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-              onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
-            />
-          ))}
+          {matches.map((match) => {
+            const ts = autoSyncMeta.autoSyncedAt[match.id];
+            const autoSyncTooltip = ts
+              ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
+              : undefined;
+            return (
+              <ScheduleMatchCard
+                key={match.id}
+                match={match}
+                label={stageLabelFor(match)}
+                isPrediction={isPrediction}
+                locked={isPrediction && isMatchLocked(match.dateUtc)}
+                synced={!isPrediction && state.syncedResultIds.includes(match.id)}
+                disabled={!match.editable && !isPrediction}
+                lockedReason={t("autoSync.waitingResult")}
+                autoSyncTooltip={autoSyncTooltip}
+                onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
+              />
+            );
+          })}
           </div>
         </div>
       ))}
@@ -112,14 +138,21 @@ export function ScheduleView() {
   );
 }
 
-function ScheduleMatchCard({ match, label, isPrediction, locked, synced, onScoreChange }: {
+function ScheduleMatchCard({ match, label, isPrediction, locked, synced, disabled, lockedReason, autoSyncTooltip, onScoreChange }: {
   match: UnifiedMatch;
   label: string;
   isPrediction: boolean;
   locked?: boolean;
   synced?: boolean;
+  disabled?: boolean;
+  lockedReason?: string;
+  autoSyncTooltip?: string;
   onScoreChange: (score: Score | null) => void;
 }) {
+  const effectiveDisabled = locked || disabled;
+  const inputTitle = effectiveDisabled
+    ? (locked ? undefined : (lockedReason ?? autoSyncTooltip))
+    : autoSyncTooltip;
   const { t, formatTime } = useLocale();
   const [homeStr, setHomeStr] = useState(match.currentScore?.home?.toString() ?? "");
   const [awayStr, setAwayStr] = useState(match.currentScore?.away?.toString() ?? "");
@@ -177,7 +210,8 @@ function ScheduleMatchCard({ match, label, isPrediction, locked, synced, onScore
         {bothKnown && (
           <input type="number" min="0" max="99"
             className={`schedule-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-            disabled={locked}
+            disabled={locked || disabled}
+            title={inputTitle}
             value={homeStr}
             onChange={(e) => { setHomeStr(e.target.value); commitScore(e.target.value, awayStr); }} />
         )}
@@ -194,7 +228,8 @@ function ScheduleMatchCard({ match, label, isPrediction, locked, synced, onScore
         {bothKnown && (
           <input type="number" min="0" max="99"
             className={`schedule-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-            disabled={locked}
+            disabled={locked || disabled}
+            title={inputTitle}
             value={awayStr}
             onChange={(e) => { setAwayStr(e.target.value); commitScore(homeStr, e.target.value); }} />
         )}
