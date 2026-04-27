@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useLocale } from "../i18n";
+import { CafecitoButton } from "./CafecitoButton";
 import { QRDisplay } from "./QRDisplay";
 import "./DonateModal.css";
 
 interface DonateModalProps {
   lightningAddress: string;
+  cafecitoUsername: string;
   onClose: () => void;
 }
 
-export function DonateModal({ lightningAddress, onClose }: DonateModalProps) {
+export function DonateModal({ lightningAddress, cafecitoUsername, onClose }: DonateModalProps) {
   const { t } = useLocale();
   const [copied, setCopied] = useState(false);
 
@@ -31,20 +33,37 @@ export function DonateModal({ lightningAddress, onClose }: DonateModalProps) {
             {t("donate.intro")}
           </p>
 
-          <div className="donate-address">
-            <code className="donate-address-text">{lightningAddress}</code>
-            <button className="modal-btn" onClick={handleCopy}>
-              {copied ? t("common.copied") : t("common.copy")}
-            </button>
+          <div className="donate-method">
+            <h3 className="donate-method-label">{t("donate.cafecitoSection")}</h3>
+            <div className="donate-cafecito">
+              <CafecitoButton
+                username={cafecitoUsername}
+                label={t("donate.cafecitoCta")}
+              />
+            </div>
           </div>
 
-          <div className="qr-display">
-            <QRDisplay value={`lightning:${lightningAddress}`} size={220} />
+          <div className="donate-divider" role="separator" aria-orientation="horizontal">
+            <span>{t("donate.or")}</span>
           </div>
 
-          <p className="donate-help">
-            {t("donate.help")}
-          </p>
+          <div className="donate-method">
+            <h3 className="donate-method-label">{t("donate.lightningSection")}</h3>
+            <div className="donate-address">
+              <code className="donate-address-text">{lightningAddress}</code>
+              <button className="modal-btn" onClick={handleCopy}>
+                {copied ? t("common.copied") : t("common.copy")}
+              </button>
+            </div>
+
+            <div className="qr-display">
+              <QRDisplay value={`lightning:${lightningAddress}`} size={220} />
+            </div>
+
+            <p className="donate-help">
+              {t("donate.help")}
+            </p>
+          </div>
         </div>
       </div>
     </div>
