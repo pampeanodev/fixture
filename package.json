@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@11.1.3",
   "description": "Mundial 2026 — Fixture interactivo con prode y sync P2P via Nostr",
   "license": "GPL-3.0-or-later",
   "author": "Pampeano Dev <pampeanobtc@gmail.com>",
