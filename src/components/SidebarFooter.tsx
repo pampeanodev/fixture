@@ -9,7 +9,6 @@ import "./SidebarFooter.css";
 const REPO_URL = "https://github.com/pampeanodev/fixture";
 const LICENSE_URL = `${REPO_URL}/blob/main/LICENSE`;
 const DONATION_LN_ADDRESS = "noisyfox5@primal.net";
-const DONATION_CAFECITO_USERNAME = "pampeanodev";
 
 export function SidebarFooter() {
   const { t } = useLocale();
@@ -83,7 +82,6 @@ export function SidebarFooter() {
       {showDonate && (
         <DonateModal
           lightningAddress={DONATION_LN_ADDRESS}
-          cafecitoUsername={DONATION_CAFECITO_USERNAME}
           onClose={() => setShowDonate(false)}
         />
       )}

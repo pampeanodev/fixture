@@ -244,11 +244,8 @@ export const es = {
     copySeed: "Copiar seed", copied: "Copiado",
   },
   donate: {
-    title: "☕ Apoyar el proyecto",
-    intro: "¿Te suma el prode? Invitame un café o tirame unos sats.",
-    cafecitoSection: "☕ Cafecito (pesos · tarjeta)",
-    cafecitoCta: "Invitame un Cafecito",
-    or: "o",
+    title: "⚡ Apoyar el proyecto",
+    intro: "¿Te suma el prode? Tirame unos sats vía Lightning.",
     lightningSection: "⚡ Lightning",
     addressLabel: "Dirección Lightning",
     copied: "Copiado", close: "Cerrar",

@@ -2650,4 +2650,4 @@ git commit -m "feat: complete World Cup 2026 fixture app MVP"
 git push -u origin main
 ```
 
-Expected: Successfully pushed to `git@github.com-pampeanodev:pampeanodev/fixture.git`.
+Expected: Successfully pushed to `git@github.com:pampeanodev/fixture.git`.
