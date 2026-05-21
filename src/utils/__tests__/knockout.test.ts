@@ -45,6 +45,26 @@ describe("resolveKnockoutTeams", () => {
     expect(resolved.find((m) => m.id === "R16-1")!.homeTeamId).toBe("MEX");
   });
 
+  it("resolves winner slots from previous match predictions when scoreField is 'prediction'", () => {
+    const r32: KnockoutMatch = {
+      id: "R32-1", round: "R32",
+      homeSlot: { type: "group", group: "A", position: 1 },
+      awaySlot: { type: "group", group: "A", position: 2 },
+      homeTeamId: "MEX", awayTeamId: "RSA",
+      dateUtc: "", venue: "",
+      result: null, prediction: { home: 2, away: 1 },
+    };
+    const r16: KnockoutMatch = {
+      id: "R16-1", round: "R16",
+      homeSlot: { type: "winner", matchId: "R32-1" },
+      awaySlot: { type: "winner", matchId: "R32-1" },
+      homeTeamId: null, awayTeamId: null,
+      dateUtc: "", venue: "", result: null, prediction: null,
+    };
+    const resolved = resolveKnockoutTeams([r32, r16], {}, {}, [], "prediction");
+    expect(resolved.find((m) => m.id === "R16-1")!.homeTeamId).toBe("MEX");
+  });
+
   it("resolves loser slots for third-place match", () => {
     const sf: KnockoutMatch = {
       id: "SF-1", round: "SF",

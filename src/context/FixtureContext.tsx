@@ -198,8 +198,8 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
   }, [bestThirds]);
 
   const resolvedKnockout = useMemo(() => {
-    return resolveKnockoutTeams(state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds.qualifying.map((t) => t.group));
-  }, [state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds]);
+    return resolveKnockoutTeams(state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds.qualifying.map((t) => t.group), scoreField);
+  }, [state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds, scoreField]);
 
   // Persist match data
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);

@@ -24,7 +24,8 @@ function resolveSlot(
   standingsByGroup: Record<string, StandingRow[]>,
   thirdAssignment: ThirdPlaceAssignment,
   matchMap: Map<string, KnockoutMatch>,
-  qualifyingThirdGroups: string[]
+  qualifyingThirdGroups: string[],
+  scoreField: "prediction" | "result"
 ): string | null {
   switch (slot.type) {
     case "group": {
@@ -46,12 +47,12 @@ function resolveSlot(
     case "winner": {
       const prev = matchMap.get(slot.matchId);
       if (!prev) return null;
-      return getWinner(prev.homeTeamId, prev.awayTeamId, prev.result);
+      return getWinner(prev.homeTeamId, prev.awayTeamId, prev[scoreField]);
     }
     case "loser": {
       const prev = matchMap.get(slot.matchId);
       if (!prev) return null;
-      return getLoser(prev.homeTeamId, prev.awayTeamId, prev.result);
+      return getLoser(prev.homeTeamId, prev.awayTeamId, prev[scoreField]);
     }
   }
 }
@@ -60,7 +61,8 @@ export function resolveKnockoutTeams(
   matches: KnockoutMatch[],
   standingsByGroup: Record<string, StandingRow[]>,
   thirdAssignment: ThirdPlaceAssignment,
-  qualifyingThirdGroups: string[]
+  qualifyingThirdGroups: string[],
+  scoreField: "prediction" | "result" = "result"
 ): KnockoutMatch[] {
   const matchMap = new Map<string, KnockoutMatch>();
   const resolved = matches.map((m) => ({ ...m }));
@@ -70,8 +72,8 @@ export function resolveKnockoutTeams(
 
   for (const round of roundOrder) {
     for (const match of resolved.filter((m) => m.round === round)) {
-      const newHome = resolveSlot(match.homeSlot, match.id, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups);
-      const newAway = resolveSlot(match.awaySlot, match.id, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups);
+      const newHome = resolveSlot(match.homeSlot, match.id, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups, scoreField);
+      const newAway = resolveSlot(match.awaySlot, match.id, standingsByGroup, thirdAssignment, matchMap, qualifyingThirdGroups, scoreField);
 
       const resolvedHome = newHome ?? match.homeTeamId;
       const resolvedAway = newAway ?? match.awayTeamId;
