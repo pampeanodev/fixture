@@ -23,7 +23,7 @@
 .bracket-match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .bracket-match-id { font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; }
 .bracket-match-date { font-size: 11px; color: #888; }
-.bracket-match-teams { display: flex; align-items: center; gap: 10px; }
+.bracket-match-teams { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .bracket-team { display: flex; align-items: center; gap: 6px; min-width: 110px; font-size: 13px; font-weight: 600; }
 .bracket-team.home { justify-content: flex-end; }
 .bracket-team.pending { color: #bbb; font-weight: 400; font-style: italic; }
