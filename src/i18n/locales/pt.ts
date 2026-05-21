@@ -176,7 +176,7 @@ export const pt = {
     lockedBadge: "🔒 Fechado",
     lockedBadgeTitle: "Fechado: não pode mais ser modificado",
     syncedTitle: "Resultado publicado pelo admin da sala",
-    penLabel: "Pên:",
+    penLabel: "pên",
   },
   rooms: {
     list: {

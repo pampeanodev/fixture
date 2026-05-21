@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocale } from "../i18n";
 import {
   loadAutoSyncEnabled,
@@ -91,7 +92,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       })
     : t("autoSync.lastFetchNever");
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -146,6 +147,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

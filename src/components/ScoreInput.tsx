@@ -34,14 +34,30 @@ export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, 
     setAwayStr(score?.away?.toString() ?? "");
   }, [score]);
 
-  function commitScore() {
-    const home = parseInt(homeStr, 10);
-    const away = parseInt(awayStr, 10);
+  function tryCommit(nextHome: string, nextAway: string) {
+    const home = parseInt(nextHome, 10);
+    const away = parseInt(nextAway, 10);
     if (!isNaN(home) && !isNaN(away) && home >= 0 && away >= 0) {
       onScoreChange({ home, away, penalties: score?.penalties });
-    } else if (homeStr === "" && awayStr === "") {
+    } else if (nextHome === "" && nextAway === "") {
       onScoreChange(null);
     }
+  }
+
+  function commitScore() {
+    tryCommit(homeStr, awayStr);
+  }
+
+  function handleHomeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setHomeStr(v);
+    tryCommit(v, awayStr);
+  }
+
+  function handleAwayChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setAwayStr(v);
+    tryCommit(homeStr, v);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -69,42 +85,52 @@ export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, 
           <span className="score-separator">|</span>
         </>
       )}
-      <input ref={homeRef} type="number" min="0" max="99"
-        className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-        disabled={locked || disabled}
-        title={inputTitle}
-        value={homeStr} onChange={(e) => setHomeStr(e.target.value)}
-        onBlur={commitScore} onKeyDown={handleKeyDown}
-        aria-label={t("scoreInput.ariaHome", { team: "home" })} />
-      <span className="score-separator">-</span>
-      <input type="number" min="0" max="99"
-        className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-        disabled={locked || disabled}
-        title={inputTitle}
-        value={awayStr} onChange={(e) => setAwayStr(e.target.value)}
-        onBlur={commitScore} onKeyDown={handleKeyDown}
-        aria-label={t("scoreInput.ariaAway", { team: "away" })} />
+      <div className="score-with-pen">
+        <div className="score-row">
+          <input ref={homeRef} type="number" min="0" max="99"
+            className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+            disabled={locked || disabled}
+            title={inputTitle}
+            value={homeStr} onChange={handleHomeChange}
+            onBlur={commitScore} onKeyDown={handleKeyDown}
+            aria-label={t("scoreInput.ariaHome", { team: "home" })} />
+          <span className="score-separator">-</span>
+          <input type="number" min="0" max="99"
+            className={`score-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+            disabled={locked || disabled}
+            title={inputTitle}
+            value={awayStr} onChange={handleAwayChange}
+            onBlur={commitScore} onKeyDown={handleKeyDown}
+            aria-label={t("scoreInput.ariaAway", { team: "away" })} />
+        </div>
+        {allowPenalties && score && score.home === score.away && (
+          <div className="penalties-input">
+            <span className="penalties-label">{t("scoreInput.penLabel")}</span>
+            <div className="penalties-row">
+              <input type="number" min="0" max="99"
+                className={`score-field penalties-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+                disabled={locked || disabled}
+                value={score.penalties?.home?.toString() ?? ""}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  if (!isNaN(v)) onScoreChange({ ...score, penalties: { home: v, away: score.penalties?.away ?? 0 } });
+                }} />
+              <span className="score-separator">-</span>
+              <input type="number" min="0" max="99"
+                className={`score-field penalties-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
+                disabled={locked || disabled}
+                value={score.penalties?.away?.toString() ?? ""}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  if (!isNaN(v)) onScoreChange({ ...score, penalties: { home: score.penalties?.home ?? 0, away: v } });
+                }} />
+            </div>
+          </div>
+        )}
+      </div>
       {locked && <span className="locked-badge" title={t("scoreInput.lockedBadgeTitle")}>{t("scoreInput.lockedBadge")}</span>}
       {synced && <span className="synced-badge" title={t("scoreInput.syncedTitle")}>↻</span>}
       {indicator && <span className={`prediction-indicator ${indicator.className}`}>{indicator.symbol}</span>}
-      {allowPenalties && score && score.home === score.away && (
-        <div className="penalties-input">
-          <span>{t("scoreInput.penLabel")}</span>
-          <input type="number" min="0" max="99" className="score-field"
-            value={score.penalties?.home?.toString() ?? ""}
-            onChange={(e) => {
-              const v = parseInt(e.target.value, 10);
-              if (!isNaN(v)) onScoreChange({ ...score, penalties: { home: v, away: score.penalties?.away ?? 0 } });
-            }} />
-          <span className="score-separator">-</span>
-          <input type="number" min="0" max="99" className="score-field"
-            value={score.penalties?.away?.toString() ?? ""}
-            onChange={(e) => {
-              const v = parseInt(e.target.value, 10);
-              if (!isNaN(v)) onScoreChange({ ...score, penalties: { home: score.penalties?.home ?? 0, away: v } });
-            }} />
-        </div>
-      )}
     </div>
   );
 }

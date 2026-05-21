@@ -88,11 +88,11 @@ export const es = {
   },
   knockout: {
     rounds: {
-      R32: "32avos", R16: "Octavos", QF: "Cuartos", SF: "Semis",
+      R32: "16avos", R16: "Octavos", QF: "Cuartos", SF: "Semis",
       "3P": "3er puesto", F: "Final",
     },
     roundTitle: {
-      R32: "32avos de Final", R16: "Octavos de Final", QF: "Cuartos de Final",
+      R32: "16avos de Final", R16: "Octavos de Final", QF: "Cuartos de Final",
       SF: "Semifinales", "3P": "Tercer Puesto", F: "Final",
     },
     slot: {
@@ -106,7 +106,7 @@ export const es = {
     title: "Calendario",
     empty: "Sin partidos para mostrar.",
     stage: {
-      group: "Grupo {group}", R32: "32avos", R16: "Octavos",
+      group: "Grupo {group}", R32: "16avos", R16: "Octavos",
       QF: "Cuartos", SF: "Semis", "3P": "3er puesto", F: "Final",
     },
     matchCard: {
@@ -174,7 +174,7 @@ export const es = {
     lockedBadge: "🔒 Cerrado",
     lockedBadgeTitle: "Cerrado: ya no se puede modificar",
     syncedTitle: "Resultado publicado por el admin de la sala",
-    penLabel: "Pen:",
+    penLabel: "pen",
   },
   rooms: {
     list: {
@@ -263,7 +263,7 @@ export const es = {
     exitAndReturn: "Salir y volver al prode real",
     simulateAgain: "Simular de nuevo",
     stageLabel: {
-      group: "Grupo {group}", R32: "32avos", R16: "Octavos",
+      group: "Grupo {group}", R32: "16avos", R16: "Octavos",
       QF: "Cuartos", SF: "Semis", "3P": "3er puesto", F: "Final",
     },
     randomButton: "▶ Simular random", manualButton: "✎ Ingresar manual",
@@ -303,7 +303,7 @@ export const es = {
       groupsTitle: "Grupos",
       groupsBody: "72 partidos de fase de grupos divididos en 12 grupos (A a L). La tabla se recalcula sola con tus predicciones.",
       knockoutTitle: "Eliminatorias",
-      knockoutBody: "32 partidos desde 32avos hasta la final. Los cruces se arman automáticamente según tus predicciones de grupos — no los definís a mano.",
+      knockoutBody: "32 partidos desde 16avos hasta la final. Los cruces se arman automáticamente según tus predicciones de grupos — no los definís a mano.",
       roomsTitle: "Salas",
       roomsBody: "Competí con amigos. Creás una sala, compartís el link, y los rankings se sincronizan peer-to-peer (sin backend).",
       helpTitle: "¿Dudas más adelante?",
@@ -313,13 +313,13 @@ export const es = {
       tabsTitle: "Grupos A–L",
       tabsBody: "Cambiás entre los 12 grupos desde estos tabs.",
       standingsTitle: "Tabla de posiciones",
-      standingsBody: "Se recalcula en vivo con tus predicciones. Verde = clasifica directo a 32avos. Amarillo = 3er puesto, puede pasar como mejor tercero junto a otros 7 de otros grupos.",
+      standingsBody: "Se recalcula en vivo con tus predicciones. Verde = clasifica directo a 16avos. Amarillo = 3er puesto, puede pasar como mejor tercero junto a otros 7 de otros grupos.",
       matchesTitle: "Cargar predicción",
       matchesBody: "Escribí el score de cada partido. Se guarda solo. Si estás en modo Resultados, cargás el resultado real. Desde el menú ⋯ podés regenerar todas las predicciones random de un toque.",
     },
     knockout: {
       tabsTitle: "Rondas de eliminatorias",
-      tabsBody: "Navegás entre 32avos, Octavos, Cuartos, Semis y Final desde estos tabs.",
+      tabsBody: "Navegás entre 16avos, Octavos, Cuartos, Semis y Final desde estos tabs.",
       autoTitle: "Cruces automáticos",
       autoBody: "Los equipos que aparecen en cada cruce salen de tus predicciones de grupos (1° de A, 2° de B, mejores terceros, etc.). Cuando cargás un partido, el ganador pasa solo al siguiente cruce.",
     },

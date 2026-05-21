@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocale } from "../i18n";
 import { CafecitoButton } from "./CafecitoButton";
 import { QRDisplay } from "./QRDisplay";
@@ -20,7 +21,7 @@ export function DonateModal({ lightningAddress, cafecitoUsername, onClose }: Don
     setTimeout(() => setCopied(false), 2000);
   }
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
@@ -66,6 +67,7 @@ export function DonateModal({ lightningAddress, cafecitoUsername, onClose }: Don
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

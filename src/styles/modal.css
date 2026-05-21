@@ -19,7 +19,21 @@
   padding: 28px;
   max-width: 420px;
   width: 100%;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
   animation: modal-in 0.15s ease-out;
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-card {
+    padding: 20px;
+    max-height: calc(100dvh - 24px);
+  }
 }
 
 @keyframes modal-in {

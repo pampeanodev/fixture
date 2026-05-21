@@ -176,7 +176,7 @@ export const en = {
     lockedBadge: "🔒 Locked",
     lockedBadgeTitle: "Locked: can no longer be modified",
     syncedTitle: "Result published by the room admin",
-    penLabel: "Pen:",
+    penLabel: "pen",
   },
   rooms: {
     list: {
