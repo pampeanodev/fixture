@@ -86,7 +86,8 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                           synced={!isPrediction && state.syncedResultIds.includes(match.id)}
                           disabled={!editable && !isPrediction}
                           lockedReason={t("autoSync.waitingResult")}
-                          autoSyncedAt={autoSyncMeta.autoSyncedAt[match.id]} />
+                          autoSyncedAt={autoSyncMeta.autoSyncedAt[match.id]}
+                          homeTeam={homeTeam ?? undefined} awayTeam={awayTeam ?? undefined} />
                       ) : <span className="score-separator">{t("knockout.vs")}</span>}
                       <div className={`bracket-team ${!awayTeam ? "pending" : ""}`}>
                         {awayTeam ? (<><span className="team-flag">{awayTeam.flag}</span><span>{t(`teams.${awayTeam.id}`)}</span></>) : <span>{slotLabel(t, match, "away")}</span>}

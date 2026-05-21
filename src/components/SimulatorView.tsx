@@ -296,6 +296,8 @@ export function SimulatorView() {
             score={manualScore}
             onScoreChange={setManualScore}
             allowPenalties={isKnockout}
+            homeTeam={homeTeam ?? undefined}
+            awayTeam={awayTeam ?? undefined}
           />
           <div className="simulator-actions">
             <button

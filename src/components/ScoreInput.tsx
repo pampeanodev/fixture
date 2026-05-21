@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocale } from "../i18n";
-import type { Score } from "../types";
+import type { Score, Team } from "../types";
 import "./ScoreInput.css";
 
 interface ScoreInputProps {
@@ -14,9 +14,18 @@ interface ScoreInputProps {
   disabled?: boolean;
   lockedReason?: string;
   autoSyncedAt?: number;
+  homeTeam?: Team;
+  awayTeam?: Team;
 }
 
-export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, allowPenalties, locked, synced, disabled, lockedReason, autoSyncedAt }: ScoreInputProps) {
+function getPenWinner(score: Score | null): "home" | "away" | null {
+  if (!score?.penalties) return null;
+  if (score.penalties.home > score.penalties.away) return "home";
+  if (score.penalties.away > score.penalties.home) return "away";
+  return null;
+}
+
+export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, allowPenalties, locked, synced, disabled, lockedReason, autoSyncedAt, homeTeam, awayTeam }: ScoreInputProps) {
   const { t } = useLocale();
   const autoSyncTooltip = autoSyncedAt
     ? t("autoSync.autoSyncedTooltip", { datetime: new Date(autoSyncedAt).toLocaleString() })
@@ -103,30 +112,36 @@ export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, 
             onBlur={commitScore} onKeyDown={handleKeyDown}
             aria-label={t("scoreInput.ariaAway", { team: "away" })} />
         </div>
-        {allowPenalties && score && score.home === score.away && (
-          <div className="penalties-input">
-            <span className="penalties-label">{t("scoreInput.penLabel")}</span>
-            <div className="penalties-row">
-              <input type="number" min="0" max="99"
-                className={`score-field penalties-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-                disabled={locked || disabled}
-                value={score.penalties?.home?.toString() ?? ""}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  if (!isNaN(v)) onScoreChange({ ...score, penalties: { home: v, away: score.penalties?.away ?? 0 } });
-                }} />
-              <span className="score-separator">-</span>
-              <input type="number" min="0" max="99"
-                className={`score-field penalties-field ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-                disabled={locked || disabled}
-                value={score.penalties?.away?.toString() ?? ""}
-                onChange={(e) => {
-                  const v = parseInt(e.target.value, 10);
-                  if (!isNaN(v)) onScoreChange({ ...score, penalties: { home: score.penalties?.home ?? 0, away: v } });
-                }} />
+        {allowPenalties && score && score.home === score.away && (() => {
+          const penWinner = getPenWinner(score);
+          const pickPen = (winner: "home" | "away") => {
+            if (penWinner === winner) return;
+            onScoreChange({ ...score, penalties: winner === "home" ? { home: 1, away: 0 } : { home: 0, away: 1 } });
+          };
+          return (
+            <div className="penalties-input">
+              <span className="penalties-label">{t("scoreInput.penLabel")}</span>
+              <div className="penalties-row">
+                <button type="button"
+                  className={`penalties-pick ${penWinner === "home" ? "active" : ""}`}
+                  disabled={locked || disabled}
+                  onClick={() => pickPen("home")}
+                  aria-pressed={penWinner === "home"}
+                  aria-label={t("scoreInput.penPickAria", { team: homeTeam ? t(`teams.${homeTeam.id}`) : "home" })}>
+                  {homeTeam?.flag ?? "1"}
+                </button>
+                <button type="button"
+                  className={`penalties-pick ${penWinner === "away" ? "active" : ""}`}
+                  disabled={locked || disabled}
+                  onClick={() => pickPen("away")}
+                  aria-pressed={penWinner === "away"}
+                  aria-label={t("scoreInput.penPickAria", { team: awayTeam ? t(`teams.${awayTeam.id}`) : "away" })}>
+                  {awayTeam?.flag ?? "2"}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
       {locked && <span className="locked-badge" title={t("scoreInput.lockedBadgeTitle")}>{t("scoreInput.lockedBadge")}</span>}
       {synced && <span className="synced-badge" title={t("scoreInput.syncedTitle")}>↻</span>}

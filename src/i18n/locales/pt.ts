@@ -177,6 +177,7 @@ export const pt = {
     lockedBadgeTitle: "Fechado: não pode mais ser modificado",
     syncedTitle: "Resultado publicado pelo admin da sala",
     penLabel: "pên",
+    penPickAria: "{team} vence nos pênaltis",
   },
   rooms: {
     list: {

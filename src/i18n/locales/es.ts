@@ -175,6 +175,7 @@ export const es = {
     lockedBadgeTitle: "Cerrado: ya no se puede modificar",
     syncedTitle: "Resultado publicado por el admin de la sala",
     penLabel: "pen",
+    penPickAria: "{team} gana por penales",
   },
   rooms: {
     list: {
