@@ -22,6 +22,7 @@ export function RankingView() {
         exact: 0,
         winner: 0,
         wrong: 0,
+        penBonus: 0,
         pending: totalMatches,
       }));
     return [...base, ...extras];
@@ -54,6 +55,12 @@ export function RankingView() {
               <div className="ranking-rule-icon">{t("ranking.rule.winnerSymbol")}</div>
               <div className="ranking-rule-label">{t("ranking.rule.winnerLabel")}</div>
               <div className="ranking-rule-example">{t("ranking.rule.winnerExample")}</div>
+            </div>
+            <div className="ranking-rule-card pen-bonus">
+              <div className="ranking-rule-points">{t("ranking.rule.penBonusPoints")}</div>
+              <div className="ranking-rule-icon">{t("ranking.rule.penBonusSymbol")}</div>
+              <div className="ranking-rule-label">{t("ranking.rule.penBonusLabel")}</div>
+              <div className="ranking-rule-example">{t("ranking.rule.penBonusExample")}</div>
             </div>
             <div className="ranking-rule-card wrong">
               <div className="ranking-rule-points">{t("ranking.rule.wrongPoints")}</div>
@@ -98,6 +105,7 @@ export function RankingView() {
               <th>{t("ranking.colPoints")}</th>
               <th>{t("ranking.colExact")}</th>
               <th>{t("ranking.colWinner")}</th>
+              <th>{t("ranking.colPenBonus")}</th>
               <th>{t("ranking.colWrong")}</th>
               <th>{t("ranking.colPending")}</th>
               <th></th>
@@ -114,6 +122,7 @@ export function RankingView() {
                 <td className="ranking-total">{player.total}</td>
                 <td>{player.exact}</td>
                 <td>{player.winner}</td>
+                <td>{player.penBonus}</td>
                 <td>{player.wrong}</td>
                 <td>{player.pending}</td>
                 <td>

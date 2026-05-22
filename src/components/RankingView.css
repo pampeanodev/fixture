@@ -45,11 +45,13 @@
 }
 .ranking-rule-card.exact { background: #e8f5e9; border-color: #c8e6c9; }
 .ranking-rule-card.winner { background: #fff8e1; border-color: #fff9c4; }
+.ranking-rule-card.pen-bonus { background: #e3f2fd; border-color: #bbdefb; }
 .ranking-rule-card.wrong { background: #ffebee; border-color: #ffcdd2; }
 
 .ranking-rule-points { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
 .ranking-rule-card.exact .ranking-rule-points { color: #2e7d32; }
 .ranking-rule-card.winner .ranking-rule-points { color: #f57f17; }
+.ranking-rule-card.pen-bonus .ranking-rule-points { color: #1565c0; }
 .ranking-rule-card.wrong .ranking-rule-points { color: #c62828; }
 
 .ranking-rule-icon { font-size: 24px; margin-bottom: 4px; }
