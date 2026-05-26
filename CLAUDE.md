@@ -39,6 +39,7 @@ pnpm run build      # tsc -b && vite build, writes to dist/
 - **Dates**: never call `toLocaleString("es-AR", ...)` or similar — use `formatDate`/`formatTime` from `useLocale()`.
 - **Team names**: never hardcode. Resolve via `` t(`teams.${team.id}`) ``.
 - **No UI libraries**: project stays vanilla CSS. Don't introduce Tailwind, MUI, Radix, etc.
+- **Component size**: 200-line soft limit for `.tsx` files in `src/components/`. Files already over the limit (`SimulatorView`, `ScheduleView`, `AutoSyncInspector`, `GroupView`) cannot grow further — refactor into sub-components under `src/components/<feature>/` instead. Enforced by `.claude/hooks/check-component-size.sh`.
 
 ## Code map (top-level tour)
 
