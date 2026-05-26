@@ -1,7 +1,8 @@
 .compact-standings {
   background: var(--card-bg); border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
-  margin-bottom: 14px;
+  margin: 0 auto 14px;
+  max-width: 480px;
 }
 .compact-standings-header {
   width: 100%; display: flex; justify-content: space-between; align-items: center;
