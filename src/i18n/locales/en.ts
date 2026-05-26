@@ -67,11 +67,20 @@ export const en = {
     },
     importError: "Import failed. Make sure it's a valid JSON file.",
   },
+  viewMode: {
+    toggleCompactAria: "Switch to compact view",
+    toggleExpandedAria: "Switch to expanded view",
+    actionCompact: "Compact",
+    actionExpand: "Expand",
+  },
   groups: {
     title: "Group {group}",
     standings: {
       pos: "Pos", team: "Team", played: "P", won: "W", drawn: "D", lost: "L",
       goalsFor: "GF", goalsAgainst: "GA", goalDifference: "GD", points: "Pts",
+      expandAria: "Show table",
+      collapseAria: "Hide table",
+      compactTeam: "Team",
     },
     legend: {
       qualified: "Qualifies directly",
@@ -103,6 +112,11 @@ export const en = {
       loserOf: "Loser {matchId}",
     },
     vs: "vs",
+    bracket: {
+      collapseAria: "Collapse {round}",
+      expandAria: "Expand {round}",
+      roundCompleted: "✓",
+    },
   },
   schedule: {
     title: "Schedule",

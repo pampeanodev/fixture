@@ -7,6 +7,9 @@ import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
 import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
+import { useViewMode } from "../context/ViewModeContext";
+import { CompactMatchRow } from "./CompactMatchRow";
+import { CompactStandings } from "./CompactStandings";
 import type { Score } from "../types";
 import "./GroupView.css";
 
@@ -40,6 +43,7 @@ function ScoreField({ value, onChange, isPrediction, locked, disabled, lockedRea
 export function GroupView({ group }: GroupViewProps) {
   const { state, dispatch, standingsByGroup } = useFixture();
   const { t } = useLocale();
+  const { mode: viewMode } = useViewMode();
   const standings = standingsByGroup[group] ?? [];
   const matches = state.groupMatches
     .filter((m) => m.group === group)
@@ -51,7 +55,7 @@ export function GroupView({ group }: GroupViewProps) {
   const autoSyncMeta = loadAutoSyncMeta();
 
   return (
-    <div className="group-view">
+    <div className={`group-view ${viewMode}`}>
       <div className="group-tabs" data-tour="group-tabs">
         {GROUPS.map((g) => (
           <button key={g}
@@ -62,67 +66,108 @@ export function GroupView({ group }: GroupViewProps) {
         ))}
       </div>
       <h2>{t("groups.title", { group })}</h2>
-      <table className="standings-table" data-tour="standings-table">
-        <thead>
-          <tr>
-            <th>{t("groups.standings.team")}</th>
-            <th>{t("groups.standings.played")}</th>
-            <th>{t("groups.standings.won")}</th>
-            <th>{t("groups.standings.drawn")}</th>
-            <th>{t("groups.standings.lost")}</th>
-            <th>{t("groups.standings.goalsFor")}</th>
-            <th>{t("groups.standings.goalsAgainst")}</th>
-            <th>{t("groups.standings.goalDifference")}</th>
-            <th>{t("groups.standings.points")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {standings.map((row, i) => {
-            const team = getTeam(row.teamId);
-            return (
-              <tr key={row.teamId} className={i < 2 ? "qualify" : i === 2 ? "maybe-qualify" : ""}>
-                <td><div className="team-cell"><span className="team-flag">{team?.flag}</span><span>{team ? t(`teams.${team.id}`) : row.teamId}</span></div></td>
-                <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
-                <td>{row.goalsFor}</td><td>{row.goalsAgainst}</td>
-                <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
-                <td><strong>{row.points}</strong></td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
 
-      <div className="group-matches-title">{t("groups.matches")}</div>
-      <div className="group-matches-grid" data-tour="match-cards">
-      {matches.map((match) => {
-        const editable = isMatchEditable(match, {
-          autoSyncEnabled,
-          circuitBreakerTripped: breakerState.tripped,
-          now,
-        });
-        const ts = autoSyncMeta.autoSyncedAt[match.id];
-        const autoSyncTooltip = ts
-          ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
-          : undefined;
-        return (
-          <MatchCard
-            key={match.id}
-            homeTeamId={match.homeTeamId}
-            awayTeamId={match.awayTeamId}
-            dateUtc={match.dateUtc}
-            result={match.result}
-            prediction={match.prediction}
-            isPrediction={isPrediction}
-            locked={isPrediction && isMatchLocked(match.dateUtc)}
-            synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-            disabled={!editable && !isPrediction}
-            lockedReason={t("autoSync.waitingResult")}
-            autoSyncTooltip={autoSyncTooltip}
-            onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
-          />
-        );
-      })}
-      </div>
+      {viewMode === "compact" ? (
+        <>
+          <CompactStandings standings={standings} />
+          <div className="group-matches-title">{t("groups.matches")}</div>
+          <div className="group-matches-compact" data-tour="match-cards">
+            {matches.map((match) => {
+              const editable = isMatchEditable(match, {
+                autoSyncEnabled,
+                circuitBreakerTripped: breakerState.tripped,
+                now,
+              });
+              const ts = autoSyncMeta.autoSyncedAt[match.id];
+              const autoSyncTooltip = ts
+                ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
+                : undefined;
+              return (
+                <CompactMatchRow
+                  key={match.id}
+                  homeTeamId={match.homeTeamId}
+                  awayTeamId={match.awayTeamId}
+                  dateUtc={match.dateUtc}
+                  badgeLabel={t("schedule.stage.group", { group: match.group })}
+                  badgeKind="group"
+                  currentScore={isPrediction ? match.prediction : match.result}
+                  realScore={match.result}
+                  isPrediction={isPrediction}
+                  locked={isPrediction && isMatchLocked(match.dateUtc)}
+                  synced={!isPrediction && state.syncedResultIds.includes(match.id)}
+                  disabled={!editable && !isPrediction}
+                  lockedReason={t("autoSync.waitingResult")}
+                  autoSyncTooltip={autoSyncTooltip}
+                  onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
+                />
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <>
+          <table className="standings-table" data-tour="standings-table">
+            <thead>
+              <tr>
+                <th>{t("groups.standings.team")}</th>
+                <th>{t("groups.standings.played")}</th>
+                <th>{t("groups.standings.won")}</th>
+                <th>{t("groups.standings.drawn")}</th>
+                <th>{t("groups.standings.lost")}</th>
+                <th>{t("groups.standings.goalsFor")}</th>
+                <th>{t("groups.standings.goalsAgainst")}</th>
+                <th>{t("groups.standings.goalDifference")}</th>
+                <th>{t("groups.standings.points")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {standings.map((row, i) => {
+                const team = getTeam(row.teamId);
+                return (
+                  <tr key={row.teamId} className={i < 2 ? "qualify" : i === 2 ? "maybe-qualify" : ""}>
+                    <td><div className="team-cell"><span className="team-flag">{team?.flag}</span><span>{team ? t(`teams.${team.id}`) : row.teamId}</span></div></td>
+                    <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
+                    <td>{row.goalsFor}</td><td>{row.goalsAgainst}</td>
+                    <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
+                    <td><strong>{row.points}</strong></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <div className="group-matches-title">{t("groups.matches")}</div>
+          <div className="group-matches-grid" data-tour="match-cards">
+            {matches.map((match) => {
+              const editable = isMatchEditable(match, {
+                autoSyncEnabled,
+                circuitBreakerTripped: breakerState.tripped,
+                now,
+              });
+              const ts = autoSyncMeta.autoSyncedAt[match.id];
+              const autoSyncTooltip = ts
+                ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
+                : undefined;
+              return (
+                <MatchCard
+                  key={match.id}
+                  homeTeamId={match.homeTeamId}
+                  awayTeamId={match.awayTeamId}
+                  dateUtc={match.dateUtc}
+                  result={match.result}
+                  prediction={match.prediction}
+                  isPrediction={isPrediction}
+                  locked={isPrediction && isMatchLocked(match.dateUtc)}
+                  synced={!isPrediction && state.syncedResultIds.includes(match.id)}
+                  disabled={!editable && !isPrediction}
+                  lockedReason={t("autoSync.waitingResult")}
+                  autoSyncTooltip={autoSyncTooltip}
+                  onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

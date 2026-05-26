@@ -3,6 +3,7 @@ import { useFixture } from "../context/FixtureContext";
 import { exportToJson, importFromJson } from "../utils/persistence";
 import { randomizePredictions } from "../simulator/randomize";
 import { useLocale } from "../i18n";
+import { useViewMode } from "../context/ViewModeContext";
 import "./TopBar.css";
 
 interface TopBarProps {
@@ -12,6 +13,7 @@ interface TopBarProps {
 export function TopBar({ onToggleSidebar }: TopBarProps) {
   const { state, dispatch } = useFixture();
   const { t } = useLocale();
+  const { mode: viewMode, toggle: toggleViewMode } = useViewMode();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -95,6 +97,30 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
       </div>
 
       <div className="topbar-right" ref={menuRef}>
+        <button
+          className="topbar-viewmode-btn"
+          onClick={toggleViewMode}
+          aria-label={viewMode === "compact" ? t("viewMode.toggleExpandedAria") : t("viewMode.toggleCompactAria")}
+          title={viewMode === "compact" ? t("viewMode.toggleExpandedAria") : t("viewMode.toggleCompactAria")}
+        >
+          {viewMode === "compact" ? (
+            <svg className="topbar-viewmode-icon" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+              <rect x="1" y="1" width="5.5" height="5.5" rx="1" />
+              <rect x="7.5" y="1" width="5.5" height="5.5" rx="1" />
+              <rect x="1" y="7.5" width="5.5" height="5.5" rx="1" />
+              <rect x="7.5" y="7.5" width="5.5" height="5.5" rx="1" />
+            </svg>
+          ) : (
+            <svg className="topbar-viewmode-icon" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+              <rect x="1" y="2" width="12" height="2" rx="0.5" />
+              <rect x="1" y="6" width="12" height="2" rx="0.5" />
+              <rect x="1" y="10" width="12" height="2" rx="0.5" />
+            </svg>
+          )}
+          <span className="topbar-viewmode-label">
+            {viewMode === "compact" ? t("viewMode.actionExpand") : t("viewMode.actionCompact")}
+          </span>
+        </button>
         <button className="topbar-menu-btn" onClick={() => setMenuOpen((v) => !v)}>
           ⋯
         </button>

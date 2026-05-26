@@ -1,0 +1,230 @@
+/* Bracket llave — 2 halves converging to center.
+   Uses CSS variables from tokens.css. No hardcoded colors. */
+
+.bracket-tree {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  padding: 12px 0;
+  min-width: 980px;
+  overflow-x: auto;
+}
+
+/* Half layout: 4 columns, R32 outer, SF inner (mirrored on right) */
+.bk-half {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.bk-half-left { direction: ltr; }
+.bk-half-right { direction: ltr; }
+.bk-half-right .bk-col { order: revert; }
+
+.bk-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 110px;
+}
+.bk-col-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--accent-green);
+  text-align: center;
+  padding: 4px 0 8px;
+}
+.bk-col-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 6px;
+}
+
+/* Round-specific vertical density to align cards with their feeders */
+.bk-col-R32 .bk-col-body { gap: 6px; }
+.bk-col-R16 .bk-col-body { padding: 24px 0; gap: 36px; }
+.bk-col-QF .bk-col-body { padding: 80px 0; gap: 108px; }
+.bk-col-SF .bk-col-body { padding: 200px 0; gap: 0; }
+
+/* Center column: Final card on top, 3P below */
+.bk-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 0 12px;
+  min-width: 150px;
+}
+.bk-final-block { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.bk-third-block { display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.9; }
+.bk-col-label.final-label { font-size: 13px; color: var(--accent-gold); letter-spacing: 1px; }
+.bk-col-label.third-label { font-size: 9px; }
+
+/* Card */
+.bk-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--accent-green);
+  padding: 4px 6px;
+  font-size: 11px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  position: relative;
+  min-width: 110px;
+}
+.bk-card.final {
+  background: var(--accent-gold-soft);
+  border: 2px solid var(--accent-gold);
+  padding: 8px 10px;
+  font-size: 13px;
+  min-width: 140px;
+  box-shadow: 0 2px 8px var(--accent-gold-soft-hover);
+}
+.bk-card.third {
+  border-left-color: var(--accent-gold);
+  font-size: 10px;
+  min-width: 110px;
+}
+
+.bk-card.ind-exact { box-shadow: 0 0 0 2px var(--result-green); }
+.bk-card.ind-winner { box-shadow: 0 0 0 2px var(--accent-gold); }
+.bk-card.ind-wrong { box-shadow: 0 0 0 2px var(--accent-eliminated); }
+
+.bk-card-team {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  min-width: 0;
+}
+.bk-card-team.pending {
+  color: var(--content-text);
+  opacity: 0.55;
+  font-style: italic;
+}
+.bk-card-flag { font-size: 13px; flex-shrink: 0; }
+.bk-card-name {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+.bk-card-team.pending .bk-card-name { font-size: 10px; font-weight: 500; }
+.bk-card-input {
+  width: 26px;
+  height: 22px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--content-text);
+  outline: none;
+  flex-shrink: 0;
+  -moz-appearance: textfield;
+}
+.bk-card-input::-webkit-inner-spin-button,
+.bk-card-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.bk-card-input:focus { border-color: var(--accent-green); }
+.bk-card-input.prediction { border-color: var(--prediction-blue); color: var(--prediction-blue); }
+.bk-card-input:disabled { background: var(--accent-qualify); opacity: 0.6; cursor: not-allowed; }
+
+.bk-card-pen {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  padding-top: 4px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--card-border);
+}
+.bk-card-pen-label {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--prediction-blue);
+  opacity: 0.75;
+}
+.bk-card-pen-pick {
+  font-size: 12px;
+  padding: 1px 6px;
+  border: 1px solid var(--prediction-blue);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.45;
+  font-family: inherit;
+  line-height: 1.1;
+  transition: opacity 0.15s, background 0.15s;
+}
+.bk-card-pen-pick:hover:not(:disabled) { opacity: 0.85; }
+.bk-card-pen-pick.active { background: var(--prediction-blue); opacity: 1; color: var(--text-on-dark); }
+.bk-card-pen-pick:disabled { cursor: not-allowed; opacity: 0.3; }
+
+/* Connector lines via card pseudo-elements.
+   Each card draws a short stub on the side facing the next round. */
+
+/* LEFT half: cards extend stubs to the right */
+.bk-half-left .bk-col-R32 .bk-card::after,
+.bk-half-left .bk-col-R16 .bk-card::after,
+.bk-half-left .bk-col-QF .bk-card::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: var(--card-border);
+}
+/* Vertical connector between pairs (odd index goes down, even goes up) */
+.bk-half-left .bk-col-R32 .bk-card:nth-child(odd)::before,
+.bk-half-left .bk-col-R16 .bk-card:nth-child(odd)::before,
+.bk-half-left .bk-col-QF .bk-card:nth-child(odd)::before {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  width: 1px;
+  background: var(--card-border);
+}
+.bk-half-left .bk-col-R32 .bk-card:nth-child(odd)::before { height: calc(100% + 6px); }
+.bk-half-left .bk-col-R16 .bk-card:nth-child(odd)::before { height: calc(100% + 36px); }
+.bk-half-left .bk-col-QF .bk-card:nth-child(odd)::before { height: calc(100% + 108px); }
+
+/* RIGHT half: cards extend stubs to the left */
+.bk-half-right .bk-col-R32 .bk-card::after,
+.bk-half-right .bk-col-R16 .bk-card::after,
+.bk-half-right .bk-col-QF .bk-card::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  width: 8px;
+  height: 1px;
+  background: var(--card-border);
+}
+.bk-half-right .bk-col-R32 .bk-card:nth-child(odd)::before,
+.bk-half-right .bk-col-R16 .bk-card:nth-child(odd)::before,
+.bk-half-right .bk-col-QF .bk-card:nth-child(odd)::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  width: 1px;
+  background: var(--card-border);
+}
+.bk-half-right .bk-col-R32 .bk-card:nth-child(odd)::before { height: calc(100% + 6px); }
+.bk-half-right .bk-col-R16 .bk-card:nth-child(odd)::before { height: calc(100% + 36px); }
+.bk-half-right .bk-col-QF .bk-card:nth-child(odd)::before { height: calc(100% + 108px); }
+
+/* Mobile: hide bracket-tree entirely; BracketView renders the tabs fallback instead. */
+@media (max-width: 767px) {
+  .bracket-tree { display: none; }
+}

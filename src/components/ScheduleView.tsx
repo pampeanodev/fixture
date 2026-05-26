@@ -7,6 +7,8 @@ import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
 import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
+import { useViewMode } from "../context/ViewModeContext";
+import { CompactMatchRow } from "./CompactMatchRow";
 import type { KnockoutRound, Score } from "../types";
 import "./ScheduleView.css";
 
@@ -28,6 +30,7 @@ interface UnifiedMatch {
 export function ScheduleView() {
   const { state, dispatch, resolvedKnockout } = useFixture();
   const { t, locale } = useLocale();
+  const { mode: viewMode } = useViewMode();
   const isPrediction = state.mode === "predictions";
   const scoreField = isPrediction ? "prediction" : "result";
 
@@ -103,35 +106,70 @@ export function ScheduleView() {
   }
 
   return (
-    <div className="schedule-view">
+    <div className={`schedule-view ${viewMode}`}>
       <h2>{t("schedule.title")}</h2>
       {matchesByDay.length === 0 ? (
         <p>{t("schedule.empty")}</p>
       ) : matchesByDay.map(({ day, matches }) => (
         <div key={day}>
-          <div className="schedule-day-header">{day}</div>
-          <div className="schedule-day-matches">
-          {matches.map((match) => {
-            const ts = autoSyncMeta.autoSyncedAt[match.id];
-            const autoSyncTooltip = ts
-              ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
-              : undefined;
-            return (
-              <ScheduleMatchCard
-                key={match.id}
-                match={match}
-                label={stageLabelFor(match)}
-                isPrediction={isPrediction}
-                locked={isPrediction && isMatchLocked(match.dateUtc)}
-                synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-                disabled={!match.editable && !isPrediction}
-                lockedReason={t("autoSync.waitingResult")}
-                autoSyncTooltip={autoSyncTooltip}
-                onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
-              />
-            );
-          })}
-          </div>
+          {viewMode === "compact" ? (
+            <div className="schedule-day-header-compact"><span>{day}</span></div>
+          ) : (
+            <div className="schedule-day-header">{day}</div>
+          )}
+          {viewMode === "compact" ? (
+            <div className="schedule-day-matches-compact">
+              {matches.map((match) => {
+                const ts = autoSyncMeta.autoSyncedAt[match.id];
+                const autoSyncTooltip = ts
+                  ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
+                  : undefined;
+                return (
+                  <CompactMatchRow
+                    key={match.id}
+                    homeTeamId={match.homeTeamId}
+                    awayTeamId={match.awayTeamId}
+                    dateUtc={match.dateUtc}
+                    badgeLabel={stageLabelFor(match)}
+                    badgeKind={match.isKnockout ? "knockout" : "group"}
+                    currentScore={match.currentScore}
+                    realScore={match.realScore}
+                    isPrediction={isPrediction}
+                    locked={isPrediction && isMatchLocked(match.dateUtc)}
+                    synced={!isPrediction && state.syncedResultIds.includes(match.id)}
+                    disabled={!match.editable && !isPrediction}
+                    lockedReason={t("autoSync.waitingResult")}
+                    autoSyncTooltip={autoSyncTooltip}
+                    pendingLabel={match.id}
+                    onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="schedule-day-matches">
+              {matches.map((match) => {
+                const ts = autoSyncMeta.autoSyncedAt[match.id];
+                const autoSyncTooltip = ts
+                  ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
+                  : undefined;
+                return (
+                  <ScheduleMatchCard
+                    key={match.id}
+                    match={match}
+                    label={stageLabelFor(match)}
+                    isPrediction={isPrediction}
+                    locked={isPrediction && isMatchLocked(match.dateUtc)}
+                    synced={!isPrediction && state.syncedResultIds.includes(match.id)}
+                    disabled={!match.editable && !isPrediction}
+                    lockedReason={t("autoSync.waitingResult")}
+                    autoSyncTooltip={autoSyncTooltip}
+                    onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       ))}
     </div>

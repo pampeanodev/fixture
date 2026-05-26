@@ -1,0 +1,27 @@
+.compact-standings {
+  background: var(--card-bg); border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
+  margin-bottom: 14px;
+}
+.compact-standings-header {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px;
+  background: var(--accent-green); color: white;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  border: none; cursor: pointer; text-align: left;
+}
+.compact-standings-header .chev { font-size: 13px; }
+.compact-standings-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+}
+.compact-standings-table th {
+  font-size: 10px; padding: 6px 4px; text-align: center;
+  color: #888; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid #eee;
+}
+.compact-standings-table th:first-child { text-align: left; padding-left: 10px; }
+.compact-standings-table td { padding: 6px 4px; text-align: center; font-size: 12px; border-bottom: 1px solid #f4f4f4; }
+.compact-standings-table td:first-child { text-align: left; padding-left: 10px; display: flex; align-items: center; gap: 6px; }
+.compact-standings-table td:first-child .team-flag { font-size: 14px; flex-shrink: 0; }
+.compact-standings-table tr.qualify { background: var(--accent-qualify); }
+.compact-standings-table tr.maybe-qualify { background: var(--accent-maybe); }
+.compact-standings-table tr:last-child td { border-bottom: none; }

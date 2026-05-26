@@ -82,3 +82,21 @@
   .topbar-name-input { width: 80px; font-size: 12px; padding: 5px 8px; }
   .mode-toggle button { padding: 5px 10px; font-size: 11px; }
 }
+
+.topbar-viewmode-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 12px; margin-right: 6px;
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+  background: rgba(255,255,255,0.08); color: #ffffff;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: background 0.15s;
+  white-space: nowrap;
+}
+.topbar-viewmode-btn:hover { background: rgba(255,255,255,0.15); }
+.topbar-viewmode-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.topbar-right { display: inline-flex; align-items: center; }
+
+@media (max-width: 480px) {
+  .topbar-viewmode-btn { width: 36px; padding: 0; justify-content: center; }
+  .topbar-viewmode-label { display: none; }
+}

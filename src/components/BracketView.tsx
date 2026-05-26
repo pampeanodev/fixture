@@ -1,5 +1,8 @@
 import { useFixture } from "../context/FixtureContext";
+import { useViewMode } from "../context/ViewModeContext";
 import { ScoreInput } from "./ScoreInput";
+import { BracketTree } from "./bracket/BracketTree";
+import { BracketMobile } from "./bracket/BracketMobile";
 import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
 import { isMatchEditable } from "../espn/graceLock";
@@ -32,6 +35,7 @@ function slotLabel(t: TFunction, match: KnockoutMatch, side: "home" | "away"): s
 export function BracketView({ round }: { round: KnockoutRound }) {
   const { state, dispatch, resolvedKnockout } = useFixture();
   const { t, formatDate } = useLocale();
+  const { mode: viewMode } = useViewMode();
   const isPrediction = state.mode === "predictions";
   const roundsToShow: KnockoutRound[] = round === "F" ? ["F", "3P"] : [round];
   const autoSyncEnabled = loadAutoSyncEnabled();
@@ -39,8 +43,17 @@ export function BracketView({ round }: { round: KnockoutRound }) {
   const now = getEffectiveNow();
   const autoSyncMeta = loadAutoSyncMeta();
 
+  if (viewMode === "compact") {
+    return (
+      <div className="bracket-view compact">
+        <BracketTree />
+        <BracketMobile round={round} />
+      </div>
+    );
+  }
+
   return (
-    <div className="bracket-view">
+    <div className="bracket-view expanded">
       <div className="round-tabs" data-tour="round-tabs">
         {ROUND_TABS.map((r) => (
           <button key={r}

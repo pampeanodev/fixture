@@ -74,3 +74,21 @@
 @media (max-width: 600px) {
   .schedule-match-venue { display: none; }
 }
+
+.schedule-day-header-compact {
+  display: flex; align-items: center; gap: 8px;
+  margin: 14px 0 4px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.6px;
+  color: var(--accent-green); text-transform: uppercase;
+}
+.schedule-day-header-compact::before,
+.schedule-day-header-compact::after {
+  content: ""; flex: 1; height: 1px; background: var(--accent-green); opacity: 0.4;
+}
+.schedule-day-header-compact:first-of-type { margin-top: 0; }
+
+.schedule-day-matches-compact {
+  display: flex; flex-direction: column;
+  background: var(--card-bg); border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
+}

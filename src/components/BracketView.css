@@ -28,3 +28,16 @@
 .bracket-team.home { justify-content: flex-end; }
 .bracket-team.pending { color: #bbb; font-weight: 400; font-style: italic; }
 .bracket-venue { font-size: 10px; color: #aaa; margin-top: 6px; }
+
+/* Compact mode: bracket-tree visible on desktop, mobile fallback on small screens */
+.bracket-mobile-fallback { display: none; }
+.bracket-mobile-list {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+@media (max-width: 767px) {
+  .bracket-mobile-fallback { display: block; }
+}

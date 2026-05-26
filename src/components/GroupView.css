@@ -100,3 +100,8 @@
   .standings-table th:first-child { white-space: nowrap; }
   .standings-table th, .standings-table td { padding: 5px 1px; font-size: 9px; }
 }
+
+.group-matches-compact {
+  background: var(--card-bg); border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
+}
