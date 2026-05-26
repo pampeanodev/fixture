@@ -22,6 +22,13 @@ export interface CompactMatchRowProps {
   onScoreChange: (score: Score | null) => void;
 }
 
+function penWinnerOf(score: Score | null): "home" | "away" | null {
+  if (!score?.penalties) return null;
+  if (score.penalties.home > score.penalties.away) return "home";
+  if (score.penalties.away > score.penalties.home) return "away";
+  return null;
+}
+
 export function CompactMatchRow(props: CompactMatchRowProps) {
   const {
     homeTeamId, awayTeamId, dateUtc, badgeLabel, badgeKind, currentScore,
@@ -41,7 +48,7 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
     const h = parseInt(hStr, 10);
     const a = parseInt(aStr, 10);
     if (!isNaN(h) && !isNaN(a) && h >= 0 && a >= 0) {
-      onScoreChange({ home: h, away: a });
+      onScoreChange({ home: h, away: a, penalties: currentScore?.penalties });
     } else if (hStr === "" && aStr === "") {
       onScoreChange(null);
     }
@@ -55,6 +62,16 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
   const inputTitle = effectiveDisabled
     ? (locked ? undefined : (lockedReason ?? autoSyncTooltip))
     : autoSyncTooltip;
+  const tied = currentScore !== null && currentScore.home === currentScore.away;
+  const showPen = badgeKind === "knockout" && bothKnown && tied;
+  const penWinner = penWinnerOf(currentScore);
+
+  function pickPen(winner: "home" | "away") {
+    if (!currentScore || currentScore.home !== currentScore.away) return;
+    if (penWinner === winner) return;
+    const penalties = winner === "home" ? { home: 1, away: 0 } : { home: 0, away: 1 };
+    onScoreChange({ ...currentScore, penalties });
+  }
 
   let indicator: { className: string; text: string } | null = null;
   if (isPrediction && realScore && currentScore) {
@@ -68,7 +85,7 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
   }
 
   return (
-    <div className={`compact-match-row ${badgeKind} ${synced ? "synced" : ""}`}>
+    <div className={`compact-match-row ${badgeKind} ${synced ? "synced" : ""} ${showPen ? "with-pen" : ""}`}>
       <span className={`compact-badge ${badgeKind}`}>
         <span className="badge-label">{badgeLabel}</span>
         <span className="badge-time">{time}</span>
@@ -117,6 +134,27 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
       {indicator && <span className={`compact-indicator ${indicator.className}`}>{indicator.text}</span>}
       {locked && !indicator && <span className="compact-status locked" title={lockedReason}>🔒</span>}
       {synced && !indicator && <span className="compact-status synced" title={t("scoreInput.syncedTitle")}>↻</span>}
+      {showPen && (
+        <div className="compact-pen-row">
+          <span className="compact-pen-label">{t("scoreInput.penLabel")}</span>
+          <button type="button"
+            className={`compact-pen-pick ${penWinner === "home" ? "active" : ""}`}
+            disabled={effectiveDisabled}
+            onClick={() => pickPen("home")}
+            aria-pressed={penWinner === "home"}
+            aria-label={t("scoreInput.penPickAria", { team: homeTeam ? t(`teams.${homeTeam.id}`) : "home" })}>
+            {homeTeam?.flag ?? "1"}
+          </button>
+          <button type="button"
+            className={`compact-pen-pick ${penWinner === "away" ? "active" : ""}`}
+            disabled={effectiveDisabled}
+            onClick={() => pickPen("away")}
+            aria-pressed={penWinner === "away"}
+            aria-label={t("scoreInput.penPickAria", { team: awayTeam ? t(`teams.${awayTeam.id}`) : "away" })}>
+            {awayTeam?.flag ?? "2"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -50,6 +50,40 @@
 .compact-status { font-size: 12px; padding-left: 4px; }
 .compact-status.synced { color: var(--accent-green, #2e7d32); }
 
+.compact-pen-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 0 2px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--card-border);
+}
+.compact-pen-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--prediction-blue);
+  opacity: 0.75;
+}
+.compact-pen-pick {
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 8px;
+  border: 1px solid var(--prediction-blue);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0.45;
+  font-family: inherit;
+  transition: opacity 0.15s, background 0.15s;
+}
+.compact-pen-pick:hover:not(:disabled) { opacity: 0.85; }
+.compact-pen-pick.active { background: var(--prediction-blue); opacity: 1; color: var(--text-on-dark); }
+.compact-pen-pick:disabled { cursor: not-allowed; opacity: 0.3; }
+
 @media (max-width: 420px) {
   .compact-match-row { grid-template-columns: 60px minmax(0, 1fr) auto minmax(0, 1fr) auto; gap: 5px; font-size: 12px; padding: 5px 6px; }
   .compact-team .team-flag { font-size: 14px; }
