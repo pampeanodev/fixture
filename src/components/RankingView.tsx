@@ -8,13 +8,28 @@ import "./RankingView.css";
 
 export function RankingView() {
   const { state, dispatch } = useFixture();
-  const { activeRoomId, isRoomOwner } = useNostr();
+  const { activeRoomId, isRoomOwner, getRoomCreator, identity } = useNostr();
   const { t } = useLocale();
 
   // In a P2P room there is no real "kick": REMOVE_RIVAL only hides a peer from
   // the local ranking (they reappear on the next sync). We still gate it to the
   // room owner so the affordance isn't offered to regular members.
   const canRemove = activeRoomId !== null && isRoomOwner(activeRoomId);
+
+  // The owner is whoever the manifest names as creator. Resolve their pubkey to
+  // a ranking-row identity: the local player is matched by pubkey; peers are
+  // matched by the display name carried in `members`.
+  const ownerPubkey = activeRoomId ? getRoomCreator(activeRoomId) : undefined;
+  const ownerName =
+    ownerPubkey !== undefined && ownerPubkey !== identity?.pubkey
+      ? state.members.find((m) => m.pubkey === ownerPubkey)?.name
+      : undefined;
+
+  function isOwnerRow(player: RankedPlayer): boolean {
+    if (ownerPubkey === undefined) return false;
+    if (player.isLocal) return ownerPubkey === identity?.pubkey;
+    return ownerName !== undefined && player.name === ownerName;
+  }
 
   const ranking = useMemo(() => {
     const base = computeRanking(state, t("common.youFallback"));
@@ -56,12 +71,14 @@ export function RankingView() {
               <div className="ranking-rule-icon">{t("ranking.rule.exactSymbol")}</div>
               <div className="ranking-rule-label">{t("ranking.rule.exactLabel")}</div>
               <div className="ranking-rule-example">{t("ranking.rule.exactExample")}</div>
+              <div className="ranking-rule-example draw">{t("ranking.rule.exactExampleDraw")}</div>
             </div>
             <div className="ranking-rule-card winner">
               <div className="ranking-rule-points">{t("ranking.rule.winnerPoints")}</div>
               <div className="ranking-rule-icon">{t("ranking.rule.winnerSymbol")}</div>
               <div className="ranking-rule-label">{t("ranking.rule.winnerLabel")}</div>
               <div className="ranking-rule-example">{t("ranking.rule.winnerExample")}</div>
+              <div className="ranking-rule-example draw">{t("ranking.rule.winnerExampleDraw")}</div>
             </div>
             <div className="ranking-rule-card pen-bonus">
               <div className="ranking-rule-points">{t("ranking.rule.penBonusPoints")}</div>
@@ -74,6 +91,7 @@ export function RankingView() {
               <div className="ranking-rule-icon">{t("ranking.rule.wrongSymbol")}</div>
               <div className="ranking-rule-label">{t("ranking.rule.wrongLabel")}</div>
               <div className="ranking-rule-example">{t("ranking.rule.wrongExample")}</div>
+              <div className="ranking-rule-example draw">{t("ranking.rule.wrongExampleDraw")}</div>
             </div>
           </div>
 
@@ -124,6 +142,11 @@ export function RankingView() {
                 <td>{i + 1}</td>
                 <td>
                   {player.name}
+                  {isOwnerRow(player) && (
+                    <span className="ranking-name-owner" title={t("ranking.ownerBadgeTitle")}>
+                      {t("ranking.ownerBadge")}
+                    </span>
+                  )}
                   {player.isLocal && <span className="ranking-name-you">{t("ranking.youSuffix")}</span>}
                 </td>
                 <td className="ranking-total">{player.total}</td>

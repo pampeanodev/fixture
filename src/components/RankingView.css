@@ -57,6 +57,10 @@
 .ranking-rule-icon { font-size: 24px; margin-bottom: 4px; }
 .ranking-rule-label { font-size: 12px; font-weight: 700; color: #333; margin-bottom: 4px; }
 .ranking-rule-example { font-size: 11px; color: #888; }
+.ranking-rule-example.draw {
+  margin-top: 4px; padding-top: 4px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+}
 
 .ranking-empty {
   text-align: center; padding: 40px 20px; color: #888;
@@ -90,6 +94,10 @@
 
 .ranking-name-you {
   font-size: 10px; font-weight: 400; color: #888; margin-left: 4px;
+}
+
+.ranking-name-owner {
+  font-size: 12px; margin-left: 4px; cursor: default;
 }
 
 .ranking-total { font-weight: 700; font-size: 16px; color: var(--accent-green); }

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import type {
   NostrIdentity,
@@ -45,6 +45,10 @@ interface NostrContextValue {
   setActiveRoom: (roomId: string | null) => void;
   /** True iff the local identity is the creator of the room, per its manifest. */
   isRoomOwner: (roomId: string) => boolean;
+  /** Creator pubkey for the room, or undefined if the manifest isn't local yet. */
+  getRoomCreator: (roomId: string) => string | undefined;
+  /** Store a manifest fetched from the relay so ownership UI works for members. */
+  cacheManifest: (manifest: RoomManifest) => void;
 }
 
 const NostrContext = createContext<NostrContextValue | null>(null);
@@ -68,8 +72,11 @@ export function NostrProvider({ children }: { children: ReactNode }) {
     return mostRecent.roomId;
   });
   const [relayConnected, setRelayConnected] = useState(false);
-  const manifestsRef = useRef<Map<string, RoomManifest>>(
-    new Map(Object.entries(loadManifests()))
+  // Room manifests keyed by roomId. Reactive (not a ref) so ownership-derived
+  // UI re-renders when a member's manifest arrives from the relay via
+  // cacheManifest. Source of truth for "who created the room".
+  const [manifests, setManifests] = useState<Record<string, RoomManifest>>(
+    () => loadManifests(),
   );
 
   const hasRooms = rooms.length > 0;
@@ -81,6 +88,10 @@ export function NostrProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     persistRooms(rooms);
   }, [rooms]);
+
+  useEffect(() => {
+    persistManifests(manifests);
+  }, [manifests]);
 
   useEffect(() => {
     try {
@@ -146,8 +157,7 @@ export function NostrProvider({ children }: { children: ReactNode }) {
       creator: identity.pubkey,
       validInvites: [],
     };
-    manifestsRef.current.set(roomId, manifest);
-    persistManifests(Object.fromEntries(manifestsRef.current));
+    setManifests((prev) => ({ ...prev, [roomId]: manifest }));
 
     const event = buildManifestEvent(manifest);
     publishEvent(event, identity).catch(() => {
@@ -184,22 +194,36 @@ export function NostrProvider({ children }: { children: ReactNode }) {
   const createInvite = useCallback((roomId: string) => {
     if (!identity) throw new Error("No identity");
     const code = generateInviteCode();
-    const manifest = manifestsRef.current.get(roomId);
+    const manifest = manifests[roomId];
     if (manifest && manifest.creator === identity.pubkey) {
-      manifest.validInvites = [...manifest.validInvites, code];
-      persistManifests(Object.fromEntries(manifestsRef.current));
-      const event = buildManifestEvent(manifest);
+      const updated = { ...manifest, validInvites: [...manifest.validInvites, code] };
+      setManifests((prev) => ({ ...prev, [roomId]: updated }));
+      const event = buildManifestEvent(updated);
       publishEvent(event, identity).catch(() => {
         enqueueEvent({ eventTemplate: event, createdAt: Date.now() });
       });
     }
     return code;
-  }, [identity]);
+  }, [identity, manifests]);
+
+  // Store a manifest fetched from the relay (member path). Idempotent: a no-op
+  // when unchanged, so re-fetching the same manifest doesn't trigger renders.
+  const cacheManifest = useCallback((manifest: RoomManifest) => {
+    setManifests((prev) => {
+      const existing = prev[manifest.roomId];
+      if (existing && JSON.stringify(existing) === JSON.stringify(manifest)) return prev;
+      return { ...prev, [manifest.roomId]: manifest };
+    });
+  }, []);
 
   const isRoomOwner = useCallback(
-    (roomId: string) =>
-      computeIsRoomOwner(manifestsRef.current.get(roomId), identity?.pubkey),
-    [identity],
+    (roomId: string) => computeIsRoomOwner(manifests[roomId], identity?.pubkey),
+    [identity, manifests],
+  );
+
+  const getRoomCreator = useCallback(
+    (roomId: string) => manifests[roomId]?.creator,
+    [manifests],
   );
 
   const value: NostrContextValue = {
@@ -217,6 +241,8 @@ export function NostrProvider({ children }: { children: ReactNode }) {
     createInvite,
     setActiveRoom,
     isRoomOwner,
+    getRoomCreator,
+    cacheManifest,
   };
 
   return <NostrContext.Provider value={value}>{children}</NostrContext.Provider>;

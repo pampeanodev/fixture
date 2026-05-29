@@ -34,7 +34,7 @@ import { isMatchLocked } from "../utils/lockTime";
 import type { Event } from "nostr-tools/core";
 
 export function useNostrSync(): void {
-  const { identity, activeRoomId, connectionStatus, isRoomOwner } = useNostr();
+  const { identity, activeRoomId, connectionStatus, isRoomOwner, cacheManifest } = useNostr();
   const { state, dispatch } = useFixture();
   const subRef = useRef<{ close: () => void } | null>(null);
   const resultsSubRef = useRef<{ close: () => void } | null>(null);
@@ -306,6 +306,9 @@ export function useNostrSync(): void {
       const manifest = parseEventContent<RoomManifest>(latest.content);
       if (!manifest) return;
       creatorRef.current = manifest.creator;
+      // Persist so RoomList/RankingView can show who the owner is, and so a
+      // creator on a restored identity is recognized as owner on this device.
+      cacheManifest(manifest);
 
       resultsSubRef.current = subscribe(
         { kinds: [NOSTR_KIND], "#d": [resultsDTag], authors: [manifest.creator] },
@@ -330,7 +333,7 @@ export function useNostrSync(): void {
       resultsSubRef.current?.close();
       resultsSubRef.current = null;
     };
-  }, [activeRoomId, identity, connectionStatus, isRoomOwner, dispatch]);
+  }, [activeRoomId, identity, connectionStatus, isRoomOwner, cacheManifest, dispatch]);
 
   // Publish room results (creator only, not during simulation)
   const publishResults = useCallback(() => {
