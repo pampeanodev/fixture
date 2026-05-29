@@ -73,6 +73,20 @@ interface ClaimRecord {
   claimedAt: number;
 }
 
+/**
+ * Authoritative ownership check. A user owns a room iff their pubkey equals the
+ * manifest's `creator`. This is derived from the manifest (the source of truth),
+ * NOT from the locally-stored `RoomMembership.role`, which can drift — e.g. when
+ * a creator re-opens their own invite link and `joinRoom` overwrites the
+ * membership with role "member".
+ */
+export function isRoomOwner(
+  manifest: RoomManifest | undefined,
+  pubkey: string | undefined,
+): boolean {
+  return manifest !== undefined && pubkey !== undefined && manifest.creator === pubkey;
+}
+
 export function isValidMember(
   manifest: RoomManifest,
   pubkey: string,

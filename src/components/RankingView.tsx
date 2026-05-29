@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useFixture } from "../context/FixtureContext";
+import { useNostr } from "../context/NostrContext";
 import { computeRanking } from "../utils/scoring";
 import { useLocale } from "../i18n";
 import type { RankedPlayer } from "../utils/scoring";
@@ -7,7 +8,13 @@ import "./RankingView.css";
 
 export function RankingView() {
   const { state, dispatch } = useFixture();
+  const { activeRoomId, isRoomOwner } = useNostr();
   const { t } = useLocale();
+
+  // In a P2P room there is no real "kick": REMOVE_RIVAL only hides a peer from
+  // the local ranking (they reappear on the next sync). We still gate it to the
+  // room owner so the affordance isn't offered to regular members.
+  const canRemove = activeRoomId !== null && isRoomOwner(activeRoomId);
 
   const ranking = useMemo(() => {
     const base = computeRanking(state, t("common.youFallback"));
@@ -126,7 +133,7 @@ export function RankingView() {
                 <td>{player.wrong}</td>
                 <td>{player.pending}</td>
                 <td>
-                  {!player.isLocal && (
+                  {!player.isLocal && canRemove && (
                     <button
                       className="ranking-remove"
                       onClick={() => dispatch({ type: "REMOVE_RIVAL", name: player.name })}

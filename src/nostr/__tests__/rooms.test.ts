@@ -7,6 +7,7 @@ import {
   addRoom,
   removeRoom,
   isValidMember,
+  isRoomOwner,
   persistManifests,
   loadManifests,
 } from "../rooms";
@@ -109,6 +110,28 @@ describe("isValidMember", () => {
   it("rejects if invite code was claimed by someone else", () => {
     const claims = [{ pubkey: "pubkey3", inviteCode: "t8f2", claimedAt: 1000 }];
     expect(isValidMember(closedManifest, "pubkey2", "t8f2", claims)).toBe(false);
+  });
+});
+
+describe("isRoomOwner", () => {
+  const manifest: RoomManifest = {
+    roomId: "abc12345", mode: "open", creator: "pubkey1", validInvites: [],
+  };
+
+  it("is true when the pubkey matches the manifest creator", () => {
+    expect(isRoomOwner(manifest, "pubkey1")).toBe(true);
+  });
+
+  it("is false when the pubkey is a different member", () => {
+    expect(isRoomOwner(manifest, "pubkey2")).toBe(false);
+  });
+
+  it("is false when the manifest is unknown (member without it locally)", () => {
+    expect(isRoomOwner(undefined, "pubkey1")).toBe(false);
+  });
+
+  it("is false when there is no identity yet", () => {
+    expect(isRoomOwner(manifest, undefined)).toBe(false);
   });
 });
 

@@ -34,7 +34,7 @@ import { isMatchLocked } from "../utils/lockTime";
 import type { Event } from "nostr-tools/core";
 
 export function useNostrSync(): void {
-  const { identity, activeRoomId, connectionStatus, rooms } = useNostr();
+  const { identity, activeRoomId, connectionStatus, isRoomOwner } = useNostr();
   const { state, dispatch } = useFixture();
   const subRef = useRef<{ close: () => void } | null>(null);
   const resultsSubRef = useRef<{ close: () => void } | null>(null);
@@ -270,10 +270,11 @@ export function useNostrSync(): void {
     lastPublishedResultsRef.current = "";
     dispatch({ type: "CLEAR_SYNCED_RESULTS" });
 
-    // Fast path: I created this room locally, so I know I'm the creator.
-    // publishResults uses creatorRef synchronously; skip the relay roundtrip.
-    const myMembership = rooms.find((r) => r.roomId === activeRoomId);
-    if (myMembership?.role === "creator") {
+    // Fast path: the local manifest names me as creator, so I know I'm the
+    // owner. publishResults uses creatorRef synchronously; skip the relay
+    // roundtrip. Derived from the manifest (not the mutable membership role,
+    // which can drift when a creator re-opens their own invite link).
+    if (isRoomOwner(activeRoomId)) {
       creatorRef.current = identity.pubkey;
       return () => {
         resultsSubRef.current?.close();
@@ -329,7 +330,7 @@ export function useNostrSync(): void {
       resultsSubRef.current?.close();
       resultsSubRef.current = null;
     };
-  }, [activeRoomId, identity, connectionStatus, rooms, dispatch]);
+  }, [activeRoomId, identity, connectionStatus, isRoomOwner, dispatch]);
 
   // Publish room results (creator only, not during simulation)
   const publishResults = useCallback(() => {

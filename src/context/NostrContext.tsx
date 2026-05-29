@@ -21,6 +21,7 @@ import {
   loadRooms,
   addRoom,
   removeRoom,
+  isRoomOwner as computeIsRoomOwner,
   persistManifests,
   loadManifests,
 } from "../nostr/rooms";
@@ -42,6 +43,8 @@ interface NostrContextValue {
   leaveRoom: (roomId: string) => void;
   createInvite: (roomId: string) => string;
   setActiveRoom: (roomId: string | null) => void;
+  /** True iff the local identity is the creator of the room, per its manifest. */
+  isRoomOwner: (roomId: string) => boolean;
 }
 
 const NostrContext = createContext<NostrContextValue | null>(null);
@@ -193,6 +196,12 @@ export function NostrProvider({ children }: { children: ReactNode }) {
     return code;
   }, [identity]);
 
+  const isRoomOwner = useCallback(
+    (roomId: string) =>
+      computeIsRoomOwner(manifestsRef.current.get(roomId), identity?.pubkey),
+    [identity],
+  );
+
   const value: NostrContextValue = {
     identity,
     rooms,
@@ -207,6 +216,7 @@ export function NostrProvider({ children }: { children: ReactNode }) {
     leaveRoom,
     createInvite,
     setActiveRoom,
+    isRoomOwner,
   };
 
   return <NostrContext.Provider value={value}>{children}</NostrContext.Provider>;

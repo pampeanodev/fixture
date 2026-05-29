@@ -5,7 +5,7 @@ import { useLocale } from "../i18n";
 import "./RoomList.css";
 
 export function RoomList() {
-  const { rooms, createRoom, joinRoom, setActiveRoom } = useNostr();
+  const { rooms, createRoom, joinRoom, setActiveRoom, isRoomOwner } = useNostr();
   const { dispatch } = useFixture();
   const { t } = useLocale();
   const [showCreate, setShowCreate] = useState(false);
@@ -79,7 +79,7 @@ export function RoomList() {
           {rooms.map((room) => (
             <button key={room.roomId} className="room-list-item" onClick={() => handleSelectRoom(room.roomId)}>
               <span className="room-item-name">{room.name}</span>
-              <span className="room-item-role">{room.role === "creator" ? t("rooms.list.roleCreator") : t("rooms.list.roleMember")}</span>
+              <span className="room-item-role">{isRoomOwner(room.roomId) ? t("rooms.list.roleCreator") : t("rooms.list.roleMember")}</span>
               <span className="room-item-arrow">&rsaquo;</span>
             </button>
           ))}
