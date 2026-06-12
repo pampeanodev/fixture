@@ -5,7 +5,47 @@ import {
   verifyReveal,
   persistSalts,
   loadSalts,
+  buildCommitmentMap,
 } from "../commitReveal";
+
+describe("buildCommitmentMap", () => {
+  const open = { id: "G-A-2", dateUtc: "2026-06-20T18:00:00Z", prediction: { home: 1, away: 0 } };
+  const locked = { id: "G-A-1", dateUtc: "2026-06-11T18:00:00Z", prediction: { home: 2, away: 1 } };
+  const isLocked = (dateUtc: string) => dateUtc === locked.dateUtc;
+
+  it("keeps previously committed hashes for locked matches (replaceable event must stay cumulative)", () => {
+    const salt = "aa".repeat(16);
+    const { commitments } = buildCommitmentMap([locked], { "G-A-1": salt }, isLocked);
+    expect(commitments["G-A-1"]).toBe(computeCommitment("G-A-1", 2, 1, salt));
+  });
+
+  it("never mints a commitment for a locked match without a prior salt", () => {
+    const { commitments, salts } = buildCommitmentMap([locked], {}, isLocked);
+    expect(commitments["G-A-1"]).toBeUndefined();
+    expect(salts["G-A-1"]).toBeUndefined();
+  });
+
+  it("mints a salt and commitment for an open match", () => {
+    const { commitments, salts } = buildCommitmentMap([open], {}, isLocked);
+    expect(salts["G-A-2"]).toMatch(/^[0-9a-f]{32}$/);
+    expect(commitments["G-A-2"]).toBe(computeCommitment("G-A-2", 1, 0, salts["G-A-2"]));
+  });
+
+  it("reuses the existing salt for an open match", () => {
+    const salt = "bb".repeat(16);
+    const { commitments, salts } = buildCommitmentMap([open], { "G-A-2": salt }, isLocked);
+    expect(salts["G-A-2"]).toBe(salt);
+    expect(commitments["G-A-2"]).toBe(computeCommitment("G-A-2", 1, 0, salt));
+  });
+
+  it("skips matches without a prediction and does not mutate the input salts", () => {
+    const input: Record<string, string> = {};
+    const noPred = { id: "G-A-3", dateUtc: "2026-06-21T18:00:00Z", prediction: null };
+    const { commitments } = buildCommitmentMap([noPred], input, isLocked);
+    expect(commitments).toEqual({});
+    expect(input).toEqual({});
+  });
+});
 
 describe("generateSalt", () => {
   it("returns a 32-char hex string (16 bytes)", () => {

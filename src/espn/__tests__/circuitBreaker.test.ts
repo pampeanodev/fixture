@@ -4,7 +4,10 @@ import {
   loadBreakerState,
   saveBreakerState,
   resetBreaker,
+  countsTowardBreaker,
   BREAKER_STORAGE_KEY,
+  LEGACY_BREAKER_STORAGE_KEY,
+  type SkipReason,
 } from "../circuitBreaker";
 
 beforeEach(() => {
@@ -76,6 +79,29 @@ describe("evaluateTick", () => {
   });
 });
 
+describe("countsTowardBreaker", () => {
+  it("does not count scheduled/in-progress events (non-terminal status)", () => {
+    // The fetch window is today ± 3 days: on every matchday the scoreboard
+    // includes future and live matches. Those are expected, not anomalies.
+    expect(countsTowardBreaker("non_terminal_status")).toBe(false);
+  });
+
+  it("counts genuine data anomalies and fixture mismatches", () => {
+    const anomalous: SkipReason[] = [
+      "invalid_date",
+      "invalid_score",
+      "missing_shootout",
+      "invalid_shootout",
+      "unknown_team_code",
+      "no_match",
+      "ambiguous",
+    ];
+    for (const reason of anomalous) {
+      expect(countsTowardBreaker(reason)).toBe(true);
+    }
+  });
+});
+
 describe("persistence", () => {
   it("round-trips breaker state through localStorage", () => {
     saveBreakerState({
@@ -99,6 +125,17 @@ describe("persistence", () => {
       reason: null,
       consecutiveFailures: 0,
     });
+  });
+
+  it("discards tripped state persisted under the legacy key", () => {
+    // States written before the non-terminal-skip fix tripped spuriously;
+    // the key bump invalidates them in one shot.
+    localStorage.setItem(
+      LEGACY_BREAKER_STORAGE_KEY,
+      JSON.stringify({ tripped: true, trippedAt: 1, reason: "many_skips", consecutiveFailures: 0 }),
+    );
+    expect(loadBreakerState().tripped).toBe(false);
+    expect(localStorage.getItem(LEGACY_BREAKER_STORAGE_KEY)).toBeNull();
   });
 
   it("resetBreaker clears the storage key", () => {

@@ -215,18 +215,15 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.sim-symbol {
-  text-align: center;
-  width: 30px;
-  font-weight: 700;
-  font-size: 15px;
-}
 .sim-delta {
   text-align: right;
   color: #2e7d32;
   font-weight: 700;
   width: 50px;
 }
+.sim-delta.exact { color: #2e7d32; }
+.sim-delta.winner { color: #f9a825; }
+.sim-delta.wrong { color: #c62828; }
 .sim-arrow {
   text-align: right;
   color: #666;

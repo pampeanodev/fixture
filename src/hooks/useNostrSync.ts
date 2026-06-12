@@ -15,8 +15,7 @@ import {
 } from "../nostr/events";
 import { enqueueEvent } from "../nostr/outbox";
 import {
-  computeCommitment,
-  generateSalt,
+  buildCommitmentMap,
   verifyReveal,
   loadSalts,
   persistSalts,
@@ -31,6 +30,8 @@ import type {
 } from "../nostr/types";
 import type { Member, Score, Rival } from "../types";
 import { isMatchLocked } from "../utils/lockTime";
+import { stripPrematureResults } from "../utils/resultsGuard";
+import { getEffectiveNow } from "../utils/devClock";
 import type { Event } from "nostr-tools/core";
 
 export function useNostrSync(): void {
@@ -39,6 +40,9 @@ export function useNostrSync(): void {
   const subRef = useRef<{ close: () => void } | null>(null);
   const resultsSubRef = useRef<{ close: () => void } | null>(null);
   const commitmentsCache = useRef<Map<string, Record<string, string>>>(new Map());
+  // Last reveal seen per peer: replayed when their commitment arrives later
+  // (relays don't guarantee commit-before-reveal ordering on live events).
+  const revealsCache = useRef<Map<string, RevealPayload>>(new Map());
   const nostrRivalsRef = useRef<Set<string>>(new Set());
   const creatorRef = useRef<string | null>(null);
   const lastPublishedResultsRef = useRef<string>("");
@@ -105,6 +109,7 @@ export function useNostrSync(): void {
     }
     nostrRivalsRef.current.clear();
     commitmentsCache.current.clear();
+    revealsCache.current.clear();
     dispatch({ type: "CLEAR_MEMBERS" });
 
     const commitDTag = getDTag(activeRoomId, "commit");
@@ -130,12 +135,17 @@ export function useNostrSync(): void {
                   name: memberNameFor(event.pubkey, payload.playerName),
                 },
               });
+              const pendingReveal = revealsCache.current.get(event.pubkey);
+              if (pendingReveal) {
+                processReveal(event.pubkey, pendingReveal, payload.commitments);
+              }
             }
           }
 
           if (dTag === revealDTag) {
             const payload = parseEventContent<RevealPayload>(event.content);
             if (!payload) return;
+            revealsCache.current.set(event.pubkey, payload);
             const peerCommitments = commitmentsCache.current.get(event.pubkey);
             processReveal(event.pubkey, payload, peerCommitments);
           }
@@ -168,6 +178,7 @@ export function useNostrSync(): void {
         if (event.pubkey === identity.pubkey) continue;
         const payload = parseEventContent<RevealPayload>(event.content);
         if (!payload) continue;
+        revealsCache.current.set(event.pubkey, payload);
         const peerCommitments = commitmentsCache.current.get(event.pubkey);
         processReveal(event.pubkey, payload, peerCommitments);
       }
@@ -180,33 +191,17 @@ export function useNostrSync(): void {
     };
   }, [activeRoomId, identity, connectionStatus, dispatch, processReveal]);
 
-  // Publish commitments when predictions change
+  // Publish commitments when predictions change. The map must include locked
+  // matches that were committed in time — the event is replaceable, so an
+  // incomplete map would erase the hashes peers need to verify reveals.
   const publishCommitments = useCallback(() => {
     if (!identity || !activeRoomId || connectionStatus !== "connected") return;
 
-    const salts = loadSalts(activeRoomId);
-    const commitments: Record<string, string> = {};
-
-    for (const match of state.groupMatches) {
-      if (!match.prediction || isMatchLocked(match.dateUtc)) continue;
-      if (!salts[match.id]) salts[match.id] = generateSalt();
-      commitments[match.id] = computeCommitment(
-        match.id,
-        match.prediction.home,
-        match.prediction.away,
-        salts[match.id],
-      );
-    }
-    for (const match of state.knockoutMatches) {
-      if (!match.prediction || isMatchLocked(match.dateUtc)) continue;
-      if (!salts[match.id]) salts[match.id] = generateSalt();
-      commitments[match.id] = computeCommitment(
-        match.id,
-        match.prediction.home,
-        match.prediction.away,
-        salts[match.id],
-      );
-    }
+    const { commitments, salts } = buildCommitmentMap(
+      [...state.groupMatches, ...state.knockoutMatches],
+      loadSalts(activeRoomId),
+      isMatchLocked,
+    );
 
     persistSalts(activeRoomId, salts);
 
@@ -292,10 +287,13 @@ export function useNostrSync(): void {
       if (event.pubkey !== expectedCreator) return;
       const payload = parseEventContent<ResultsPayload>(event.content);
       if (!payload) return;
+      // Never accept a result for a match that hasn't kicked off — a polluted
+      // admin state must not propagate phantom results to the whole room.
+      const now = getEffectiveNow();
       dispatch({
         type: "APPLY_SYNCED_RESULTS",
-        groupResults: payload.groupResults,
-        knockoutResults: payload.knockoutResults,
+        groupResults: stripPrematureResults(payload.groupResults, now),
+        knockoutResults: stripPrematureResults(payload.knockoutResults, now),
       });
     }
 

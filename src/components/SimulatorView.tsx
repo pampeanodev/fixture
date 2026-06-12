@@ -7,7 +7,7 @@ import {
   generateKnockoutResult,
 } from "../simulator/resultGenerator";
 import { ScoreInput } from "./ScoreInput";
-import { computeRanking, scoreMatch } from "../utils/scoring";
+import { computeRanking, scoreMatch, indicatorForPoints } from "../utils/scoring";
 import type { RankedPlayer } from "../utils/scoring";
 import type { Score, KnockoutRound } from "../types";
 import type { PendingMatch } from "../simulator/types";
@@ -181,8 +181,7 @@ export function SimulatorView() {
                   <td className="pred-score">
                     {d.predScore ? `${d.predScore.home}-${d.predScore.away}` : t("simulator.noScore")}
                   </td>
-                  <td className="sim-symbol">{symbolFor(d.matchPoints)}</td>
-                  <td className="sim-delta">+{d.matchPoints}</td>
+                  <td className={`sim-delta ${indicatorForPoints(d.matchPoints).kind}`}>{indicatorForPoints(d.matchPoints).label}</td>
                 </tr>
               ))}
             </tbody>
@@ -348,10 +347,4 @@ export function SimulatorView() {
       )}
     </div>
   );
-}
-
-function symbolFor(points: number): string {
-  if (points === 3) return "✓";
-  if (points === 1) return "½";
-  return "✗";
 }

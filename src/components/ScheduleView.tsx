@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
+import { indicatorFor } from "../utils/scoring";
 import { isMatchEditable } from "../espn/graceLock";
 import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
@@ -11,7 +12,6 @@ import { useViewMode } from "../context/ViewModeContext";
 import { CompactMatchRow } from "./CompactMatchRow";
 import type { KnockoutRound, Score } from "../types";
 import "./ScheduleView.css";
-
 interface UnifiedMatch {
   id: string;
   dateUtc: string;
@@ -216,18 +216,8 @@ function ScheduleMatchCard({ match, label, isPrediction, locked, synced, disable
 
   const time = formatTime(match.dateUtc);
 
-  let indicator: { className: string; text: string } | null = null;
-  if (isPrediction && match.realScore && match.currentScore) {
-    const r = match.realScore;
-    const p = match.currentScore;
-    if (r.home === p.home && r.away === p.away) {
-      indicator = { className: "exact", text: "✓" };
-    } else if (Math.sign(r.home - r.away) === Math.sign(p.home - p.away)) {
-      indicator = { className: "winner", text: "½" };
-    } else {
-      indicator = { className: "wrong", text: "✗" };
-    }
-  }
+  const scored = isPrediction ? indicatorFor(match.realScore, match.currentScore) : null;
+  const indicator = scored ? { className: scored.kind, text: scored.label } : null;
 
   return (
     <div className={`schedule-match-card ${match.isKnockout ? "knockout" : ""} ${match.hasResult ? "has-result" : ""}`}>

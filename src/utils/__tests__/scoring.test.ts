@@ -1,6 +1,56 @@
 import { describe, it, expect } from "vitest";
-import { scoreMatch, getPenBonus, calculatePlayerScore } from "../scoring";
+import { scoreMatch, getPenBonus, calculatePlayerScore, indicatorFor, indicatorForPoints } from "../scoring";
 import type { Score, GroupMatch, KnockoutMatch } from "../../types";
+
+describe("indicatorFor", () => {
+  it("returns +3 exact for an exact score", () => {
+    expect(indicatorFor({ home: 2, away: 1 }, { home: 2, away: 1 })).toEqual({
+      kind: "exact",
+      label: "+3",
+    });
+  });
+
+  it("returns +1 winner for correct outcome with wrong score", () => {
+    expect(indicatorFor({ home: 3, away: 1 }, { home: 2, away: 0 })).toEqual({
+      kind: "winner",
+      label: "+1",
+    });
+  });
+
+  it("returns 0 wrong for a missed outcome", () => {
+    expect(indicatorFor({ home: 1, away: 2 }, { home: 2, away: 1 })).toEqual({
+      kind: "wrong",
+      label: "0",
+    });
+  });
+
+  it("includes the pen bonus in the label: exact draw + correct pen winner = +4", () => {
+    const result: Score = { home: 1, away: 1, penalties: { home: 4, away: 3 } };
+    const prediction: Score = { home: 1, away: 1, penalties: { home: 1, away: 0 } };
+    expect(indicatorFor(result, prediction)).toEqual({ kind: "exact", label: "+4" });
+  });
+
+  it("includes the pen bonus in the label: outcome draw + correct pen winner = +2", () => {
+    const result: Score = { home: 1, away: 1, penalties: { home: 4, away: 3 } };
+    const prediction: Score = { home: 2, away: 2, penalties: { home: 1, away: 0 } };
+    expect(indicatorFor(result, prediction)).toEqual({ kind: "winner", label: "+2" });
+  });
+
+  it("returns null when result or prediction is missing", () => {
+    expect(indicatorFor(null, { home: 1, away: 1 })).toBeNull();
+    expect(indicatorFor({ home: 1, away: 1 }, null)).toBeNull();
+  });
+});
+
+describe("indicatorForPoints", () => {
+  it("maps every possible point total to kind + label", () => {
+    expect(indicatorForPoints(4)).toEqual({ kind: "exact", label: "+4" });
+    expect(indicatorForPoints(3)).toEqual({ kind: "exact", label: "+3" });
+    expect(indicatorForPoints(2)).toEqual({ kind: "winner", label: "+2" });
+    expect(indicatorForPoints(1)).toEqual({ kind: "winner", label: "+1" });
+    expect(indicatorForPoints(0)).toEqual({ kind: "wrong", label: "0" });
+  });
+});
 
 describe("scoreMatch", () => {
   it("returns 3 for exact match", () => {

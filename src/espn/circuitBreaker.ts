@@ -1,6 +1,19 @@
 // src/espn/circuitBreaker.ts
+import type { ValidationReason } from "./validator";
+import type { MatchFailure } from "./matcher";
 
-export const BREAKER_STORAGE_KEY = "wc2026-autosync-breaker";
+// v1 states could trip "many_skips" off scheduled/in-progress events in the
+// ±3-day fetch window; the key bump discards them wholesale.
+export const BREAKER_STORAGE_KEY = "wc2026-autosync-breaker-v2";
+export const LEGACY_BREAKER_STORAGE_KEY = "wc2026-autosync-breaker";
+
+export type SkipReason = ValidationReason | MatchFailure;
+
+export function countsTowardBreaker(reason: SkipReason): boolean {
+  // Non-final events (scheduled, live, halftime) show up on every tick during
+  // the tournament — they are expected, not a sign of fixture mismatch.
+  return reason !== "non_terminal_status";
+}
 
 export type BreakerReason = "many_skips" | "repeated_network_failures";
 
@@ -26,6 +39,7 @@ const INITIAL: BreakerState = {
 
 export function loadBreakerState(): BreakerState {
   try {
+    localStorage.removeItem(LEGACY_BREAKER_STORAGE_KEY);
     const raw = localStorage.getItem(BREAKER_STORAGE_KEY);
     if (!raw) return { ...INITIAL };
     const parsed = JSON.parse(raw) as Partial<BreakerState>;

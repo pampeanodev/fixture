@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getTeam } from "../data/teams";
 import { useLocale } from "../i18n";
+import { indicatorFor } from "../utils/scoring";
 import type { Score } from "../types";
 import "./CompactMatchRow.css";
 
@@ -73,16 +74,8 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
     onScoreChange({ ...currentScore, penalties });
   }
 
-  let indicator: { className: string; text: string } | null = null;
-  if (isPrediction && realScore && currentScore) {
-    if (realScore.home === currentScore.home && realScore.away === currentScore.away) {
-      indicator = { className: "exact", text: "✓" };
-    } else if (Math.sign(realScore.home - realScore.away) === Math.sign(currentScore.home - currentScore.away)) {
-      indicator = { className: "winner", text: "½" };
-    } else {
-      indicator = { className: "wrong", text: "✗" };
-    }
-  }
+  const scored = isPrediction ? indicatorFor(realScore, currentScore) : null;
+  const indicator = scored ? { className: scored.kind, text: scored.label } : null;
 
   return (
     <div className={`compact-match-row ${badgeKind} ${synced ? "synced" : ""} ${showPen ? "with-pen" : ""}`}>

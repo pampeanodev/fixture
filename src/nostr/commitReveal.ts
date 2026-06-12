@@ -26,6 +26,44 @@ export function verifyReveal(
   return computeCommitment(matchId, home, away, salt) === commitment;
 }
 
+export interface CommittableMatch {
+  id: string;
+  dateUtc: string;
+  prediction: { home: number; away: number } | null;
+}
+
+/**
+ * Build the full commitment map to publish. The commitment event is
+ * REPLACEABLE (kind 30078): every publish overwrites the previous map, so it
+ * must stay cumulative — locked matches keep their previously committed hash
+ * (salt already exists), otherwise peers can no longer verify reveals for
+ * played matches. New commitments are only minted while the match is open.
+ */
+export function buildCommitmentMap(
+  matches: ReadonlyArray<CommittableMatch>,
+  existingSalts: Record<string, string>,
+  isLocked: (dateUtc: string) => boolean,
+): { commitments: Record<string, string>; salts: Record<string, string> } {
+  const salts = { ...existingSalts };
+  const commitments: Record<string, string> = {};
+
+  for (const match of matches) {
+    if (!match.prediction) continue;
+    if (!salts[match.id]) {
+      if (isLocked(match.dateUtc)) continue; // never mint a commitment after lock
+      salts[match.id] = generateSalt();
+    }
+    commitments[match.id] = computeCommitment(
+      match.id,
+      match.prediction.home,
+      match.prediction.away,
+      salts[match.id],
+    );
+  }
+
+  return { commitments, salts };
+}
+
 const SALTS_PREFIX = "wc2026-salts-";
 
 export function persistSalts(roomId: string, salts: Record<string, string>): void {

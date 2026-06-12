@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocale } from "../i18n";
+import { indicatorFor } from "../utils/scoring";
 import type { Score, Team } from "../types";
 import "./ScoreInput.css";
 
@@ -73,16 +74,8 @@ export function ScoreInput({ score, onScoreChange, isPrediction, readonlyScore, 
     if (e.key === "Enter") { commitScore(); (e.target as HTMLInputElement).blur(); }
   }
 
-  function getPredictionIndicator() {
-    if (!readonlyScore || !score) return null;
-    if (readonlyScore.home === score.home && readonlyScore.away === score.away) return { className: "exact", symbol: "✓" };
-    const realOut = Math.sign(readonlyScore.home - readonlyScore.away);
-    const predOut = Math.sign(score.home - score.away);
-    if (realOut === predOut) return { className: "winner", symbol: "½" };
-    return { className: "wrong", symbol: "✗" };
-  }
-
-  const indicator = getPredictionIndicator();
+  const scored = indicatorFor(readonlyScore ?? null, score);
+  const indicator = scored ? { className: scored.kind, symbol: scored.label } : null;
 
   return (
     <div className="score-input-wrapper">

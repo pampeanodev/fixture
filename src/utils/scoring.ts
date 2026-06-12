@@ -35,6 +35,30 @@ export function scoreMatch(result: Score | null, prediction: Score | null): numb
   return points + getPenBonus(result, prediction);
 }
 
+export interface PredictionIndicator {
+  kind: "exact" | "winner" | "wrong";
+  label: string;
+}
+
+/**
+ * UI indicator for a match point total: kind follows the base points
+ * (4|3 = exact, 2|1 = winner, 0 = wrong — the pen bonus only ever stacks on a
+ * base-positive match), label shows the points earned ("+4" … "+1" | "0").
+ */
+export function indicatorForPoints(points: number): PredictionIndicator {
+  const kind = points >= 3 ? "exact" : points >= 1 ? "winner" : "wrong";
+  return { kind, label: points > 0 ? `+${points}` : "0" };
+}
+
+/** Same indicator, computed from a result/prediction pair. */
+export function indicatorFor(
+  result: Score | null,
+  prediction: Score | null
+): PredictionIndicator | null {
+  if (!result || !prediction) return null;
+  return indicatorForPoints(scoreMatch(result, prediction));
+}
+
 /**
  * Calculate total score for a player's predictions against real results.
  * Invariant: total = 3*exact + 1*winner + penBonus,

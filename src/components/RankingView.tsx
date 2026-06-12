@@ -34,10 +34,15 @@ export function RankingView() {
   const ranking = useMemo(() => {
     const base = computeRanking(state, t("common.youFallback"));
     const totalMatches = state.groupMatches.length + state.knockoutMatches.length;
-    const existingNames = new Set(base.map((p) => p.name));
-    const extras: RankedPlayer[] = state.members
-      .filter((m) => !existingNames.has(m.name))
-      .map((m) => ({
+    // Dedupe placeholders by display name: the same person joining from several
+    // devices leaves one member entry per pubkey, but rivals are name-keyed, so
+    // duplicate names would render duplicate rows (and clash as React keys).
+    const seenNames = new Set(base.map((p) => p.name));
+    const extras: RankedPlayer[] = [];
+    for (const m of state.members) {
+      if (seenNames.has(m.name)) continue;
+      seenNames.add(m.name);
+      extras.push({
         name: m.name,
         isLocal: false,
         total: 0,
@@ -46,7 +51,8 @@ export function RankingView() {
         wrong: 0,
         penBonus: 0,
         pending: totalMatches,
-      }));
+      });
+    }
     return [...base, ...extras];
   }, [state, t]);
 
@@ -138,7 +144,7 @@ export function RankingView() {
           </thead>
           <tbody>
             {ranking.map((player, i) => (
-              <tr key={player.name} className={player.isLocal ? "local" : ""}>
+              <tr key={`${player.isLocal ? "you" : "peer"}:${player.name}`} className={player.isLocal ? "local" : ""}>
                 <td>{i + 1}</td>
                 <td>
                   {player.name}

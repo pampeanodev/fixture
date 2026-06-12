@@ -13,6 +13,7 @@ import {
   isWithinTournamentWindow,
 } from "../espn/tournamentWindow";
 import {
+  countsTowardBreaker,
   evaluateTick,
   loadBreakerState,
   saveBreakerState,
@@ -26,6 +27,7 @@ import {
   type AutoSyncMeta,
 } from "../espn/autoSyncMeta";
 import { getEffectiveNow } from "../utils/devClock";
+import { hasKickedOff } from "../utils/resultsGuard";
 import type { EspnEvent } from "../espn/types";
 import type { Score } from "../types";
 
@@ -82,21 +84,33 @@ export function useAutoResultSync(): void {
         const v = validateEvent(ev);
         if (!v.ok) {
           skipped.push({ matchId: null, reason: v.reason });
-          tickOutcome.skipped += 1;
-          console.warn(`[autosync] skip event ${ev.id}: ${v.reason}`);
+          if (countsTowardBreaker(v.reason)) {
+            tickOutcome.skipped += 1;
+            console.warn(`[autosync] skip event ${ev.id}: ${v.reason}`);
+          }
           continue;
         }
         const mr = matchEvent(ev, allMatches);
         if (!mr.ok) {
           skipped.push({ matchId: null, reason: mr.reason });
-          tickOutcome.skipped += 1;
-          console.warn(`[autosync] skip event ${ev.id}: ${mr.reason}`);
+          if (countsTowardBreaker(mr.reason)) {
+            tickOutcome.skipped += 1;
+            console.warn(`[autosync] skip event ${ev.id}: ${mr.reason}`);
+          }
           continue;
         }
         const existing = allMatches.find((m) => m.id === mr.matchId);
         if (!existing) continue;
         if (existing.result !== null) {
           // Not counted as skipped for breaker purposes; this is the idempotent / admin-wins case.
+          continue;
+        }
+        if (!hasKickedOff(existing.id, now)) {
+          // A "final" result before kickoff is bogus API data (scheduled events
+          // carry placeholder 0-0 scores) — anomalous, counts toward the breaker.
+          skipped.push({ matchId: existing.id, reason: "premature_result" });
+          tickOutcome.skipped += 1;
+          console.warn(`[autosync] skip event ${ev.id}: premature_result`);
           continue;
         }
         const score = scoreFromEvent(ev);
