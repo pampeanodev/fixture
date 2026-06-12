@@ -3,7 +3,7 @@ import { useFixture } from "../context/FixtureContext";
 import { getTeam, GROUPS } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
 import { isMatchEditable } from "../espn/graceLock";
-import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
+import { loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
 import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
@@ -49,7 +49,6 @@ export function GroupView({ group }: GroupViewProps) {
     .filter((m) => m.group === group)
     .sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
   const isPrediction = state.mode === "predictions";
-  const autoSyncEnabled = loadAutoSyncEnabled();
   const breakerState = loadBreakerState();
   const now = getEffectiveNow();
   const autoSyncMeta = loadAutoSyncMeta();
@@ -74,7 +73,6 @@ export function GroupView({ group }: GroupViewProps) {
           <div className="group-matches-compact" data-tour="match-cards">
             {matches.map((match) => {
               const editable = isMatchEditable(match, {
-                autoSyncEnabled,
                 circuitBreakerTripped: breakerState.tripped,
                 now,
               });
@@ -139,7 +137,6 @@ export function GroupView({ group }: GroupViewProps) {
           <div className="group-matches-grid" data-tour="match-cards">
             {matches.map((match) => {
               const editable = isMatchEditable(match, {
-                autoSyncEnabled,
                 circuitBreakerTripped: breakerState.tripped,
                 now,
               });

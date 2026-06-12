@@ -19,6 +19,8 @@ import {
   verifyReveal,
   loadSalts,
   persistSalts,
+  loadCommitments,
+  persistCommitments,
 } from "../nostr/commitReveal";
 import { NOSTR_KIND } from "../nostr/types";
 import type {
@@ -201,9 +203,11 @@ export function useNostrSync(): void {
       [...state.groupMatches, ...state.knockoutMatches],
       loadSalts(activeRoomId),
       isMatchLocked,
+      loadCommitments(activeRoomId),
     );
 
     persistSalts(activeRoomId, salts);
+    persistCommitments(activeRoomId, commitments);
 
     if (Object.keys(commitments).length === 0) return;
 

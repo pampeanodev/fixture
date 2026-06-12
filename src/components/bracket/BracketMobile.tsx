@@ -1,7 +1,7 @@
 import { useFixture } from "../../context/FixtureContext";
 import { isMatchLocked } from "../../utils/lockTime";
 import { isMatchEditable } from "../../espn/graceLock";
-import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../../espn/autoSyncMeta";
+import { loadAutoSyncMeta } from "../../espn/autoSyncMeta";
 import { loadBreakerState } from "../../espn/circuitBreaker";
 import { getEffectiveNow } from "../../utils/devClock";
 import { useLocale } from "../../i18n";
@@ -15,7 +15,6 @@ export function BracketMobile({ round }: { round: KnockoutRound }) {
   const { t } = useLocale();
   const isPrediction = state.mode === "predictions";
   const roundsToShow: KnockoutRound[] = round === "F" ? ["F", "3P"] : [round];
-  const autoSyncEnabled = loadAutoSyncEnabled();
   const breakerState = loadBreakerState();
   const now = getEffectiveNow();
   const autoSyncMeta = loadAutoSyncMeta();
@@ -42,7 +41,6 @@ export function BracketMobile({ round }: { round: KnockoutRound }) {
             <div className="bracket-mobile-list">
               {matches.map((m) => {
                 const editable = isMatchEditable(m, {
-                  autoSyncEnabled,
                   circuitBreakerTripped: breakerState.tripped,
                   now,
                 });

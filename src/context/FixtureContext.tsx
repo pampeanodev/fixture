@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useRef, useMemo } from "react";
 import type { ReactNode } from "react";
-import type { FixtureState, FixtureAction, KnockoutMatch, StandingRow } from "../types";
+import type { FixtureState, FixtureAction, GroupMatch, KnockoutMatch, Score, StandingRow } from "../types";
 import { TEAMS, GROUPS } from "../data/teams";
 import { INITIAL_GROUP_MATCHES } from "../data/groupMatches";
 import { INITIAL_KNOCKOUT_MATCHES } from "../data/knockoutStructure";
@@ -72,24 +72,25 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
     case "CLEAR_MEMBERS":
       return { ...state, members: [] };
     case "APPLY_SYNCED_RESULTS": {
-      // Matches previously synced from admin but missing from the new payload were cleared.
+      // Admin push is a fallback: it only fills voids — auto-sync (ESPN) is the
+      // source of truth and overwrites freely. Matches previously synced from
+      // admin but missing from the new payload are cleared.
       const previouslySynced = new Set(state.syncedResultIds);
-      const groupMatches = state.groupMatches.map((m) => {
-        const incoming = action.groupResults[m.id];
-        if (incoming) return { ...m, result: incoming };
+      const syncedResultIds: string[] = [];
+      function fillVoid<M extends GroupMatch | KnockoutMatch>(m: M, incoming: Score | undefined): M {
+        if (incoming) {
+          if (m.result === null) {
+            syncedResultIds.push(m.id);
+            return { ...m, result: incoming };
+          }
+          if (previouslySynced.has(m.id)) syncedResultIds.push(m.id);
+          return m;
+        }
         if (previouslySynced.has(m.id)) return { ...m, result: null };
         return m;
-      });
-      const knockoutMatches = state.knockoutMatches.map((m) => {
-        const incoming = action.knockoutResults[m.id];
-        if (incoming) return { ...m, result: incoming };
-        if (previouslySynced.has(m.id)) return { ...m, result: null };
-        return m;
-      });
-      const syncedResultIds = [
-        ...Object.keys(action.groupResults),
-        ...Object.keys(action.knockoutResults),
-      ];
+      }
+      const groupMatches = state.groupMatches.map((m) => fillVoid(m, action.groupResults[m.id]));
+      const knockoutMatches = state.knockoutMatches.map((m) => fillVoid(m, action.knockoutResults[m.id]));
       return { ...state, groupMatches, knockoutMatches, syncedResultIds };
     }
     case "CLEAR_SYNCED_RESULTS":
@@ -124,19 +125,24 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
       };
     }
     case "APPLY_AUTOSYNC_RESULTS": {
-      // Auto-sync: only fill voids. Never overwrite an existing result, regardless of source.
-      // Never touch predictions. Never touch syncedResultIds (that's for Nostr admin push).
+      // Auto-sync is the source of truth: overwrite whatever is there (manual
+      // or admin-pushed entries included) so ESPN corrections propagate.
+      // Never touch predictions. Matches it writes stop being admin-owned —
+      // drop them from syncedResultIds so a later admin clear can't wipe them.
+      const written = new Set([
+        ...Object.keys(action.groupResults),
+        ...Object.keys(action.knockoutResults),
+      ]);
       const groupMatches = state.groupMatches.map((m) => {
-        if (m.result !== null) return m;
         const incoming = action.groupResults[m.id];
         return incoming ? { ...m, result: incoming } : m;
       });
       const knockoutMatches = state.knockoutMatches.map((m) => {
-        if (m.result !== null) return m;
         const incoming = action.knockoutResults[m.id];
         return incoming ? { ...m, result: incoming } : m;
       });
-      return { ...state, groupMatches, knockoutMatches };
+      const syncedResultIds = state.syncedResultIds.filter((id) => !written.has(id));
+      return { ...state, groupMatches, knockoutMatches, syncedResultIds };
     }
     default:
       return state;

@@ -3,7 +3,6 @@ import { useFixture } from "../../context/FixtureContext";
 import { getTeam } from "../../data/teams";
 import { isMatchLocked } from "../../utils/lockTime";
 import { isMatchEditable } from "../../espn/graceLock";
-import { loadAutoSyncEnabled } from "../../espn/autoSyncMeta";
 import { loadBreakerState } from "../../espn/circuitBreaker";
 import { getEffectiveNow } from "../../utils/devClock";
 import { useLocale } from "../../i18n";
@@ -56,7 +55,6 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
   const awayTeam = match.awayTeamId ? getTeam(match.awayTeamId) : null;
   const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
   const editable = isMatchEditable(match, {
-    autoSyncEnabled: loadAutoSyncEnabled(),
     circuitBreakerTripped: loadBreakerState().tripped,
     now: getEffectiveNow(),
   });

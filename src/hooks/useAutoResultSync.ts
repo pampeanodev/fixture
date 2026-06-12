@@ -21,7 +21,6 @@ import {
   type TickOutcome,
 } from "../espn/circuitBreaker";
 import {
-  loadAutoSyncEnabled,
   loadAutoSyncMeta,
   saveAutoSyncMeta,
   type AutoSyncMeta,
@@ -41,11 +40,26 @@ function scoreFromEvent(ev: EspnEvent): Score {
   return score;
 }
 
+function scoresDiffer(a: Score, b: Score): boolean {
+  if (a.home !== b.home || a.away !== b.away) return true;
+  if (!a.penalties !== !b.penalties) return true;
+  if (a.penalties && b.penalties) {
+    return a.penalties.home !== b.penalties.home || a.penalties.away !== b.penalties.away;
+  }
+  return false;
+}
+
 export function useAutoResultSync(): void {
   const { state, dispatch } = useFixture();
   const inFlightRef = useRef<boolean>(false);
   const abortRef = useRef<AbortController | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Latest state via ref so runTick stays referentially stable — the mount
+  // effect must not tear down/refire the interval (and refetch) on every
+  // state change.
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   // Breaker state is mirrored in React so the UI re-renders on trip.
   const [breaker, setBreaker] = useState<BreakerState>(() => loadBreakerState());
@@ -53,10 +67,10 @@ export function useAutoResultSync(): void {
   breakerRef.current = breaker;
 
   const runTick = useCallback(async (): Promise<void> => {
-    const enabled = loadAutoSyncEnabled();
-    if (!enabled) return;
     if (breakerRef.current.tripped) return;
     if (typeof document !== "undefined" && document.hidden) return;
+    // Never write over an active simulation; results are re-imposed next tick.
+    if (stateRef.current.simulationActive) return;
     const now = getEffectiveNow();
     if (!isWithinTournamentWindow(now)) return;
     if (inFlightRef.current) return;
@@ -75,7 +89,10 @@ export function useAutoResultSync(): void {
         signal: abortRef.current.signal,
       });
       const events = parseScoreboard(raw);
-      const allMatches = [...state.groupMatches, ...state.knockoutMatches];
+      const allMatches = [
+        ...stateRef.current.groupMatches,
+        ...stateRef.current.knockoutMatches,
+      ];
 
       const groupResults: Record<string, Score> = {};
       const knockoutResults: Record<string, Score> = {};
@@ -101,10 +118,6 @@ export function useAutoResultSync(): void {
         }
         const existing = allMatches.find((m) => m.id === mr.matchId);
         if (!existing) continue;
-        if (existing.result !== null) {
-          // Not counted as skipped for breaker purposes; this is the idempotent / admin-wins case.
-          continue;
-        }
         if (!hasKickedOff(existing.id, now)) {
           // A "final" result before kickoff is bogus API data (scheduled events
           // carry placeholder 0-0 scores) — anomalous, counts toward the breaker.
@@ -114,6 +127,10 @@ export function useAutoResultSync(): void {
           continue;
         }
         const score = scoreFromEvent(ev);
+        if (existing.result !== null && !scoresDiffer(existing.result, score)) {
+          // Already in sync — idempotent no-op, not a skip.
+          continue;
+        }
         const isGroup = existing.id.startsWith("G-");
         if (isGroup) groupResults[existing.id] = score;
         else knockoutResults[existing.id] = score;
@@ -151,7 +168,7 @@ export function useAutoResultSync(): void {
       lastSkipped: skipped,
       lastApplied: appliedIds,
     });
-  }, [state.groupMatches, state.knockoutMatches, dispatch]);
+  }, [dispatch]);
 
   // Fire on mount + set up interval.
   useEffect(() => {

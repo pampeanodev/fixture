@@ -6,7 +6,7 @@ import { BracketMobile } from "./bracket/BracketMobile";
 import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
 import { isMatchEditable } from "../espn/graceLock";
-import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
+import { loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
 import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
@@ -38,7 +38,6 @@ export function BracketView({ round }: { round: KnockoutRound }) {
   const { mode: viewMode } = useViewMode();
   const isPrediction = state.mode === "predictions";
   const roundsToShow: KnockoutRound[] = round === "F" ? ["F", "3P"] : [round];
-  const autoSyncEnabled = loadAutoSyncEnabled();
   const breakerState = loadBreakerState();
   const now = getEffectiveNow();
   const autoSyncMeta = loadAutoSyncMeta();
@@ -77,7 +76,6 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                 const readonlyScore = isPrediction ? match.result : undefined;
                 const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
                 const editable = isMatchEditable(match, {
-                  autoSyncEnabled,
                   circuitBreakerTripped: breakerState.tripped,
                   now,
                 });

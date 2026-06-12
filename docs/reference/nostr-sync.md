@@ -94,7 +94,7 @@ When the local user edits a prediction in a room context, [`useNostrSync`](../..
 3. Persist the salt locally (`localStorage["wc2026-salts-<roomId>"]`) so reveal later can reproduce the hash.
 4. Publish a `CommitmentPayload` = `{ commitments: { matchId: hex, ... }, playerName }` to kind-30078 with d-tag `fixture:<roomId>:commit`. Being replaceable, re-publishing updates the whole commitment map.
 
-The map is built by [`commitReveal.ts#buildCommitmentMap`](../../src/nostr/commitReveal.ts) and is **cumulative**: locked matches keep their previously committed hash (recomputed from the persisted salt) so peers can still verify reveals for played matches — dropping them from the replaceable event would erase the proof. New commitments are never minted after lock: a locked match without a pre-existing salt is skipped.
+The map is built by [`commitReveal.ts#buildCommitmentMap`](../../src/nostr/commitReveal.ts) and is **cumulative**: locked matches keep their previously committed hash so peers can still verify reveals for played matches — dropping them from the replaceable event would erase the proof. Published hashes are persisted (`localStorage["wc2026-commits-<roomId>"]`) and the stored hash wins for locked matches: a prediction that mutates after lock (bug, import, tampering) cannot rewrite the published commitment. New commitments are never minted after lock: a locked match without a pre-existing salt is skipped.
 
 At this point, other members see the commitment but can't derive the prediction — the salt is private.
 
@@ -118,7 +118,7 @@ Only the room creator publishes the official match results. This keeps the room'
 
 - When the creator enters/edits a real result in the app, `useNostrSync` publishes a `ResultsPayload` under d-tag `fixture:<roomId>:results`.
 - Other members subscribe to **only the creator's pubkey** on that d-tag (filtered via `Filter.authors = [manifest.creator]`). Events from any other pubkey on that d-tag are ignored.
-- On receipt, the member dispatches `APPLY_SYNCED_RESULTS`, which merges the server-truth results into local state and tags the match IDs under `syncedResultIds`.
+- On receipt, the member dispatches `APPLY_SYNCED_RESULTS`, which **only fills voids** — ESPN auto-sync is the source of truth and overwrites freely (`APPLY_AUTOSYNC_RESULTS`); the admin push is a fallback for devices that can reach Nostr but not ESPN. Matches it fills are tagged under `syncedResultIds`.
 - If the creator later edits a result, `APPLY_SYNCED_RESULTS` re-runs. If they delete a result (sends a payload without that match's ID), [`CLEAR_SYNCED_RESULTS`](../../src/context/FixtureContext.tsx) clears the stale one on members — this is what commit `da99086` fixed.
 - Incoming payloads are filtered through [`utils/resultsGuard.ts#stripPrematureResults`](../../src/utils/resultsGuard.ts): a result for a match that hasn't kicked off is never applied (and, being absent from the filtered payload, an already-applied phantom gets cleared). This stops a polluted admin state from propagating phantom results to the room. The same `hasKickedOff` guard gates ESPN auto-sync applies.
 

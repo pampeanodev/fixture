@@ -11,6 +11,7 @@ import { selectBestThirds } from "../utils/bestThirds";
 import type { ThirdPlaceEntry } from "../utils/bestThirds";
 import { resolveKnockoutTeams } from "../utils/knockout";
 import { assignThirdPlaceSlots } from "../data/thirdPlaceMapping";
+import { isMatchLocked } from "../utils/lockTime";
 
 const GROUPS = ["A","B","C","D","E","F","G","H","I","J","K","L"];
 const ROUNDS: KnockoutRound[] = ["R32", "R16", "QF", "SF", "3P", "F"];
@@ -18,19 +19,22 @@ const ROUNDS: KnockoutRound[] = ["R32", "R16", "QF", "SF", "3P", "F"];
 /**
  * Generate random predictions for every match in the fixture, cascading through
  * the knockout bracket so later rounds' teams resolve from earlier rounds'
- * predicted winners. Existing predictions are overwritten; `result` fields are
- * preserved as-is.
+ * predicted winners. Existing predictions are overwritten — except for locked
+ * matches, whose predictions are immutable (they back published commit-reveal
+ * hashes). `result` fields are preserved as-is.
  */
 export function randomizePredictions(
   groupMatches: GroupMatch[],
   knockoutMatches: KnockoutMatch[],
   teams: readonly Team[],
+  isLocked: (dateUtc: string) => boolean = isMatchLocked,
 ): { groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] } {
-  // Phase 1: randomize all group predictions.
-  const newGroupMatches: GroupMatch[] = groupMatches.map((m) => ({
-    ...m,
-    prediction: generateGroupResult(m.homeTeamId, m.awayTeamId),
-  }));
+  // Phase 1: randomize all group predictions (locked ones stay untouched).
+  const newGroupMatches: GroupMatch[] = groupMatches.map((m) =>
+    isLocked(m.dateUtc)
+      ? { ...m }
+      : { ...m, prediction: generateGroupResult(m.homeTeamId, m.awayTeamId) },
+  );
 
   // Phase 2: compute standings based on these predictions.
   const standingsByGroup: Record<string, StandingRow[]> = {};
@@ -67,6 +71,7 @@ export function randomizePredictions(
     tempMatches = resolved.map((m) => {
       if (m.round !== round) return m;
       if (!m.homeTeamId || !m.awayTeamId) return m;
+      if (isLocked(m.dateUtc)) return { ...m, result: m.prediction };
       const pred = generateKnockoutResult(m.homeTeamId, m.awayTeamId);
       return { ...m, prediction: pred, result: pred };
     });

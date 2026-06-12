@@ -5,7 +5,6 @@ export const GRACE_PERIOD_GROUP_MS = 3 * 60 * 60 * 1000; // 3h
 export const GRACE_PERIOD_KO_MS = 4.5 * 60 * 60 * 1000; // 4.5h
 
 export interface EditabilityContext {
-  autoSyncEnabled: boolean;
   circuitBreakerTripped: boolean;
   now: number;
 }
@@ -18,7 +17,8 @@ export function isMatchEditable(
   match: GroupMatch | KnockoutMatch,
   ctx: EditabilityContext,
 ): boolean {
-  if (!ctx.autoSyncEnabled) return true;
+  // Auto-sync is always on (ESPN is the source of truth). Manual entry only
+  // unlocks as a fallback: API down (breaker) or grace elapsed with no result.
   if (ctx.circuitBreakerTripped) return true;
 
   const kickoff = new Date(match.dateUtc).getTime();

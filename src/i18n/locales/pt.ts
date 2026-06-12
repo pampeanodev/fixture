@@ -12,8 +12,7 @@ export const pt = {
   },
   autoSync: {
     sectionTitle: "Sincronização automática",
-    toggleLabel: "Atualizar resultados automaticamente",
-    toggleHelp: "Busca os resultados oficiais a cada 30 minutos. Se você errou ao digitar, ele corrige.",
+    alwaysOnHelp: "Os resultados oficiais se atualizam sozinhos a cada 30 minutos e sempre mandam: substituem qualquer registro manual. A digitação manual só libera se a API cair.",
     lastFetchNever: "Nunca",
     lastFetchAgo: "Última busca: {relative}",
     verifyButton: "Verificar sincronização",
@@ -60,6 +59,7 @@ export const pt = {
       sectionPredictions: "Palpites", sectionSimulation: "Simulação",
       sectionResults: "Resultados", sectionFixture: "Tabela",
       randomize: "Gerar palpites aleatórios", startSimulation: "Iniciar simulação",
+      randomizeConfirm: "Isso substitui TODOS os seus palpites editáveis por valores aleatórios (jogos já fechados não mudam). Tem certeza?",
       exitSimulation: "Sair da simulação",
       fetchApi: "Buscar da API (em breve)",
       fetchApiTitle: "Integração com API externa: em breve",

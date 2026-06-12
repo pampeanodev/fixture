@@ -12,8 +12,7 @@ export const en = {
   },
   autoSync: {
     sectionTitle: "Auto-sync results",
-    toggleLabel: "Update results automatically",
-    toggleHelp: "Fetches official results every 30 minutes. If you mistyped one, it corrects it.",
+    alwaysOnHelp: "Official results update on their own every 30 minutes and always win: they overwrite any manual entry. Manual entry only unlocks if the API is down.",
     lastFetchNever: "Never",
     lastFetchAgo: "Last fetch: {relative}",
     verifyButton: "Verify auto-sync",
@@ -60,6 +59,7 @@ export const en = {
       sectionPredictions: "Predictions", sectionSimulation: "Simulation",
       sectionResults: "Results", sectionFixture: "Fixture",
       randomize: "Regenerate random", startSimulation: "Start simulation",
+      randomizeConfirm: "This replaces ALL your editable predictions with random ones (locked matches stay untouched). Are you sure?",
       exitSimulation: "Exit simulation",
       fetchApi: "Fetch from API (coming soon)",
       fetchApiTitle: "External API integration: coming soon",

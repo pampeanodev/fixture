@@ -47,6 +47,10 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   }
 
   function handleRandomize() {
+    if (!window.confirm(t("topbar.menu.randomizeConfirm"))) {
+      setMenuOpen(false);
+      return;
+    }
     const { groupMatches, knockoutMatches } = randomizePredictions(
       state.groupMatches,
       state.knockoutMatches,

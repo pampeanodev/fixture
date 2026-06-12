@@ -10,8 +10,7 @@ export const es = {
   },
   autoSync: {
     sectionTitle: "Auto-sync de resultados",
-    toggleLabel: "Actualizar resultados automáticamente",
-    toggleHelp: "Trae los resultados oficiales cada 30 minutos. Si te equivocaste tipeando, te lo corrige.",
+    alwaysOnHelp: "Los resultados oficiales se actualizan solos cada 30 minutos y siempre mandan: pisan cualquier carga manual. La carga a mano se habilita únicamente si la API falla.",
     lastFetchNever: "Nunca",
     lastFetchAgo: "Último fetch: {relative}",
     verifyButton: "Verificar auto-sync",
@@ -58,6 +57,7 @@ export const es = {
       sectionPredictions: "Predicciones", sectionSimulation: "Simulación",
       sectionResults: "Resultados", sectionFixture: "Fixture",
       randomize: "Regenerar random", startSimulation: "Iniciar simulación",
+      randomizeConfirm: "Esto reemplaza TODAS tus predicciones editables por valores aleatorios (los partidos ya cerrados no se tocan). ¿Seguro?",
       exitSimulation: "Salir de simulación",
       fetchApi: "Fetch desde API (próximamente)",
       fetchApiTitle: "Integración con API externa: próximamente",

@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocale } from "../i18n";
-import {
-  loadAutoSyncEnabled,
-  saveAutoSyncEnabled,
-  loadAutoSyncMeta,
-} from "../espn/autoSyncMeta";
+import { loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState, resetBreaker } from "../espn/circuitBreaker";
 import { fetchScoreboard } from "../espn/client";
 import { parseScoreboard } from "../espn/parser";
@@ -30,18 +26,11 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
   const { t } = useLocale();
   const { state } = useFixture();
 
-  const [enabled, setEnabled] = useState<boolean>(loadAutoSyncEnabled());
   const [verifying, setVerifying] = useState<boolean>(false);
   const [report, setReport] = useState<VerifyReport | null>(null);
 
   const breaker = loadBreakerState();
   const meta = useMemo(() => loadAutoSyncMeta(), []);
-
-  const toggle = useCallback(() => {
-    const next = !enabled;
-    setEnabled(next);
-    saveAutoSyncEnabled(next);
-  }, [enabled]);
 
   const verify = useCallback(async () => {
     setVerifying(true);
@@ -101,11 +90,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
         </div>
 
         <div className="modal-section">
-          <label className="settings-toggle">
-            <input type="checkbox" checked={enabled} onChange={toggle} />
-            <span>{t("autoSync.toggleLabel")}</span>
-          </label>
-          <p className="settings-help">{t("autoSync.toggleHelp")}</p>
+          <p className="settings-help">{t("autoSync.alwaysOnHelp")}</p>
         </div>
 
         <div className="modal-section settings-meta">

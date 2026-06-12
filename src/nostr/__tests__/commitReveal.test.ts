@@ -19,6 +19,30 @@ describe("buildCommitmentMap", () => {
     expect(commitments["G-A-1"]).toBe(computeCommitment("G-A-1", 2, 1, salt));
   });
 
+  it("prefers the stored hash for locked matches over recomputing (post-lock prediction corruption must not rewrite the commitment)", () => {
+    const salt = "aa".repeat(16);
+    const originalHash = computeCommitment("G-A-1", 9, 9, salt); // committed pre-lock with a different prediction
+    const { commitments } = buildCommitmentMap(
+      [locked], // current prediction is 2-1, but that's NOT what was committed
+      { "G-A-1": salt },
+      isLocked,
+      { "G-A-1": originalHash },
+    );
+    expect(commitments["G-A-1"]).toBe(originalHash);
+  });
+
+  it("recomputes unlocked matches even when a stored hash exists (prediction edits must update the commitment)", () => {
+    const salt = "bb".repeat(16);
+    const staleHash = computeCommitment("G-A-2", 9, 9, salt);
+    const { commitments } = buildCommitmentMap(
+      [open],
+      { "G-A-2": salt },
+      isLocked,
+      { "G-A-2": staleHash },
+    );
+    expect(commitments["G-A-2"]).toBe(computeCommitment("G-A-2", 1, 0, salt));
+  });
+
   it("never mints a commitment for a locked match without a prior salt", () => {
     const { commitments, salts } = buildCommitmentMap([locked], {}, isLocked);
     expect(commitments["G-A-1"]).toBeUndefined();

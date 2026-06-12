@@ -4,7 +4,7 @@ import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
 import { indicatorFor } from "../utils/scoring";
 import { isMatchEditable } from "../espn/graceLock";
-import { loadAutoSyncEnabled, loadAutoSyncMeta } from "../espn/autoSyncMeta";
+import { loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
 import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
@@ -35,11 +35,9 @@ export function ScheduleView() {
   const scoreField = isPrediction ? "prediction" : "result";
 
   const allMatches = useMemo(() => {
-    const autoSyncEnabled = loadAutoSyncEnabled();
-    const breakerState = loadBreakerState();
+      const breakerState = loadBreakerState();
     const now = getEffectiveNow();
     const ctx = {
-      autoSyncEnabled,
       circuitBreakerTripped: breakerState.tripped,
       now,
     };

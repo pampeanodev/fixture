@@ -35,22 +35,33 @@ export interface CommittableMatch {
 /**
  * Build the full commitment map to publish. The commitment event is
  * REPLACEABLE (kind 30078): every publish overwrites the previous map, so it
- * must stay cumulative — locked matches keep their previously committed hash
- * (salt already exists), otherwise peers can no longer verify reveals for
- * played matches. New commitments are only minted while the match is open.
+ * must stay cumulative — locked matches keep their previously committed hash,
+ * otherwise peers can no longer verify reveals for played matches.
+ *
+ * For locked matches the STORED hash wins over recomputing: a prediction that
+ * mutated after lock (bug, import, tampering) must not rewrite the published
+ * commitment. Recomputing from the salt is only a fallback for states saved
+ * before hashes were persisted. New commitments are only minted while open.
  */
 export function buildCommitmentMap(
   matches: ReadonlyArray<CommittableMatch>,
   existingSalts: Record<string, string>,
   isLocked: (dateUtc: string) => boolean,
+  storedCommitments: Record<string, string> = {},
 ): { commitments: Record<string, string>; salts: Record<string, string> } {
   const salts = { ...existingSalts };
   const commitments: Record<string, string> = {};
 
   for (const match of matches) {
     if (!match.prediction) continue;
-    if (!salts[match.id]) {
-      if (isLocked(match.dateUtc)) continue; // never mint a commitment after lock
+    if (isLocked(match.dateUtc)) {
+      const stored = storedCommitments[match.id];
+      if (stored) {
+        commitments[match.id] = stored;
+        continue;
+      }
+      if (!salts[match.id]) continue; // never mint a commitment after lock
+    } else if (!salts[match.id]) {
       salts[match.id] = generateSalt();
     }
     commitments[match.id] = computeCommitment(
@@ -65,6 +76,25 @@ export function buildCommitmentMap(
 }
 
 const SALTS_PREFIX = "wc2026-salts-";
+const COMMITS_PREFIX = "wc2026-commits-";
+
+export function persistCommitments(roomId: string, commitments: Record<string, string>): void {
+  try {
+    localStorage.setItem(COMMITS_PREFIX + roomId, JSON.stringify(commitments));
+  } catch {
+    /* storage full */
+  }
+}
+
+export function loadCommitments(roomId: string): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(COMMITS_PREFIX + roomId);
+    if (!raw) return {};
+    return JSON.parse(raw) as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
 
 export function persistSalts(roomId: string, salts: Record<string, string>): void {
   try {
