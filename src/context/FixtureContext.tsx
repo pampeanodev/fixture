@@ -11,7 +11,7 @@ import { assignThirdPlaceSlots } from "../data/thirdPlaceMapping";
 import { resolveKnockoutTeams } from "../utils/knockout";
 import { isMatchLocked } from "../utils/lockTime";
 import {
-  saveToLocalStorage, loadFromLocalStorage,
+  saveToLocalStorage, loadFromLocalStorage, reconcileMatches,
   savePlayerName, loadPlayerName,
   saveRivals, loadRivals,
   saveMembers, loadMembers,
@@ -54,7 +54,13 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
     case "SET_VIEW":
       return { ...state, activeView: action.view };
     case "IMPORT_STATE":
-      return { ...state, groupMatches: action.groupMatches, knockoutMatches: action.knockoutMatches };
+      // Reconcile onto canonical so an imported prode keeps its predictions/
+      // results but never reintroduces stale schedule metadata.
+      return {
+        ...state,
+        groupMatches: reconcileMatches(INITIAL_GROUP_MATCHES, action.groupMatches),
+        knockoutMatches: reconcileMatches(INITIAL_KNOCKOUT_MATCHES, action.knockoutMatches),
+      };
     case "SET_PLAYER_NAME":
       return { ...state, playerName: action.name };
     case "ADD_RIVAL": {
@@ -169,8 +175,8 @@ function buildInitialState(): FixtureState {
   return {
     mode: "predictions",
     teams: TEAMS,
-    groupMatches: saved?.groupMatches ?? INITIAL_GROUP_MATCHES,
-    knockoutMatches: saved?.knockoutMatches ?? INITIAL_KNOCKOUT_MATCHES,
+    groupMatches: reconcileMatches(INITIAL_GROUP_MATCHES, saved?.groupMatches),
+    knockoutMatches: reconcileMatches(INITIAL_KNOCKOUT_MATCHES, saved?.knockoutMatches),
     activeView: { type: "schedule" },
     playerName: loadPlayerName(),
     rivals: loadRivals(),

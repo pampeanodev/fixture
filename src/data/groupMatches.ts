@@ -36,7 +36,7 @@ export const INITIAL_GROUP_MATCHES: GroupMatch[] = [
   gm("G-C-6", "C", "MAR", "HAI", "2026-06-24T22:00:00Z", "Mercedes-Benz Stadium, Atlanta"),
   // Group D
   gm("G-D-1", "D", "USA", "PAR", "2026-06-13T01:00:00Z", "SoFi Stadium, Inglewood"),
-  gm("G-D-2", "D", "AUS", "TUR", "2026-06-13T04:00:00Z", "BC Place, Vancouver"),
+  gm("G-D-2", "D", "AUS", "TUR", "2026-06-14T04:00:00Z", "BC Place, Vancouver"),
   gm("G-D-3", "D", "USA", "AUS", "2026-06-19T19:00:00Z", "Lumen Field, Seattle"),
   gm("G-D-4", "D", "TUR", "PAR", "2026-06-20T03:00:00Z", "Levi's Stadium, Santa Clara"),
   gm("G-D-5", "D", "TUR", "USA", "2026-06-26T02:00:00Z", "SoFi Stadium, Inglewood"),

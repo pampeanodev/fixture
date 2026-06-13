@@ -1,4 +1,4 @@
-import type { GroupMatch, KnockoutMatch, Member, Rival } from "../types";
+import type { GroupMatch, KnockoutMatch, Member, Rival, Score } from "../types";
 
 const STORAGE_KEY = "wc2026-fixture";
 const PLAYER_NAME_KEY = "wc2026-player-name";
@@ -15,6 +15,27 @@ export interface ExportedProde {
   playerName: string;
   groupPredictions: Record<string, { home: number; away: number }>;
   knockoutPredictions: Record<string, { home: number; away: number }>;
+}
+
+/**
+ * Reconcile persisted matches onto the canonical (code-defined) fixture.
+ * Schedule metadata — date, venue, teams, slots — always comes from code, so a
+ * fixture correction (e.g. a fixed kickoff date) reaches users who already have
+ * the old value persisted. Only the user-mutable fields (`prediction`,
+ * `result`) are carried over from saved state, keyed by match id. Saved matches
+ * whose id no longer exists are dropped; new code matches are added.
+ */
+export function reconcileMatches<M extends { id: string; result: Score | null; prediction: Score | null }>(
+  canonical: M[],
+  saved: ReadonlyArray<{ id: string; result?: Score | null; prediction?: Score | null }> | undefined,
+): M[] {
+  if (!saved) return canonical;
+  const savedById = new Map(saved.map((m) => [m.id, m]));
+  return canonical.map((m) => {
+    const prev = savedById.get(m.id);
+    if (!prev) return m;
+    return { ...m, result: prev.result ?? null, prediction: prev.prediction ?? null };
+  });
 }
 
 export function saveToLocalStorage(data: PersistedData): void {
