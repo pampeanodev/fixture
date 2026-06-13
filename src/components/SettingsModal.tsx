@@ -18,6 +18,28 @@ interface VerifyReport {
   skipped: Array<{ matchId: string | null; reason: string }>;
 }
 
+const KNOWN_SKIP_REASONS = [
+  "non_terminal_status",
+  "invalid_score",
+  "missing_shootout",
+  "invalid_shootout",
+  "invalid_date",
+  "unknown_team_code",
+  "no_match",
+  "ambiguous",
+] as const;
+type KnownSkipReason = (typeof KNOWN_SKIP_REASONS)[number];
+
+function isKnownSkipReason(reason: string): reason is KnownSkipReason {
+  return (KNOWN_SKIP_REASONS as readonly string[]).includes(reason);
+}
+
+function groupByReason(skipped: VerifyReport["skipped"]): Array<[string, number]> {
+  const counts = new Map<string, number>();
+  for (const s of skipped) counts.set(s.reason, (counts.get(s.reason) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+}
+
 interface SettingsModalProps {
   onClose: () => void;
 }
@@ -124,8 +146,13 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             </p>
             {report.skipped.length > 0 && (
               <ul className="settings-report-list">
-                {report.skipped.map((s, i) => (
-                  <li key={i}>{s.reason}</li>
+                {groupByReason(report.skipped).map(([reason, count]) => (
+                  <li key={reason}>
+                    {isKnownSkipReason(reason)
+                      ? t(`autoSync.verifySkipReason.${reason}`)
+                      : reason}
+                    {count > 1 ? ` ×${count}` : ""}
+                  </li>
                 ))}
               </ul>
             )}

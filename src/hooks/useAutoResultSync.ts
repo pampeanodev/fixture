@@ -75,6 +75,20 @@ export function useAutoResultSync(): void {
     if (!isWithinTournamentWindow(now)) return;
     if (inFlightRef.current) return;
 
+    // Self-clean before fetching: a local result for a match that hasn't
+    // kicked off is garbage by definition (manual entry during an outage,
+    // legacy bugs) and ESPN has no final to overwrite it with.
+    const premature = [
+      ...stateRef.current.groupMatches,
+      ...stateRef.current.knockoutMatches,
+    ]
+      .filter((m) => m.result !== null && !hasKickedOff(m.id, now))
+      .map((m) => m.id);
+    if (premature.length > 0) {
+      console.warn(`[autosync] clearing premature local results: ${premature.join(", ")}`);
+      dispatch({ type: "CLEAR_PREMATURE_RESULTS", matchIds: premature });
+    }
+
     inFlightRef.current = true;
     abortRef.current = new AbortController();
 

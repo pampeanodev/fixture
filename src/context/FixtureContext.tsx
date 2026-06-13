@@ -144,6 +144,21 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
       const syncedResultIds = state.syncedResultIds.filter((id) => !written.has(id));
       return { ...state, groupMatches, knockoutMatches, syncedResultIds };
     }
+    case "CLEAR_PREMATURE_RESULTS": {
+      // A result for a match that hasn't kicked off is impossible — drop it.
+      // Auto-sync overwrite can't fix these (ESPN has no final to impose) and
+      // graceLock keeps the input disabled while a result exists, so without
+      // this the garbage is permanently stuck.
+      const ids = new Set(action.matchIds);
+      const groupMatches = state.groupMatches.map((m) =>
+        ids.has(m.id) ? { ...m, result: null } : m,
+      );
+      const knockoutMatches = state.knockoutMatches.map((m) =>
+        ids.has(m.id) ? { ...m, result: null } : m,
+      );
+      const syncedResultIds = state.syncedResultIds.filter((id) => !ids.has(id));
+      return { ...state, groupMatches, knockoutMatches, syncedResultIds };
+    }
     default:
       return state;
   }

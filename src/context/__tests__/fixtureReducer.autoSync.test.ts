@@ -107,6 +107,35 @@ describe("APPLY_AUTOSYNC_RESULTS", () => {
   });
 });
 
+describe("CLEAR_PREMATURE_RESULTS", () => {
+  it("nulls the result of the given matches", () => {
+    const s = state([
+      gm("G-A-1", { result: { home: 2, away: 2 } }),
+      gm("G-A-2", { result: { home: 1, away: 0 } }),
+    ]);
+    const next = fixtureReducer(s, {
+      type: "CLEAR_PREMATURE_RESULTS",
+      matchIds: ["G-A-1"],
+    });
+    expect(next.groupMatches[0].result).toBeNull();
+    expect(next.groupMatches[1].result).toEqual({ home: 1, away: 0 });
+  });
+
+  it("drops cleared matches from syncedResultIds and never touches predictions", () => {
+    const s = {
+      ...state([gm("G-A-1", { result: { home: 2, away: 2 }, prediction: { home: 1, away: 0 } })]),
+      syncedResultIds: ["G-A-1"],
+    };
+    const next = fixtureReducer(s, {
+      type: "CLEAR_PREMATURE_RESULTS",
+      matchIds: ["G-A-1"],
+    });
+    expect(next.groupMatches[0].result).toBeNull();
+    expect(next.groupMatches[0].prediction).toEqual({ home: 1, away: 0 });
+    expect(next.syncedResultIds).toEqual([]);
+  });
+});
+
 describe("APPLY_SYNCED_RESULTS (admin push is a fallback: fill voids only)", () => {
   it("fills a null result and tags it as synced", () => {
     const s = state([gm("G-A-1")]);

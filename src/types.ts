@@ -121,4 +121,5 @@ export type FixtureAction =
       type: "APPLY_AUTOSYNC_RESULTS";
       groupResults: Record<string, Score>;
       knockoutResults: Record<string, Score>;
-    };
+    }
+  | { type: "CLEAR_PREMATURE_RESULTS"; matchIds: string[] };
