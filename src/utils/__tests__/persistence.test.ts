@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { reconcileMatches } from "../persistence";
+import { describe, it, expect, beforeEach } from "vitest";
+import { reconcileMatches, importFromJson } from "../persistence";
+import { loadSalts } from "../../nostr/commitReveal";
 import type { GroupMatch } from "../../types";
 
 function gm(id: string, overrides: Partial<GroupMatch> = {}): GroupMatch {
@@ -61,5 +62,31 @@ describe("reconcileMatches", () => {
     expect(merged).toHaveLength(2);
     expect(merged[1].id).toBe("G-D-3");
     expect(merged[1].prediction).toBeNull();
+  });
+});
+
+describe("importFromJson salt restore", () => {
+  beforeEach(() => localStorage.clear());
+
+  function fileOf(obj: unknown): File {
+    return new File([JSON.stringify(obj)], "backup.json", { type: "application/json" });
+  }
+
+  it("restores bundled salts so a migrated device can reveal", async () => {
+    const data = await importFromJson(
+      fileOf({ groupMatches: [], knockoutMatches: [], salts: { room1: { "G-A-1": "aabb" } } }),
+    );
+    expect(data.groupMatches).toEqual([]);
+    expect(loadSalts("room1")).toEqual({ "G-A-1": "aabb" });
+  });
+
+  it("imports an older backup without salts unchanged", async () => {
+    const data = await importFromJson(fileOf({ groupMatches: [], knockoutMatches: [] }));
+    expect(data.knockoutMatches).toEqual([]);
+    expect(loadSalts("room1")).toEqual({});
+  });
+
+  it("rejects an invalid backup", async () => {
+    await expect(importFromJson(fileOf({ nope: true }))).rejects.toThrow();
   });
 });

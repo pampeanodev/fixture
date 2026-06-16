@@ -1,4 +1,7 @@
 import type { GroupMatch, KnockoutMatch, Member, Rival, Score } from "../types";
+import { collectAllSalts, restoreSalts } from "../nostr/commitReveal";
+
+type SaltsByRoom = Record<string, Record<string, string>>;
 
 const STORAGE_KEY = "wc2026-fixture";
 const PLAYER_NAME_KEY = "wc2026-player-name";
@@ -95,7 +98,10 @@ export function loadSyncedResultIds(): string[] {
 }
 
 export function exportToJson(data: PersistedData): void {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  // Bundle every room's salts so the backup can re-publish reveals on another
+  // device. Without them, migrating leaves committed predictions unrevealable.
+  const payload = { ...data, salts: collectAllSalts() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -148,9 +154,12 @@ export function importFromJson(file: File): Promise<PersistedData> {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const data = JSON.parse(reader.result as string) as PersistedData;
+        const data = JSON.parse(reader.result as string) as PersistedData & { salts?: SaltsByRoom };
         if (!Array.isArray(data.groupMatches) || !Array.isArray(data.knockoutMatches)) throw new Error("Invalid format");
-        resolve(data);
+        // Restore salts so this device can reveal the imported predictions.
+        // Optional + merge-safe, so older backups without salts still import.
+        if (data.salts && typeof data.salts === "object") restoreSalts(data.salts);
+        resolve({ groupMatches: data.groupMatches, knockoutMatches: data.knockoutMatches });
       } catch (e) { reject(e); }
     };
     reader.onerror = () => reject(reader.error);

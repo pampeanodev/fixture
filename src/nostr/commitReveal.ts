@@ -113,3 +113,33 @@ export function loadSalts(roomId: string): Record<string, string> {
     return {};
   }
 }
+
+/**
+ * Gather every room's salts, keyed by room id, for inclusion in a full backup.
+ * Salts are the only piece needed to re-publish reveals from a new device —
+ * without them a migrated user can never reveal their committed predictions.
+ */
+export function collectAllSalts(): Record<string, Record<string, string>> {
+  const out: Record<string, Record<string, string>> = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith(SALTS_PREFIX)) continue;
+      const roomId = key.slice(SALTS_PREFIX.length);
+      out[roomId] = loadSalts(roomId);
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  return out;
+}
+
+/**
+ * Restore salts from a backup, merging per room so locally-present salts win
+ * over imported ones (imported only fills gaps). Idempotent and non-destructive.
+ */
+export function restoreSalts(byRoom: Record<string, Record<string, string>>): void {
+  for (const [roomId, imported] of Object.entries(byRoom)) {
+    persistSalts(roomId, { ...imported, ...loadSalts(roomId) });
+  }
+}

@@ -5,6 +5,8 @@ import {
   verifyReveal,
   persistSalts,
   loadSalts,
+  collectAllSalts,
+  restoreSalts,
   buildCommitmentMap,
 } from "../commitReveal";
 
@@ -149,5 +151,45 @@ describe("salt persistence", () => {
     persistSalts("room2", { "G-A-1": "ccdd" });
     expect(loadSalts("room1")["G-A-1"]).toBe("aabb");
     expect(loadSalts("room2")["G-A-1"]).toBe("ccdd");
+  });
+});
+
+describe("salt portability (export/import across devices)", () => {
+  beforeEach(() => localStorage.clear());
+
+  it("collects every room's salts, keyed by room id", () => {
+    persistSalts("room1", { "G-A-1": "aabb" });
+    persistSalts("room2", { "G-B-2": "ccdd", "G-C-1": "eeff" });
+    expect(collectAllSalts()).toEqual({
+      room1: { "G-A-1": "aabb" },
+      room2: { "G-B-2": "ccdd", "G-C-1": "eeff" },
+    });
+  });
+
+  it("returns an empty object when there are no salts", () => {
+    expect(collectAllSalts()).toEqual({});
+  });
+
+  it("ignores unrelated localStorage keys", () => {
+    localStorage.setItem("wc2026-rivals", "[]");
+    persistSalts("room1", { "G-A-1": "aabb" });
+    expect(collectAllSalts()).toEqual({ room1: { "G-A-1": "aabb" } });
+  });
+
+  it("restores salts into a fresh device", () => {
+    restoreSalts({ room1: { "G-A-1": "aabb" }, room2: { "G-B-2": "ccdd" } });
+    expect(loadSalts("room1")).toEqual({ "G-A-1": "aabb" });
+    expect(loadSalts("room2")).toEqual({ "G-B-2": "ccdd" });
+  });
+
+  it("merges without clobbering salts already present locally", () => {
+    persistSalts("room1", { "G-A-1": "local", "G-A-2": "alsoLocal" });
+    restoreSalts({ room1: { "G-A-1": "imported", "G-D-2": "newFromImport" } });
+    // Existing local salt wins; imported only fills gaps.
+    expect(loadSalts("room1")).toEqual({
+      "G-A-1": "local",
+      "G-A-2": "alsoLocal",
+      "G-D-2": "newFromImport",
+    });
   });
 });
