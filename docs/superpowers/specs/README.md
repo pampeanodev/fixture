@@ -39,6 +39,7 @@ When you start a new spec, reserve the next available `Y` under your area and ad
 | f4.1 | how-to-play-panel | `f4.1-how-to-play-panel.md` | 2026-04-22 |
 | f4.2 | mobile-tour-fix | `f4.2-mobile-tour-fix.md` | 2026-04-22 |
 | f5.1 | compact-views | `f5.1-compact-views.md` | 2026-05-26 |
+| f5.2 | unified-match-view | `f5.2-unified-match-view.md` | 2026-06-16 |
 | f7.1 | auto-results-sync | `f7.1-auto-results-sync.md` | 2026-04-22 |
 | f7.2 | espn-source-of-truth | `f7.2-espn-source-of-truth.md` | 2026-06-12 |
 
