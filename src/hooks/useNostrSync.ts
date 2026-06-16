@@ -387,4 +387,25 @@ export function useNostrSync(): void {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [activeRoomId, identity, publishCommitments, publishReveals, publishResults]);
+
+  // Reveals can only be published while the author's client is online, and a
+  // prediction made early but only revealed once its match locks. A user who
+  // predicts ahead and isn't online when later matches lock leaves those
+  // reveals stale, so peers score them as misses. Re-publish whenever the tab
+  // regains focus (and periodically while open) so any return visit heals the
+  // full set — the reveal event is replaceable, so this is cheap and idempotent.
+  useEffect(() => {
+    if (!activeRoomId || !identity) return;
+    function republish(): void {
+      if (typeof document !== "undefined" && document.hidden) return;
+      publishCommitments();
+      publishReveals();
+    }
+    document.addEventListener("visibilitychange", republish);
+    const interval = setInterval(republish, 5 * 60 * 1000);
+    return () => {
+      document.removeEventListener("visibilitychange", republish);
+      clearInterval(interval);
+    };
+  }, [activeRoomId, identity, publishCommitments, publishReveals]);
 }
