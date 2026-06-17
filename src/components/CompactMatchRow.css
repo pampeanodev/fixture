@@ -1,6 +1,6 @@
 .compact-match-row {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem;
   gap: 8px;
   align-items: center;
   padding: 6px 8px;
@@ -45,7 +45,6 @@
 .compact-indicator {
   font-size: 14px;
   padding-left: 4px;
-  flex: 0 0 2.5rem;
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -93,7 +92,7 @@
 .compact-pen-pick:disabled { cursor: not-allowed; opacity: 0.3; }
 
 @media (max-width: 420px) {
-  .compact-match-row { grid-template-columns: 60px minmax(0, 1fr) auto minmax(0, 1fr) auto; gap: 5px; font-size: 12px; padding: 5px 6px; }
+  .compact-match-row { grid-template-columns: 60px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; gap: 5px; font-size: 12px; padding: 5px 6px; }
   .compact-team .team-flag { font-size: 14px; }
   .compact-badge { font-size: 8px; padding: 2px 4px; }
   .compact-score-input { width: 24px; height: 24px; font-size: 12px; }
