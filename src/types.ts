@@ -100,9 +100,11 @@ export interface SimulationSnapshot {
   knockoutMatches: KnockoutMatch[];
 }
 
+export type ScoreField = "prediction" | "result";
+
 export type FixtureAction =
-  | { type: "SET_GROUP_SCORE"; matchId: string; score: Score | null; field?: "prediction" | "result" }
-  | { type: "SET_KNOCKOUT_SCORE"; matchId: string; score: Score | null; field?: "prediction" | "result" }
+  | { type: "SET_GROUP_SCORE"; matchId: string; score: Score | null; field?: ScoreField }
+  | { type: "SET_KNOCKOUT_SCORE"; matchId: string; score: Score | null; field?: ScoreField }
   | { type: "TOGGLE_MODE" }
   | { type: "SET_VIEW"; view: ViewTarget }
   | { type: "IMPORT_STATE"; groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] }
