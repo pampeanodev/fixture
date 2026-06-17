@@ -101,8 +101,8 @@ export interface SimulationSnapshot {
 }
 
 export type FixtureAction =
-  | { type: "SET_GROUP_SCORE"; matchId: string; score: Score | null }
-  | { type: "SET_KNOCKOUT_SCORE"; matchId: string; score: Score | null }
+  | { type: "SET_GROUP_SCORE"; matchId: string; score: Score | null; field?: "prediction" | "result" }
+  | { type: "SET_KNOCKOUT_SCORE"; matchId: string; score: Score | null; field?: "prediction" | "result" }
   | { type: "TOGGLE_MODE" }
   | { type: "SET_VIEW"; view: ViewTarget }
   | { type: "IMPORT_STATE"; groupMatches: GroupMatch[]; knockoutMatches: KnockoutMatch[] }

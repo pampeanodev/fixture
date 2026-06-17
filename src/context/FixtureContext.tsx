@@ -22,13 +22,13 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
   switch (action.type) {
     case "SET_GROUP_SCORE": {
       const match = state.groupMatches.find((m) => m.id === action.matchId);
-      if (state.mode === "predictions" && match && isMatchLocked(match.dateUtc)) {
+      const field = action.field ?? (state.mode === "predictions" ? "prediction" : "result");
+      if (field === "prediction" && match && isMatchLocked(match.dateUtc)) {
         return state;
       }
-      const field = state.mode === "predictions" ? "prediction" : "result";
-      // Manual edit in results mode = local override; drop synced flag for this match.
+      // Manual edit of a result = local override; drop synced flag for this match.
       const syncedResultIds =
-        state.mode === "results"
+        field === "result"
           ? state.syncedResultIds.filter((id) => id !== action.matchId)
           : state.syncedResultIds;
       return { ...state, groupMatches: state.groupMatches.map((m) =>
@@ -37,12 +37,12 @@ export function fixtureReducer(state: FixtureState, action: FixtureAction): Fixt
     }
     case "SET_KNOCKOUT_SCORE": {
       const match = state.knockoutMatches.find((m) => m.id === action.matchId);
-      if (state.mode === "predictions" && match && isMatchLocked(match.dateUtc)) {
+      const field = action.field ?? (state.mode === "predictions" ? "prediction" : "result");
+      if (field === "prediction" && match && isMatchLocked(match.dateUtc)) {
         return state;
       }
-      const field = state.mode === "predictions" ? "prediction" : "result";
       const syncedResultIds =
-        state.mode === "results"
+        field === "result"
           ? state.syncedResultIds.filter((id) => id !== action.matchId)
           : state.syncedResultIds;
       return { ...state, knockoutMatches: state.knockoutMatches.map((m) =>
