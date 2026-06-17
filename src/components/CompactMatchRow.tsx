@@ -124,7 +124,9 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           <span className="compact-team-name pending">{pendingLabel ?? ""}</span>
         )}
       </span>
-      {indicator && <span className={`compact-indicator ${indicator.className}`}>{indicator.text}</span>}
+      <span className={`compact-indicator ${indicator ? indicator.className : "none"}`}>
+        {indicator ? indicator.text : "·"}
+      </span>
       {locked && !indicator && <span className="compact-status locked" title={lockedReason}>🔒</span>}
       {synced && !indicator && <span className="compact-status synced" title={t("scoreInput.syncedTitle")}>↻</span>}
       {showPen && (

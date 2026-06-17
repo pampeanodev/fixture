@@ -42,10 +42,18 @@
 }
 .compact-score-sep { font-size: 12px; color: #999; font-weight: 700; }
 
-.compact-indicator { font-size: 14px; padding-left: 4px; }
+.compact-indicator {
+  font-size: 14px;
+  padding-left: 4px;
+  flex: 0 0 2.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
 .compact-indicator.exact { color: #2e7d32; }
 .compact-indicator.winner { color: #f9a825; }
 .compact-indicator.wrong { color: #c62828; }
+.compact-indicator.none { color: var(--text-muted, #b0b0b0); font-weight: 400; }
 
 .compact-status { font-size: 12px; padding-left: 4px; }
 .compact-status.synced { color: var(--accent-green, #2e7d32); }
