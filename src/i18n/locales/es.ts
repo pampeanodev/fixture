@@ -203,6 +203,7 @@ export const es = {
     penPickAria: "{team} gana por penales",
   },
   rooms: {
+    rankingSoloTitle: "Tu ranking",
     list: {
       title: "Mis Salas", empty: "No estás en ninguna sala todavía.",
       createCta: "Crear sala", joinCta: "Unirme con código",

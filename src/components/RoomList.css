@@ -172,3 +172,13 @@
 .room-list-empty p {
   margin: 0 0 8px;
 }
+
+.room-list-ranking {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border);
+}
+.room-list-ranking h3 {
+  font-size: 13px; color: #888; text-transform: uppercase;
+  letter-spacing: 0.5px; margin: 0 0 8px;
+}

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNostr } from "../context/NostrContext";
 import { useFixture } from "../context/FixtureContext";
 import { useLocale } from "../i18n";
+import { RankingView } from "./RankingView";
 import "./RoomList.css";
 
 export function RoomList() {
-  const { rooms, createRoom, joinRoom, setActiveRoom, isRoomOwner } = useNostr();
+  const { rooms, createRoom, joinRoom, setActiveRoom, isRoomOwner, activeRoomId } = useNostr();
   const { dispatch } = useFixture();
   const { t } = useLocale();
   const [showCreate, setShowCreate] = useState(false);
@@ -83,6 +84,12 @@ export function RoomList() {
               <span className="room-item-arrow">&rsaquo;</span>
             </button>
           ))}
+        </div>
+      )}
+      {!activeRoomId && (
+        <div className="room-list-ranking">
+          <h3>{t("rooms.rankingSoloTitle")}</h3>
+          <RankingView />
         </div>
       )}
     </div>

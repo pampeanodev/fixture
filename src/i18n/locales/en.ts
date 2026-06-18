@@ -205,6 +205,7 @@ export const en = {
     penPickAria: "{team} wins on penalties",
   },
   rooms: {
+    rankingSoloTitle: "Your ranking",
     list: {
       title: "My Rooms", empty: "You're not in any room yet.",
       createCta: "Create room", joinCta: "Join with code",

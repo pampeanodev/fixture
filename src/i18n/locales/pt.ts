@@ -205,6 +205,7 @@ export const pt = {
     penPickAria: "{team} vence nos pênaltis",
   },
   rooms: {
+    rankingSoloTitle: "Seu ranking",
     list: {
       title: "Minhas Salas", empty: "Você ainda não está em nenhuma sala.",
       createCta: "Criar sala", joinCta: "Entrar com código",
