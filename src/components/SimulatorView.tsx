@@ -292,8 +292,8 @@ export function SimulatorView() {
         <div className="simulator-manual">
           <p>{t("simulator.manualPrompt")}</p>
           <ScoreInput
-            score={manualScore}
-            onScoreChange={setManualScore}
+            prediction={manualScore} result={null}
+            onPredictionChange={setManualScore} onResultChange={() => {}}
             allowPenalties={isKnockout}
             homeTeam={homeTeam ?? undefined}
             awayTeam={awayTeam ?? undefined}
