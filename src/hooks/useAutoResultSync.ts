@@ -161,9 +161,17 @@ export function useAutoResultSync(): void {
         });
       }
     } catch (err) {
-      tickOutcome.networkFailed = true;
-      const msg = err instanceof AutoSyncNetworkError ? err.message : String(err);
-      console.warn(`[autosync] network: ${msg}`);
+      // Our own AbortController cancelling the in-flight fetch on cleanup is not
+      // a network failure — don't log it and don't count it toward the breaker
+      // (otherwise routine re-renders/visibility changes could trip it).
+      const aborted =
+        (err instanceof DOMException && err.name === "AbortError") ||
+        abortRef.current?.signal.aborted === true;
+      if (!aborted) {
+        tickOutcome.networkFailed = true;
+        const msg = err instanceof AutoSyncNetworkError ? err.message : String(err);
+        console.warn(`[autosync] network: ${msg}`);
+      }
     } finally {
       inFlightRef.current = false;
       abortRef.current = null;
@@ -191,6 +199,11 @@ export function useAutoResultSync(): void {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       abortRef.current?.abort();
+      // Release the in-flight guard synchronously: the aborted fetch's `finally`
+      // runs on a later microtask, so without this a remount (React 19 StrictMode
+      // double-invoke, or a real remount) would see inFlightRef still true and
+      // skip its tick — leaving results unloaded.
+      inFlightRef.current = false;
     };
   }, [runTick]);
 

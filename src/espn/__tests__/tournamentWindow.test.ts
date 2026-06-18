@@ -28,15 +28,16 @@ describe("isWithinTournamentWindow", () => {
 });
 
 describe("buildFetchDates", () => {
-  it("returns an ESPN-formatted range spanning today ± 3 days", () => {
-    // 2026-06-15T14:00:00Z → window 2026-06-12 to 2026-06-18
+  it("spans tournament start through today + 3 days (back-fills missed matches)", () => {
+    // 2026-06-15T14:00:00Z → 2026-06-10 (start) to 2026-06-18 (now + 3)
     const now = Date.UTC(2026, 5, 15, 14, 0, 0);
-    expect(buildFetchDates(now)).toBe("20260612-20260618");
+    expect(buildFetchDates(now)).toBe("20260610-20260618");
   });
 
-  it("zero-pads days and months", () => {
-    const now = Date.UTC(2026, 0, 5, 0, 0, 0);
-    expect(buildFetchDates(now)).toBe("20260102-20260108");
+  it("zero-pads the upper bound and always starts at the tournament start", () => {
+    // 2026-07-05T00:00:00Z → start 2026-06-10, end 2026-07-08
+    const now = Date.UTC(2026, 6, 5, 0, 0, 0);
+    expect(buildFetchDates(now)).toBe("20260610-20260708");
   });
 });
 

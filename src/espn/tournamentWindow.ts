@@ -19,7 +19,11 @@ function yyyymmdd(ms: number): string {
 
 export function buildFetchDates(nowMs: number): string {
   const dayMs = 24 * 60 * 60 * 1000;
-  const start = nowMs - 3 * dayMs;
+  // Span the whole tournament-to-date (not just today ± 3) so matches played
+  // while auto-sync was down — breaker tripped, app closed — get back-filled
+  // instead of ageing out of a narrow window. The upper bound keeps +3 days of
+  // upcoming fixtures. ESPN serves the full ~40-day range in one small response.
+  const start = TOURNAMENT_START_MS;
   const end = nowMs + 3 * dayMs;
   return `${yyyymmdd(start)}-${yyyymmdd(end)}`;
 }
