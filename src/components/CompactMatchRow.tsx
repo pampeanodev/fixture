@@ -168,7 +168,7 @@ function CompactResult({ format, result, editable, onChange, label }: {
     else if (hStr === "" && aStr === "") onChange(null);
   }
   const cls = format === "badge" ? "compact-result-badge" : "compact-result-line";
-  if (editable && result) {
+  if (editable) {
     return (
       <span className={`${cls} editable`} title={label}>
         {format === "line" && <span className="compact-result-line-label">{label}:</span>}

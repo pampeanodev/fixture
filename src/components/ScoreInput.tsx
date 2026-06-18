@@ -146,7 +146,7 @@ function ResultDisplay({ result, editable, onChange }: {
     if (!isNaN(hh) && !isNaN(aa) && hh >= 0 && aa >= 0) onChange({ home: hh, away: aa });
     else if (hStr === "" && aStr === "") onChange(null);
   }
-  if (editable && result) {
+  if (editable) {
     return (
       <>
         <input type="number" min="0" max="99" className="score-field result-edit" value={h}

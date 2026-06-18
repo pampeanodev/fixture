@@ -35,13 +35,24 @@ function koMatch(overrides: Partial<KnockoutMatch> = {}): KnockoutMatch {
 const kickoff = new Date("2026-06-15T18:00:00Z").getTime();
 
 describe("isMatchEditable", () => {
-  it("is editable when circuit breaker is tripped", () => {
+  it("is editable when circuit breaker is tripped and the match has kicked off", () => {
+    expect(
+      isMatchEditable(groupMatch(), {
+        circuitBreakerTripped: true,
+        now: kickoff + 10_000,
+      }),
+    ).toBe(true);
+  });
+
+  it("is locked before kickoff even when the breaker is tripped", () => {
+    // A match that hasn't started has no result to enter manually; the fallback
+    // must not turn future matches into editable empty fields.
     expect(
       isMatchEditable(groupMatch(), {
         circuitBreakerTripped: true,
         now: kickoff - 10_000,
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("is locked when breaker off, kickoff in future, no result", () => {

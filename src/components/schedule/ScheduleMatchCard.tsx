@@ -117,7 +117,7 @@ function ScheduleResultRow({ result, editable, onChange, label, indicator }: {
     if (!isNaN(hh) && !isNaN(aa) && hh >= 0 && aa >= 0) onChange({ home: hh, away: aa });
     else if (hStr === "" && aStr === "") onChange(null);
   }
-  if (editable && result) {
+  if (editable) {
     return (
       <div className="schedule-result-row editable">
         <span>{label}:</span>
