@@ -1,8 +1,6 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useFixture } from "../context/FixtureContext";
-import { getTeam } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
-import { indicatorFor } from "../utils/scoring";
 import { isMatchEditable } from "../espn/graceLock";
 import { loadAutoSyncMeta } from "../espn/autoSyncMeta";
 import { loadBreakerState } from "../espn/circuitBreaker";
@@ -10,8 +8,10 @@ import { getEffectiveNow } from "../utils/devClock";
 import { useLocale } from "../i18n";
 import { useViewMode } from "../context/ViewModeContext";
 import { CompactMatchRow } from "./CompactMatchRow";
+import { ScheduleMatchCard } from "./schedule/ScheduleMatchCard";
 import type { KnockoutRound, Score } from "../types";
 import "./ScheduleView.css";
+
 interface UnifiedMatch {
   id: string;
   dateUtc: string;
@@ -21,9 +21,8 @@ interface UnifiedMatch {
   stageKind: "group" | "knockout";
   stageValue: string; // group letter or round code
   isKnockout: boolean;
-  hasResult: boolean;
-  currentScore: Score | null; prediction: Score | null;
-  realScore: Score | null; result: Score | null;
+  prediction: Score | null;
+  result: Score | null;
   editable: boolean;
 }
 
@@ -31,25 +30,18 @@ export function ScheduleView() {
   const { state, dispatch, resolvedKnockout } = useFixture();
   const { t, locale } = useLocale();
   const { mode: viewMode } = useViewMode();
-  const isPrediction = state.mode === "predictions";
-  const scoreField = isPrediction ? "prediction" : "result";
 
   const allMatches = useMemo(() => {
-      const breakerState = loadBreakerState();
+    const breakerState = loadBreakerState();
     const now = getEffectiveNow();
-    const ctx = {
-      circuitBreakerTripped: breakerState.tripped,
-      now,
-    };
+    const ctx = { circuitBreakerTripped: breakerState.tripped, now };
     const matches: UnifiedMatch[] = [];
     for (const m of state.groupMatches) {
       matches.push({
         id: m.id, dateUtc: m.dateUtc, venue: m.venue,
         homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId,
         stageKind: "group", stageValue: m.group, isKnockout: false,
-        hasResult: m[scoreField] !== null,
-        currentScore: m[scoreField], prediction: m.prediction,
-        realScore: m.result, result: m.result,
+        prediction: m.prediction, result: m.result,
         editable: isMatchEditable(m, ctx),
       });
     }
@@ -58,15 +50,13 @@ export function ScheduleView() {
         id: m.id, dateUtc: m.dateUtc, venue: m.venue,
         homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId,
         stageKind: "knockout", stageValue: m.round, isKnockout: true,
-        hasResult: m[scoreField] !== null,
-        currentScore: m[scoreField], prediction: m.prediction,
-        realScore: m.result, result: m.result,
+        prediction: m.prediction, result: m.result,
         editable: isMatchEditable(m, ctx),
       });
     }
     matches.sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
     return matches;
-  }, [state.groupMatches, resolvedKnockout, scoreField]);
+  }, [state.groupMatches, resolvedKnockout]);
 
   const dayFormatter = useMemo(() => {
     const bcp = locale === "es" ? "es-AR" : locale === "pt" ? "pt-BR" : "en-US";
@@ -155,13 +145,12 @@ export function ScheduleView() {
                     key={match.id}
                     match={match}
                     label={stageLabelFor(match)}
-                    isPrediction={isPrediction}
-                    locked={isPrediction && isMatchLocked(match.dateUtc)}
-                    synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-                    disabled={!match.editable && !isPrediction}
-                    lockedReason={t("autoSync.waitingResult")}
+                    predictionLocked={isMatchLocked(match.dateUtc)}
+                    resultEditable={match.editable}
+                    synced={state.syncedResultIds.includes(match.id)}
                     autoSyncTooltip={autoSyncTooltip}
-                    onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score, scoreField)}
+                    onPredictionChange={(score) => handleScoreChange(match.id, match.isKnockout, score, "prediction")}
+                    onResultChange={(score) => handleScoreChange(match.id, match.isKnockout, score, "result")}
                   />
                 );
               })}
@@ -169,104 +158,6 @@ export function ScheduleView() {
           )}
         </div>
       ))}
-    </div>
-  );
-}
-
-function ScheduleMatchCard({ match, label, isPrediction, locked, synced, disabled, lockedReason, autoSyncTooltip, onScoreChange }: {
-  match: UnifiedMatch;
-  label: string;
-  isPrediction: boolean;
-  locked?: boolean;
-  synced?: boolean;
-  disabled?: boolean;
-  lockedReason?: string;
-  autoSyncTooltip?: string;
-  onScoreChange: (score: Score | null) => void;
-}) {
-  const effectiveDisabled = locked || disabled;
-  const inputTitle = effectiveDisabled
-    ? (locked ? undefined : (lockedReason ?? autoSyncTooltip))
-    : autoSyncTooltip;
-  const { t, formatTime } = useLocale();
-  const [homeStr, setHomeStr] = useState(match.currentScore?.home?.toString() ?? "");
-  const [awayStr, setAwayStr] = useState(match.currentScore?.away?.toString() ?? "");
-
-  useEffect(() => {
-    setHomeStr(match.currentScore?.home?.toString() ?? "");
-    setAwayStr(match.currentScore?.away?.toString() ?? "");
-  }, [match.currentScore]);
-
-  function commitScore(hStr: string, aStr: string) {
-    const h = parseInt(hStr, 10);
-    const a = parseInt(aStr, 10);
-    if (!isNaN(h) && !isNaN(a) && h >= 0 && a >= 0) {
-      onScoreChange({ home: h, away: a });
-    } else if (hStr === "" && aStr === "") {
-      onScoreChange(null);
-    }
-  }
-
-  const homeTeam = match.homeTeamId ? getTeam(match.homeTeamId) : null;
-  const awayTeam = match.awayTeamId ? getTeam(match.awayTeamId) : null;
-  const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
-
-  const time = formatTime(match.dateUtc);
-
-  const scored = isPrediction ? indicatorFor(match.realScore, match.currentScore) : null;
-  const indicator = scored ? { className: scored.kind, text: scored.label } : null;
-
-  return (
-    <div className={`schedule-match-card ${match.isKnockout ? "knockout" : ""} ${match.hasResult ? "has-result" : ""}`}>
-      <div className="schedule-match-top">
-        <span>{time}</span>
-        <span className={`schedule-badge ${match.isKnockout ? "ko" : "group"}`}>{label}</span>
-        <span className="schedule-match-venue">{match.venue}</span>
-      </div>
-      <div className="schedule-team-row">
-        {homeTeam ? (
-          <>
-            <span className="team-flag">{homeTeam.flag}</span>
-            <span className="schedule-team-row-name">{t(`teams.${homeTeam.id}`)}</span>
-          </>
-        ) : (
-          <span className="schedule-team-row-name pending">{match.id}</span>
-        )}
-        {bothKnown && (
-          <input type="number" min="0" max="99"
-            className={`schedule-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-            disabled={locked || disabled}
-            title={inputTitle}
-            value={homeStr}
-            onChange={(e) => { setHomeStr(e.target.value); commitScore(e.target.value, awayStr); }} />
-        )}
-      </div>
-      <div className="schedule-team-row">
-        {awayTeam ? (
-          <>
-            <span className="team-flag">{awayTeam.flag}</span>
-            <span className="schedule-team-row-name">{t(`teams.${awayTeam.id}`)}</span>
-          </>
-        ) : (
-          <span className="schedule-team-row-name pending">{match.id}</span>
-        )}
-        {bothKnown && (
-          <input type="number" min="0" max="99"
-            className={`schedule-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-            disabled={locked || disabled}
-            title={inputTitle}
-            value={awayStr}
-            onChange={(e) => { setAwayStr(e.target.value); commitScore(homeStr, e.target.value); }} />
-        )}
-      </div>
-      {locked && <div className="schedule-locked">{t("schedule.matchCard.locked")}</div>}
-      {synced && <div className="schedule-synced" title={t("schedule.matchCard.syncedTitle")}>{t("schedule.matchCard.synced")}</div>}
-      {isPrediction && match.realScore && (
-        <div className="schedule-prediction-row">
-          {t("schedule.matchCard.real")}: {match.realScore.home} - {match.realScore.away}
-          {indicator && <span className={`prediction-indicator ${indicator.className}`}>{indicator.text}</span>}
-        </div>
-      )}
     </div>
   );
 }
