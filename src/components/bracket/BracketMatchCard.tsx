@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { useFixture } from "../../context/FixtureContext";
 import { getTeam } from "../../data/teams";
 import { isMatchLocked } from "../../utils/lockTime";
-import { isMatchEditable } from "../../espn/graceLock";
-import { loadBreakerState } from "../../espn/circuitBreaker";
-import { getEffectiveNow } from "../../utils/devClock";
+import { indicatorFor } from "../../utils/scoring";
 import { useLocale } from "../../i18n";
 import type { TFunction } from "../../i18n/translate";
 import type { KnockoutMatch } from "../../types";
@@ -21,57 +19,46 @@ function slotShort(t: TFunction, match: KnockoutMatch, side: "home" | "away"): s
 }
 
 export function BracketMatchCard({ match, variant = "regular" }: { match: KnockoutMatch; variant?: "regular" | "final" | "third" }) {
-  const { state, dispatch } = useFixture();
+  const { dispatch } = useFixture();
   const { t } = useLocale();
-  const isPrediction = state.mode === "predictions";
-  const currentScore = isPrediction ? match.prediction : match.result;
-  const realScore = match.result;
+  const prediction = match.prediction;
 
-  const [homeStr, setHomeStr] = useState(currentScore?.home?.toString() ?? "");
-  const [awayStr, setAwayStr] = useState(currentScore?.away?.toString() ?? "");
+  const [homeStr, setHomeStr] = useState(prediction?.home?.toString() ?? "");
+  const [awayStr, setAwayStr] = useState(prediction?.away?.toString() ?? "");
 
   useEffect(() => {
-    setHomeStr(currentScore?.home?.toString() ?? "");
-    setAwayStr(currentScore?.away?.toString() ?? "");
-  }, [currentScore]);
+    setHomeStr(prediction?.home?.toString() ?? "");
+    setAwayStr(prediction?.away?.toString() ?? "");
+  }, [prediction]);
 
   function commit(h: string, a: string) {
     const hi = parseInt(h, 10);
     const ai = parseInt(a, 10);
     if (!isNaN(hi) && !isNaN(ai) && hi >= 0 && ai >= 0) {
-      dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score: { home: hi, away: ai, penalties: currentScore?.penalties } });
+      dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score: { home: hi, away: ai, penalties: prediction?.penalties }, field: "prediction" });
     } else if (h === "" && a === "") {
-      dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score: null });
+      dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score: null, field: "prediction" });
     }
   }
 
   function pickPen(winner: "home" | "away") {
-    if (!currentScore || currentScore.home !== currentScore.away) return;
+    if (!prediction || prediction.home !== prediction.away) return;
     const penalties = winner === "home" ? { home: 1, away: 0 } : { home: 0, away: 1 };
-    dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score: { ...currentScore, penalties } });
+    dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: match.id, score: { ...prediction, penalties }, field: "prediction" });
   }
 
   const homeTeam = match.homeTeamId ? getTeam(match.homeTeamId) : null;
   const awayTeam = match.awayTeamId ? getTeam(match.awayTeamId) : null;
   const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
-  const editable = isMatchEditable(match, {
-    circuitBreakerTripped: loadBreakerState().tripped,
-    now: getEffectiveNow(),
-  });
-  const locked = isPrediction && isMatchLocked(match.dateUtc);
-  const disabled = locked || (!editable && !isPrediction);
-  const tied = currentScore !== null && currentScore.home === currentScore.away;
-  const penWinner: "home" | "away" | null = currentScore?.penalties
-    ? currentScore.penalties.home > currentScore.penalties.away ? "home"
-    : currentScore.penalties.away > currentScore.penalties.home ? "away" : null
+  const predictionLocked = isMatchLocked(match.dateUtc);
+  const tied = prediction !== null && prediction.home === prediction.away;
+  const penWinner: "home" | "away" | null = prediction?.penalties
+    ? prediction.penalties.home > prediction.penalties.away ? "home"
+    : prediction.penalties.away > prediction.penalties.home ? "away" : null
     : null;
 
-  let indicatorClass: string | null = null;
-  if (isPrediction && realScore && currentScore) {
-    if (realScore.home === currentScore.home && realScore.away === currentScore.away) indicatorClass = "exact";
-    else if (Math.sign(realScore.home - realScore.away) === Math.sign(currentScore.home - currentScore.away)) indicatorClass = "winner";
-    else indicatorClass = "wrong";
-  }
+  const scored = indicatorFor(match.result, prediction);
+  const indicatorClass = scored ? scored.kind : null;
 
   return (
     <div className={`bk-card ${variant} ${indicatorClass ? "ind-" + indicatorClass : ""}`}>
@@ -80,8 +67,8 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
         <span className="bk-card-name">{homeTeam ? t(`teams.${homeTeam.id}`) : slotShort(t, match, "home")}</span>
         {bothKnown && (
           <input type="number" min="0" max="99"
-            className={`bk-card-input ${isPrediction ? "prediction" : ""}`}
-            disabled={disabled}
+            className="bk-card-input prediction"
+            disabled={predictionLocked}
             value={homeStr}
             onChange={(e) => { setHomeStr(e.target.value); commit(e.target.value, awayStr); }} />
         )}
@@ -91,8 +78,8 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
         <span className="bk-card-name">{awayTeam ? t(`teams.${awayTeam.id}`) : slotShort(t, match, "away")}</span>
         {bothKnown && (
           <input type="number" min="0" max="99"
-            className={`bk-card-input ${isPrediction ? "prediction" : ""}`}
-            disabled={disabled}
+            className="bk-card-input prediction"
+            disabled={predictionLocked}
             value={awayStr}
             onChange={(e) => { setAwayStr(e.target.value); commit(homeStr, e.target.value); }} />
         )}
@@ -100,8 +87,8 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
       {bothKnown && tied && variant !== "third" && (
         <div className="bk-card-pen">
           <span className="bk-card-pen-label">PEN</span>
-          <button type="button" className={`bk-card-pen-pick ${penWinner === "home" ? "active" : ""}`} disabled={disabled} onClick={() => pickPen("home")} aria-label={t("scoreInput.penPickAria", { team: homeTeam ? t(`teams.${homeTeam.id}`) : "home" })}>{homeTeam?.flag ?? "1"}</button>
-          <button type="button" className={`bk-card-pen-pick ${penWinner === "away" ? "active" : ""}`} disabled={disabled} onClick={() => pickPen("away")} aria-label={t("scoreInput.penPickAria", { team: awayTeam ? t(`teams.${awayTeam.id}`) : "away" })}>{awayTeam?.flag ?? "2"}</button>
+          <button type="button" className={`bk-card-pen-pick ${penWinner === "home" ? "active" : ""}`} disabled={predictionLocked} onClick={() => pickPen("home")} aria-label={t("scoreInput.penPickAria", { team: homeTeam ? t(`teams.${homeTeam.id}`) : "home" })}>{homeTeam?.flag ?? "1"}</button>
+          <button type="button" className={`bk-card-pen-pick ${penWinner === "away" ? "active" : ""}`} disabled={predictionLocked} onClick={() => pickPen("away")} aria-label={t("scoreInput.penPickAria", { team: awayTeam ? t(`teams.${awayTeam.id}`) : "away" })}>{awayTeam?.flag ?? "2"}</button>
         </div>
       )}
     </div>
