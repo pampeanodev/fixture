@@ -69,7 +69,7 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
   function handleExitSimulation() {
     dispatch({ type: "EXIT_SIMULATION" });
     if (state.activeView.type === "simulator") {
-      dispatch({ type: "SET_VIEW", view: { type: "ranking" } });
+      dispatch({ type: "SET_VIEW", view: { type: "rooms" } });
     }
     setMenuOpen(false);
   }

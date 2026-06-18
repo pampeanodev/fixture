@@ -21,7 +21,7 @@ function makeState(overrides: Partial<FixtureState> = {}): FixtureState {
     teams: [],
     groupMatches: [groupMatch],
     knockoutMatches: [knockoutMatch],
-    activeView: { type: "ranking" },
+    activeView: { type: "rooms" },
     playerName: "test",
     rivals: [],
     members: [],

@@ -70,7 +70,7 @@ export function SimulatorView() {
 
   function handleExit() {
     dispatch({ type: "EXIT_SIMULATION" });
-    dispatch({ type: "SET_VIEW", view: { type: "ranking" } });
+    dispatch({ type: "SET_VIEW", view: { type: "rooms" } });
   }
 
   function handleReset() {

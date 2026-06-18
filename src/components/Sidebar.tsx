@@ -51,16 +51,6 @@ export function Sidebar({ collapsed, isMobile, onNavigate }: SidebarProps) {
         </div>
         <div className="sidebar-divider" />
         <div
-          className={`sidebar-item ${activeView.type === "ranking" ? "active" : ""}`}
-          onClick={() => navigate({ type: "ranking" })}>
-          {t("sidebar.nav.ranking")}
-          {state.rivals.length > 0 && (
-            <span style={{ fontSize: "10px", opacity: 0.6, marginLeft: "6px" }}>
-              {state.rivals.length + 1}
-            </span>
-          )}
-        </div>
-        <div
           data-tour="nav-rooms"
           className={`sidebar-item ${activeView.type === "rooms" || activeView.type === "room" ? "active" : ""}`}
           onClick={() => navigate({ type: "rooms" })}>

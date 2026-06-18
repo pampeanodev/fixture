@@ -7,7 +7,6 @@ import { TopBar } from "./components/TopBar";
 import { GroupView } from "./components/GroupView";
 import { BracketView } from "./components/BracketView";
 import { ScheduleView } from "./components/ScheduleView";
-import { RankingView } from "./components/RankingView";
 import { RoomList } from "./components/RoomList";
 import { RoomDetail } from "./components/RoomDetail";
 import { SimulatorView } from "./components/SimulatorView";
@@ -101,7 +100,6 @@ function AppContent() {
             {activeView.type === "groups" && <GroupView group={activeView.group} />}
             {activeView.type === "knockout" && <BracketView round={activeView.round} />}
             {activeView.type === "schedule" && <ScheduleView />}
-            {activeView.type === "ranking" && <RankingView />}
             {activeView.type === "rooms" && <RoomList />}
             {activeView.type === "room" && <RoomDetail roomId={activeView.roomId} />}
             {activeView.type === "simulator" && <SimulatorView />}

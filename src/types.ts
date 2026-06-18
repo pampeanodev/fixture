@@ -74,7 +74,6 @@ export type ViewTarget =
   | { type: "groups"; group: string }
   | { type: "knockout"; round: KnockoutRound }
   | { type: "schedule" }
-  | { type: "ranking" }
   | { type: "rooms" }
   | { type: "room"; roomId: string }
   | { type: "simulator" };
