@@ -87,19 +87,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
         />
       </div>
 
-      <div className="topbar-center">
-        <div className="mode-toggle" data-tour="mode-toggle">
-          <button className={state.mode === "results" ? "active" : ""}
-            onClick={() => state.mode !== "results" && dispatch({ type: "TOGGLE_MODE" })}>
-            {t("topbar.mode.results")}
-          </button>
-          <button className={state.mode === "predictions" ? "active" : ""}
-            onClick={() => state.mode !== "predictions" && dispatch({ type: "TOGGLE_MODE" })}>
-            {t("topbar.mode.predictions")}
-          </button>
-        </div>
-      </div>
-
       <div className="topbar-right" ref={menuRef}>
         <button
           className="topbar-viewmode-btn"
@@ -148,16 +135,6 @@ export function TopBar({ onToggleSidebar }: TopBarProps) {
               <button className="dropdown-item" onClick={handleExitSimulation}>
                 <span className="dropdown-icon">■</span> {t("topbar.menu.exitSimulation")}
               </button>
-            )}
-            {state.mode === "results" && (
-              <>
-                <div className="dropdown-divider" />
-                <div className="dropdown-section">{t("topbar.menu.sectionResults")}</div>
-                <button className="dropdown-item disabled" disabled
-                  title={t("topbar.menu.fetchApiTitle")}>
-                  <span className="dropdown-icon">↻</span> {t("topbar.menu.fetchApi")}
-                </button>
-              </>
             )}
             <div className="dropdown-divider" />
             <div className="dropdown-section">{t("topbar.menu.sectionFixture")}</div>

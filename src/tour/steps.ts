@@ -34,14 +34,6 @@ export function buildTours(t: TFunction, opts: TourOptions): Record<TourId, Driv
       ...mobileHook(false),
     },
     {
-      element: '[data-tour="mode-toggle"]',
-      popover: {
-        title: t("tour.overview.modeTitle"),
-        description: t("tour.overview.modeBody"),
-      },
-      ...mobileHook(false),
-    },
-    {
       element: '[data-tour="nav-groups"]',
       popover: {
         title: t("tour.overview.groupsTitle"),

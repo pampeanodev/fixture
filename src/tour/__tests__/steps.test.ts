@@ -36,8 +36,8 @@ describe("buildTours — overview tour", () => {
     const setSidebarOpen = vi.fn();
     const tours = buildTours(fakeT(), { isMobile: true, setSidebarOpen });
 
-    // 0 welcome, 1 mode-toggle, 2 nav-groups, 3 nav-knockout, 4 nav-rooms, 5 help-button
-    const expectations: ReadonlyArray<boolean> = [false, false, true, true, true, false];
+    // 0 welcome, 1 nav-groups, 2 nav-knockout, 3 nav-rooms, 4 help-button
+    const expectations: ReadonlyArray<boolean> = [false, true, true, true, false];
 
     expectations.forEach((expected, idx) => {
       setSidebarOpen.mockClear();
