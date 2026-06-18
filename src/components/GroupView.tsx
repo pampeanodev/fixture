@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam, GROUPS } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
@@ -10,35 +9,10 @@ import { useLocale } from "../i18n";
 import { useViewMode } from "../context/ViewModeContext";
 import { CompactMatchRow } from "./CompactMatchRow";
 import { CompactStandings } from "./CompactStandings";
-import type { Score } from "../types";
+import { GroupMatchCard } from "./group/GroupMatchCard";
 import "./GroupView.css";
 
 interface GroupViewProps { group: string; }
-
-function ScoreField({ value, onChange, isPrediction, locked, disabled, lockedReason, autoSyncTooltip }: {
-  value: string;
-  onChange: (v: string) => void;
-  isPrediction?: boolean;
-  locked?: boolean;
-  disabled?: boolean;
-  lockedReason?: string;
-  autoSyncTooltip?: string;
-}) {
-  const effectiveDisabled = locked || disabled;
-  const title = effectiveDisabled
-    ? (locked ? undefined : (lockedReason ?? autoSyncTooltip))
-    : autoSyncTooltip;
-  return (
-    <input
-      type="number" min="0" max="99"
-      className={`group-match-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-      disabled={locked || disabled}
-      title={title}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  );
-}
 
 export function GroupView({ group }: GroupViewProps) {
   const { state, dispatch, standingsByGroup } = useFixture();
@@ -48,7 +22,6 @@ export function GroupView({ group }: GroupViewProps) {
   const matches = state.groupMatches
     .filter((m) => m.group === group)
     .sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
-  const isPrediction = state.mode === "predictions";
   const breakerState = loadBreakerState();
   const now = getEffectiveNow();
   const autoSyncMeta = loadAutoSyncMeta();
@@ -145,103 +118,24 @@ export function GroupView({ group }: GroupViewProps) {
                 ? t("autoSync.autoSyncedTooltip", { datetime: new Date(ts).toLocaleString() })
                 : undefined;
               return (
-                <MatchCard
+                <GroupMatchCard
                   key={match.id}
                   homeTeamId={match.homeTeamId}
                   awayTeamId={match.awayTeamId}
                   dateUtc={match.dateUtc}
-                  result={match.result}
                   prediction={match.prediction}
-                  isPrediction={isPrediction}
-                  locked={isPrediction && isMatchLocked(match.dateUtc)}
-                  synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-                  disabled={!editable && !isPrediction}
-                  lockedReason={t("autoSync.waitingResult")}
+                  result={match.result}
+                  predictionLocked={isMatchLocked(match.dateUtc)}
+                  resultEditable={editable}
+                  synced={state.syncedResultIds.includes(match.id)}
                   autoSyncTooltip={autoSyncTooltip}
-                  onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
+                  onPredictionChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score, field: "prediction" })}
+                  onResultChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score, field: "result" })}
                 />
               );
             })}
           </div>
         </>
-      )}
-    </div>
-  );
-}
-
-function MatchCard({ homeTeamId, awayTeamId, dateUtc, result, prediction, isPrediction, locked, synced, disabled, lockedReason, autoSyncTooltip, onScoreChange }: {
-  homeTeamId: string;
-  awayTeamId: string;
-  dateUtc: string;
-  result: Score | null;
-  prediction: Score | null;
-  isPrediction: boolean;
-  locked?: boolean;
-  synced?: boolean;
-  disabled?: boolean;
-  lockedReason?: string;
-  autoSyncTooltip?: string;
-  onScoreChange: (score: Score | null) => void;
-}) {
-  const { t, formatDate } = useLocale();
-  const currentScore = isPrediction ? prediction : result;
-  const [homeStr, setHomeStr] = useState(currentScore?.home?.toString() ?? "");
-  const [awayStr, setAwayStr] = useState(currentScore?.away?.toString() ?? "");
-
-  useEffect(() => {
-    setHomeStr(currentScore?.home?.toString() ?? "");
-    setAwayStr(currentScore?.away?.toString() ?? "");
-  }, [currentScore]);
-
-  function commitScore(hStr: string, aStr: string) {
-    const h = parseInt(hStr, 10);
-    const a = parseInt(aStr, 10);
-    if (!isNaN(h) && !isNaN(a) && h >= 0 && a >= 0) {
-      onScoreChange({ home: h, away: a });
-    } else if (hStr === "" && aStr === "") {
-      onScoreChange(null);
-    }
-  }
-
-  const homeTeam = getTeam(homeTeamId);
-  const awayTeam = getTeam(awayTeamId);
-
-  // Prediction comparison
-  let indicator: { className: string; symbol: string } | null = null;
-  if (isPrediction && result && prediction) {
-    if (result.home === prediction.home && result.away === prediction.away) {
-      indicator = { className: "exact", symbol: t("groups.matchCard.exact") };
-    } else {
-      const realOut = Math.sign(result.home - result.away);
-      const predOut = Math.sign(prediction.home - prediction.away);
-      indicator = realOut === predOut
-        ? { className: "winner", symbol: t("groups.matchCard.winner") }
-        : { className: "wrong", symbol: t("groups.matchCard.wrong") };
-    }
-  }
-
-  return (
-    <div className="group-match-card">
-      <div className="group-match-date">{formatDate(dateUtc)}</div>
-      <div className="group-match-team-row">
-        <span className="team-flag">{homeTeam?.flag}</span>
-        <span className="group-match-team-name">{homeTeam ? t(`teams.${homeTeam.id}`) : ""}</span>
-        <ScoreField value={homeStr} isPrediction={isPrediction} locked={locked} disabled={disabled} lockedReason={lockedReason} autoSyncTooltip={autoSyncTooltip}
-          onChange={(v) => { setHomeStr(v); commitScore(v, awayStr); }} />
-      </div>
-      <div className="group-match-team-row">
-        <span className="team-flag">{awayTeam?.flag}</span>
-        <span className="group-match-team-name">{awayTeam ? t(`teams.${awayTeam.id}`) : ""}</span>
-        <ScoreField value={awayStr} isPrediction={isPrediction} locked={locked} disabled={disabled} lockedReason={lockedReason} autoSyncTooltip={autoSyncTooltip}
-          onChange={(v) => { setAwayStr(v); commitScore(homeStr, v); }} />
-      </div>
-      {locked && <div className="group-match-locked">{t("groups.matchCard.locked")}</div>}
-      {synced && <div className="group-match-synced" title={t("groups.matchCard.syncedTitle")}>{t("groups.matchCard.synced")}</div>}
-      {isPrediction && result && (
-        <div className="group-match-prediction-row">
-          {t("groups.matchCard.real")}: {result.home} - {result.away}
-          {indicator && <span className={`prediction-indicator ${indicator.className}`}>{indicator.symbol}</span>}
-        </div>
       )}
     </div>
   );

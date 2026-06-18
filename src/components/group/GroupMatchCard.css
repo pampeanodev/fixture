@@ -1,0 +1,45 @@
+.group-match-card {
+  background: var(--card-bg); border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden;
+}
+
+.group-match-date {
+  font-size: 11px; color: #888; padding: 8px 14px 4px;
+}
+
+.group-match-team-row {
+  display: flex; align-items: center; padding: 6px 14px; gap: 8px;
+}
+
+.group-match-team-row .team-flag { font-size: 18px; }
+
+.group-match-team-name {
+  font-size: 14px; font-weight: 600; flex: 1;
+}
+
+.group-match-score-input {
+  width: 36px; height: 30px; text-align: center; font-size: 16px; font-weight: 700;
+  border: 1px solid var(--card-border); border-radius: 4px; background: var(--card-bg);
+  color: var(--content-text); outline: none;
+  -moz-appearance: textfield;
+}
+.group-match-score-input::-webkit-inner-spin-button,
+.group-match-score-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.group-match-score-input:focus { border-color: var(--accent-green); }
+.group-match-score-input.prediction { border-color: var(--prediction-blue); color: var(--prediction-blue); }
+.group-match-score-input.locked, .group-match-score-input:disabled {
+  background: #f2f2f2; color: #999; cursor: not-allowed; opacity: 0.7;
+}
+
+.group-match-synced {
+  padding: 0 14px 8px; font-size: 11px; color: var(--accent-green, #2e7d32);
+}
+
+.group-match-result-row {
+  display: flex; align-items: center; gap: 4px; padding: 0 14px 8px;
+  font-size: 11px; color: #999;
+}
+.group-match-result-row .prediction-indicator { margin-left: 4px; }
+.group-match-result-row.editable .group-match-score-input {
+  width: 30px; height: 24px; font-size: 13px;
+}
