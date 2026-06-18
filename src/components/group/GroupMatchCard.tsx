@@ -90,7 +90,7 @@ function ResultRow({ result, editable, onChange, label, indicator }: {
     if (!isNaN(hh) && !isNaN(aa) && hh >= 0 && aa >= 0) onChange({ home: hh, away: aa });
     else if (hStr === "" && aStr === "") onChange(null);
   }
-  if (editable) {
+  if (editable && result) {
     return (
       <div className="group-match-result-row editable">
         <span>{label}:</span>

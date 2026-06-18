@@ -120,7 +120,7 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           <span className="compact-team-name pending">{pendingLabel ?? ""}</span>
         )}
       </span>
-      <CompactResult result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} />
+      <CompactResult format="badge" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} />
       <span className={`compact-indicator ${indicator ? indicator.className : "none"}`}>
         {indicator ? indicator.text : "·"}
       </span>
@@ -146,11 +146,13 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           </button>
         </div>
       )}
+      <CompactResult format="line" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} />
     </div>
   );
 }
 
-function CompactResult({ result, editable, onChange, label }: {
+function CompactResult({ format, result, editable, onChange, label }: {
+  format: "badge" | "line";
   result: Score | null;
   editable: boolean;
   onChange: (score: Score | null) => void;
@@ -165,9 +167,11 @@ function CompactResult({ result, editable, onChange, label }: {
     if (!isNaN(hh) && !isNaN(aa) && hh >= 0 && aa >= 0) onChange({ home: hh, away: aa });
     else if (hStr === "" && aStr === "") onChange(null);
   }
-  if (editable) {
+  const cls = format === "badge" ? "compact-result-badge" : "compact-result-line";
+  if (editable && result) {
     return (
-      <span className="compact-result-badge editable" title={label}>
+      <span className={`${cls} editable`} title={label}>
+        {format === "line" && <span className="compact-result-line-label">{label}:</span>}
         <input type="number" min="0" max="99" className="compact-score-input"
           value={h}
           onChange={(e) => { setH(e.target.value); commit(e.target.value, a); }} />
@@ -178,6 +182,17 @@ function CompactResult({ result, editable, onChange, label }: {
       </span>
     );
   }
-  if (!result) return <span className="compact-result-badge none" aria-hidden="true" />;
+  if (!result) {
+    // The badge keeps an empty placeholder to hold its grid column on desktop;
+    // the line simply renders nothing (no second row) for pending matches.
+    return format === "badge" ? <span className="compact-result-badge none" aria-hidden="true" /> : null;
+  }
+  if (format === "line") {
+    return (
+      <span className="compact-result-line">
+        <span className="compact-result-line-label">{label}:</span> {result.home}–{result.away}
+      </span>
+    );
+  }
   return <span className="compact-result-badge" title={label}>{result.home}–{result.away}</span>;
 }

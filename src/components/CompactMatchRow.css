@@ -91,20 +91,9 @@
 .compact-pen-pick.active { background: var(--prediction-blue); opacity: 1; color: var(--text-on-dark); }
 .compact-pen-pick:disabled { cursor: not-allowed; opacity: 0.3; }
 
-/* Narrow viewports: drop the inline result badge so team names keep their
-   width. The +3/+1/0 indicator still conveys correctness; the real score stays
-   visible in the expanded (non-compact) view. */
-@media (max-width: 600px) {
-  .compact-match-row { grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; }
-  .compact-result-badge { display: none; }
-}
-
-@media (max-width: 420px) {
-  .compact-match-row { grid-template-columns: 60px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; gap: 5px; font-size: 12px; padding: 5px 6px; }
-  .compact-team .team-flag { font-size: 14px; }
-  .compact-badge { font-size: 8px; padding: 2px 4px; }
-  .compact-score-input { width: 24px; height: 24px; font-size: 12px; }
-}
+/* Inline result badge (desktop, grid column 5). The full-width result line is
+   the mobile alternative, hidden here and revealed in the narrow media query. */
+.compact-result-line { display: none; }
 
 .compact-result-badge {
   width: 3rem;
@@ -131,4 +120,34 @@
   min-width: 0;
   height: 22px;
   font-size: 0.85em;
+}
+
+/* Media queries LAST so they win the cascade over the .editable variant above
+   (which has higher class-specificity than a bare .compact-result-badge). */
+
+/* Narrow viewports: drop the inline result-badge column entirely so team names
+   keep full width whether the match is pending or scored. The real score moves
+   to a full-width second line under the row, shown only when it exists. */
+@media (max-width: 600px) {
+  .compact-match-row { grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; }
+  .compact-result-badge,
+  .compact-result-badge.none,
+  .compact-result-badge.editable { display: none; }
+  .compact-result-line {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 6px;
+    padding: 1px 0 0 86px;
+    font-size: 11px; color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .compact-result-line-label { text-transform: uppercase; letter-spacing: 0.3px; font-weight: 700; opacity: 0.7; }
+  .compact-result-line .compact-score-input { width: 1.7rem; height: 22px; font-size: 0.85em; }
+}
+
+@media (max-width: 420px) {
+  .compact-match-row { grid-template-columns: 60px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; gap: 5px; font-size: 12px; padding: 5px 6px; }
+  .compact-team .team-flag { font-size: 14px; }
+  .compact-badge { font-size: 8px; padding: 2px 4px; }
+  .compact-score-input { width: 24px; height: 24px; font-size: 12px; }
+  .compact-result-line { padding-left: 66px; }
 }
