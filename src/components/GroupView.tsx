@@ -88,15 +88,15 @@ export function GroupView({ group }: GroupViewProps) {
                   dateUtc={match.dateUtc}
                   badgeLabel={t("schedule.stage.group", { group: match.group })}
                   badgeKind="group"
-                  currentScore={isPrediction ? match.prediction : match.result}
-                  realScore={match.result}
-                  isPrediction={isPrediction}
-                  locked={isPrediction && isMatchLocked(match.dateUtc)}
-                  synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-                  disabled={!editable && !isPrediction}
-                  lockedReason={t("autoSync.waitingResult")}
+                  prediction={match.prediction}
+                  result={match.result}
+                  predictionLocked={isMatchLocked(match.dateUtc)}
+                  resultEditable={editable}
+                  synced={state.syncedResultIds.includes(match.id)}
                   autoSyncTooltip={autoSyncTooltip}
-                  onScoreChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score })}
+                  pendingLabel={match.id}
+                  onPredictionChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score, field: "prediction" })}
+                  onResultChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score, field: "result" })}
                 />
               );
             })}

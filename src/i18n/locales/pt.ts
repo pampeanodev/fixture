@@ -194,6 +194,7 @@ export const pt = {
     ownerBadge: "👑",
     ownerBadgeTitle: "Criador da sala",
   },
+  matchCard: { resultBadge: "Resultado real" },
   scoreInput: {
     ariaHome: "Gols {team}", ariaAway: "Gols {team}",
     lockedTitle: "Fechado — falta 1 h para o apito inicial",

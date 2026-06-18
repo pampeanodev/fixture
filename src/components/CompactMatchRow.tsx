@@ -11,16 +11,15 @@ export interface CompactMatchRowProps {
   dateUtc: string;
   badgeLabel: string;
   badgeKind: "group" | "knockout";
-  currentScore: Score | null;
-  realScore: Score | null;        // for prediction-mode comparison only
-  isPrediction: boolean;
-  locked?: boolean;
+  prediction: Score | null;
+  result: Score | null;
+  predictionLocked: boolean;     // isMatchLocked -> prediction inputs read-only
+  resultEditable: boolean;       // fallback -> result badge becomes inputs
   synced?: boolean;
-  disabled?: boolean;
-  lockedReason?: string;
   autoSyncTooltip?: string;
-  pendingLabel?: string;          // shown when a team slot is unresolved (knockouts only)
-  onScoreChange: (score: Score | null) => void;
+  pendingLabel?: string;         // shown when a team slot is unresolved (knockouts only)
+  onPredictionChange: (score: Score | null) => void;
+  onResultChange: (score: Score | null) => void;
 }
 
 function penWinnerOf(score: Score | null): "home" | "away" | null {
@@ -32,26 +31,26 @@ function penWinnerOf(score: Score | null): "home" | "away" | null {
 
 export function CompactMatchRow(props: CompactMatchRowProps) {
   const {
-    homeTeamId, awayTeamId, dateUtc, badgeLabel, badgeKind, currentScore,
-    realScore, isPrediction, locked, synced, disabled, lockedReason,
-    autoSyncTooltip, pendingLabel, onScoreChange,
+    homeTeamId, awayTeamId, dateUtc, badgeLabel, badgeKind,
+    prediction, result, predictionLocked, resultEditable, synced,
+    autoSyncTooltip, pendingLabel, onPredictionChange, onResultChange,
   } = props;
   const { t, formatTime } = useLocale();
-  const [homeStr, setHomeStr] = useState(currentScore?.home?.toString() ?? "");
-  const [awayStr, setAwayStr] = useState(currentScore?.away?.toString() ?? "");
+  const [homeStr, setHomeStr] = useState(prediction?.home?.toString() ?? "");
+  const [awayStr, setAwayStr] = useState(prediction?.away?.toString() ?? "");
 
   useEffect(() => {
-    setHomeStr(currentScore?.home?.toString() ?? "");
-    setAwayStr(currentScore?.away?.toString() ?? "");
-  }, [currentScore]);
+    setHomeStr(prediction?.home?.toString() ?? "");
+    setAwayStr(prediction?.away?.toString() ?? "");
+  }, [prediction]);
 
-  function commitScore(hStr: string, aStr: string) {
+  function commitPrediction(hStr: string, aStr: string) {
     const h = parseInt(hStr, 10);
     const a = parseInt(aStr, 10);
     if (!isNaN(h) && !isNaN(a) && h >= 0 && a >= 0) {
-      onScoreChange({ home: h, away: a, penalties: currentScore?.penalties });
+      onPredictionChange({ home: h, away: a, penalties: prediction?.penalties });
     } else if (hStr === "" && aStr === "") {
-      onScoreChange(null);
+      onPredictionChange(null);
     }
   }
 
@@ -59,22 +58,19 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
   const awayTeam = awayTeamId ? getTeam(awayTeamId) : null;
   const bothKnown = homeTeamId !== null && awayTeamId !== null;
   const time = formatTime(dateUtc);
-  const effectiveDisabled = locked || disabled;
-  const inputTitle = effectiveDisabled
-    ? (locked ? undefined : (lockedReason ?? autoSyncTooltip))
-    : autoSyncTooltip;
-  const tied = currentScore !== null && currentScore.home === currentScore.away;
+  const inputTitle = predictionLocked ? undefined : autoSyncTooltip;
+  const tied = prediction !== null && prediction.home === prediction.away;
   const showPen = badgeKind === "knockout" && bothKnown && tied;
-  const penWinner = penWinnerOf(currentScore);
+  const penWinner = penWinnerOf(prediction);
 
   function pickPen(winner: "home" | "away") {
-    if (!currentScore || currentScore.home !== currentScore.away) return;
+    if (!prediction || prediction.home !== prediction.away) return;
     if (penWinner === winner) return;
     const penalties = winner === "home" ? { home: 1, away: 0 } : { home: 0, away: 1 };
-    onScoreChange({ ...currentScore, penalties });
+    onPredictionChange({ ...prediction, penalties });
   }
 
-  const scored = isPrediction ? indicatorFor(realScore, currentScore) : null;
+  const scored = indicatorFor(result, prediction);
   const indicator = scored ? { className: scored.kind, text: scored.label } : null;
 
   return (
@@ -97,18 +93,18 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
         {bothKnown ? (
           <>
             <input type="number" min="0" max="99"
-              className={`compact-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-              disabled={effectiveDisabled}
+              className={`compact-score-input prediction ${predictionLocked ? "locked" : ""}`}
+              disabled={predictionLocked}
               title={inputTitle}
               value={homeStr}
-              onChange={(e) => { setHomeStr(e.target.value); commitScore(e.target.value, awayStr); }} />
+              onChange={(e) => { setHomeStr(e.target.value); commitPrediction(e.target.value, awayStr); }} />
             <span className="compact-score-sep">–</span>
             <input type="number" min="0" max="99"
-              className={`compact-score-input ${isPrediction ? "prediction" : ""} ${locked ? "locked" : ""}`}
-              disabled={effectiveDisabled}
+              className={`compact-score-input prediction ${predictionLocked ? "locked" : ""}`}
+              disabled={predictionLocked}
               title={inputTitle}
               value={awayStr}
-              onChange={(e) => { setAwayStr(e.target.value); commitScore(homeStr, e.target.value); }} />
+              onChange={(e) => { setAwayStr(e.target.value); commitPrediction(homeStr, e.target.value); }} />
           </>
         ) : (
           <span className="compact-score-sep">{t("knockout.vs")}</span>
@@ -124,17 +120,17 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           <span className="compact-team-name pending">{pendingLabel ?? ""}</span>
         )}
       </span>
+      <CompactResult result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} />
       <span className={`compact-indicator ${indicator ? indicator.className : "none"}`}>
         {indicator ? indicator.text : "·"}
       </span>
-      {locked && !indicator && <span className="compact-status locked" title={lockedReason}>🔒</span>}
-      {synced && !indicator && <span className="compact-status synced" title={t("scoreInput.syncedTitle")}>↻</span>}
+      {synced && <span className="compact-status synced" title={t("scoreInput.syncedTitle")}>↻</span>}
       {showPen && (
         <div className="compact-pen-row">
           <span className="compact-pen-label">{t("scoreInput.penLabel")}</span>
           <button type="button"
             className={`compact-pen-pick ${penWinner === "home" ? "active" : ""}`}
-            disabled={effectiveDisabled}
+            disabled={predictionLocked}
             onClick={() => pickPen("home")}
             aria-pressed={penWinner === "home"}
             aria-label={t("scoreInput.penPickAria", { team: homeTeam ? t(`teams.${homeTeam.id}`) : "home" })}>
@@ -142,7 +138,7 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           </button>
           <button type="button"
             className={`compact-pen-pick ${penWinner === "away" ? "active" : ""}`}
-            disabled={effectiveDisabled}
+            disabled={predictionLocked}
             onClick={() => pickPen("away")}
             aria-pressed={penWinner === "away"}
             aria-label={t("scoreInput.penPickAria", { team: awayTeam ? t(`teams.${awayTeam.id}`) : "away" })}>
@@ -152,4 +148,33 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
       )}
     </div>
   );
+}
+
+function CompactResult({ result, editable, onChange, label }: {
+  result: Score | null;
+  editable: boolean;
+  onChange: (score: Score | null) => void;
+  label: string;
+}) {
+  const [h, setH] = useState(result?.home?.toString() ?? "");
+  const [a, setA] = useState(result?.away?.toString() ?? "");
+  useEffect(() => { setH(result?.home?.toString() ?? ""); setA(result?.away?.toString() ?? ""); }, [result]);
+  function commit(hStr: string, aStr: string) {
+    const hh = parseInt(hStr, 10), aa = parseInt(aStr, 10);
+    if (!isNaN(hh) && !isNaN(aa) && hh >= 0 && aa >= 0) onChange({ home: hh, away: aa });
+    else if (hStr === "" && aStr === "") onChange(null);
+  }
+  if (editable) {
+    return (
+      <span className="compact-result-badge editable" title={label}>
+        <input type="number" min="0" max="99" value={h}
+          onChange={(e) => { setH(e.target.value); commit(e.target.value, a); }} />
+        <span>–</span>
+        <input type="number" min="0" max="99" value={a}
+          onChange={(e) => { setA(e.target.value); commit(h, e.target.value); }} />
+      </span>
+    );
+  }
+  if (!result) return <span className="compact-result-badge none" aria-hidden="true" />;
+  return <span className="compact-result-badge" title={label}>{result.home}–{result.away}</span>;
 }

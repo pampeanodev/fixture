@@ -22,8 +22,8 @@ interface UnifiedMatch {
   stageValue: string; // group letter or round code
   isKnockout: boolean;
   hasResult: boolean;
-  currentScore: Score | null;
-  realScore: Score | null;
+  currentScore: Score | null; prediction: Score | null;
+  realScore: Score | null; result: Score | null;
   editable: boolean;
 }
 
@@ -48,8 +48,8 @@ export function ScheduleView() {
         homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId,
         stageKind: "group", stageValue: m.group, isKnockout: false,
         hasResult: m[scoreField] !== null,
-        currentScore: m[scoreField],
-        realScore: m.result,
+        currentScore: m[scoreField], prediction: m.prediction,
+        realScore: m.result, result: m.result,
         editable: isMatchEditable(m, ctx),
       });
     }
@@ -59,8 +59,8 @@ export function ScheduleView() {
         homeTeamId: m.homeTeamId, awayTeamId: m.awayTeamId,
         stageKind: "knockout", stageValue: m.round, isKnockout: true,
         hasResult: m[scoreField] !== null,
-        currentScore: m[scoreField],
-        realScore: m.result,
+        currentScore: m[scoreField], prediction: m.prediction,
+        realScore: m.result, result: m.result,
         editable: isMatchEditable(m, ctx),
       });
     }
@@ -90,11 +90,11 @@ export function ScheduleView() {
 
   const autoSyncMeta = loadAutoSyncMeta();
 
-  function handleScoreChange(matchId: string, isKnockout: boolean, score: Score | null) {
+  function handleScoreChange(matchId: string, isKnockout: boolean, score: Score | null, field: "prediction" | "result") {
     if (isKnockout) {
-      dispatch({ type: "SET_KNOCKOUT_SCORE", matchId, score });
+      dispatch({ type: "SET_KNOCKOUT_SCORE", matchId, score, field });
     } else {
-      dispatch({ type: "SET_GROUP_SCORE", matchId, score });
+      dispatch({ type: "SET_GROUP_SCORE", matchId, score, field });
     }
   }
 
@@ -130,16 +130,15 @@ export function ScheduleView() {
                     dateUtc={match.dateUtc}
                     badgeLabel={stageLabelFor(match)}
                     badgeKind={match.isKnockout ? "knockout" : "group"}
-                    currentScore={match.currentScore}
-                    realScore={match.realScore}
-                    isPrediction={isPrediction}
-                    locked={isPrediction && isMatchLocked(match.dateUtc)}
-                    synced={!isPrediction && state.syncedResultIds.includes(match.id)}
-                    disabled={!match.editable && !isPrediction}
-                    lockedReason={t("autoSync.waitingResult")}
+                    prediction={match.prediction}
+                    result={match.result}
+                    predictionLocked={isMatchLocked(match.dateUtc)}
+                    resultEditable={match.editable}
+                    synced={state.syncedResultIds.includes(match.id)}
                     autoSyncTooltip={autoSyncTooltip}
                     pendingLabel={match.id}
-                    onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
+                    onPredictionChange={(score) => handleScoreChange(match.id, match.isKnockout, score, "prediction")}
+                    onResultChange={(score) => handleScoreChange(match.id, match.isKnockout, score, "result")}
                   />
                 );
               })}
@@ -162,7 +161,7 @@ export function ScheduleView() {
                     disabled={!match.editable && !isPrediction}
                     lockedReason={t("autoSync.waitingResult")}
                     autoSyncTooltip={autoSyncTooltip}
-                    onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score)}
+                    onScoreChange={(score) => handleScoreChange(match.id, match.isKnockout, score, scoreField)}
                   />
                 );
               })}

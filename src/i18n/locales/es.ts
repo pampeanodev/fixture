@@ -192,6 +192,7 @@ export const es = {
     ownerBadge: "👑",
     ownerBadgeTitle: "Creador de la sala",
   },
+  matchCard: { resultBadge: "Resultado real" },
   scoreInput: {
     ariaHome: "Goles {team}", ariaAway: "Goles {team}",
     lockedTitle: "Cerrado — falta 1 h para el kickoff",

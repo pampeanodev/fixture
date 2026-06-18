@@ -194,6 +194,7 @@ export const en = {
     ownerBadge: "👑",
     ownerBadgeTitle: "Room creator",
   },
+  matchCard: { resultBadge: "Real result" },
   scoreInput: {
     ariaHome: "Goals {team}", ariaAway: "Goals {team}",
     lockedTitle: "Locked — 1 h before kickoff",

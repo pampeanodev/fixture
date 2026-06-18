@@ -13,7 +13,6 @@ const ROUND_TABS: KnockoutRound[] = ["R32", "R16", "QF", "SF", "F"];
 export function BracketMobile({ round }: { round: KnockoutRound }) {
   const { state, dispatch, resolvedKnockout } = useFixture();
   const { t } = useLocale();
-  const isPrediction = state.mode === "predictions";
   const roundsToShow: KnockoutRound[] = round === "F" ? ["F", "3P"] : [round];
   const breakerState = loadBreakerState();
   const now = getEffectiveNow();
@@ -56,16 +55,15 @@ export function BracketMobile({ round }: { round: KnockoutRound }) {
                     dateUtc={m.dateUtc}
                     badgeLabel={t(`knockout.rounds.${m.round}`)}
                     badgeKind="knockout"
-                    currentScore={isPrediction ? m.prediction : m.result}
-                    realScore={m.result}
-                    isPrediction={isPrediction}
-                    locked={isPrediction && isMatchLocked(m.dateUtc)}
-                    synced={!isPrediction && state.syncedResultIds.includes(m.id)}
-                    disabled={!editable && !isPrediction}
-                    lockedReason={t("autoSync.waitingResult")}
+                    prediction={m.prediction}
+                    result={m.result}
+                    predictionLocked={isMatchLocked(m.dateUtc)}
+                    resultEditable={editable}
+                    synced={state.syncedResultIds.includes(m.id)}
                     autoSyncTooltip={autoSyncTooltip}
                     pendingLabel={m.id}
-                    onScoreChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: m.id, score })}
+                    onPredictionChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: m.id, score, field: "prediction" })}
+                    onResultChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: m.id, score, field: "result" })}
                   />
                 );
               })}
