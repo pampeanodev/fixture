@@ -158,6 +158,7 @@ function CompactResult({ result, editable, onChange, label }: {
 }) {
   const [h, setH] = useState(result?.home?.toString() ?? "");
   const [a, setA] = useState(result?.away?.toString() ?? "");
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- controlled-input resync to external result, matches the prediction-input pattern above
   useEffect(() => { setH(result?.home?.toString() ?? ""); setA(result?.away?.toString() ?? ""); }, [result]);
   function commit(hStr: string, aStr: string) {
     const hh = parseInt(hStr, 10), aa = parseInt(aStr, 10);
@@ -167,10 +168,12 @@ function CompactResult({ result, editable, onChange, label }: {
   if (editable) {
     return (
       <span className="compact-result-badge editable" title={label}>
-        <input type="number" min="0" max="99" value={h}
+        <input type="number" min="0" max="99" className="compact-score-input"
+          value={h}
           onChange={(e) => { setH(e.target.value); commit(e.target.value, a); }} />
         <span>–</span>
-        <input type="number" min="0" max="99" value={a}
+        <input type="number" min="0" max="99" className="compact-score-input"
+          value={a}
           onChange={(e) => { setA(e.target.value); commit(h, e.target.value); }} />
       </span>
     );

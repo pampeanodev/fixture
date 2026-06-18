@@ -118,8 +118,9 @@
   align-items: center;
   gap: 2px;
 }
-.compact-result-badge.editable input {
-  width: 1.4rem;
-  text-align: center;
+.compact-result-badge.editable .compact-score-input {
+  width: 1.3rem;
+  min-width: 0;
+  height: 22px;
   font-size: 0.85em;
 }
