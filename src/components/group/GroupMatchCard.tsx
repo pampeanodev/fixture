@@ -69,16 +69,19 @@ export function GroupMatchCard(props: GroupMatchCardProps) {
       {synced && <div className="group-match-synced" title={t("groups.matchCard.syncedTitle")}>{t("groups.matchCard.synced")}</div>}
       <ResultRow result={result} editable={resultEditable} onChange={onResultChange}
         label={t("groups.matchCard.real")}
+        locked={predictionLocked} lockedLabel={t("groups.matchCard.locked")}
         indicator={scored ? { className: scored.kind, text: scored.label } : null} />
     </div>
   );
 }
 
-function ResultRow({ result, editable, onChange, label, indicator }: {
+function ResultRow({ result, editable, onChange, label, locked, lockedLabel, indicator }: {
   result: Score | null;
   editable: boolean;
   onChange: (score: Score | null) => void;
   label: string;
+  locked: boolean;
+  lockedLabel: string;
   indicator: { className: string; text: string } | null;
 }) {
   const [h, setH] = useState(result?.home?.toString() ?? "");
@@ -102,7 +105,11 @@ function ResultRow({ result, editable, onChange, label, indicator }: {
       </div>
     );
   }
-  if (!result) return null;
+  if (!result) {
+    // No result yet. While predictions are locked (match in progress / closed),
+    // show the lock indicator instead of leaving the row blank.
+    return locked ? <div className="group-match-locked">{lockedLabel}</div> : null;
+  }
   return (
     <div className="group-match-result-row">
       {label}: {result.home} - {result.away}

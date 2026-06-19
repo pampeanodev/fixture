@@ -18,19 +18,18 @@ export function isMatchEditable(
   ctx: EditabilityContext,
 ): boolean {
   // Auto-sync is always on (ESPN is the source of truth). Manual entry only
-  // unlocks as a fallback, and only once a match has kicked off — a match that
-  // hasn't started has no result to enter, so the fallback must never turn
-  // future matches into editable empty fields (even when the breaker is tripped).
+  // unlocks as a fallback, and only once a match should already be OVER — never
+  // while it is in progress. A match still being played has no final result to
+  // enter, so showing empty manual-entry fields then is premature; it shows the
+  // lock indicator instead. The grace window doubles as "the match should be
+  // finished by now", so we gate manual entry behind it in every case —
+  // including when the breaker is tripped.
   const kickoff = new Date(match.dateUtc).getTime();
-  if (ctx.now < kickoff) return false;
-
-  // API down (breaker) → manual entry for any kicked-off match.
-  if (ctx.circuitBreakerTripped) return true;
-
-  // API up but well past kickoff with still no result → grace elapsed, fall back.
   const grace = isKnockout(match) ? GRACE_PERIOD_KO_MS : GRACE_PERIOD_GROUP_MS;
-  const stale = ctx.now > kickoff + grace && match.result === null;
-  if (stale) return true;
+  if (ctx.now <= kickoff + grace) return false;
 
-  return false;
+  // The match should be over by now. API down (breaker) → allow manual entry or
+  // correction. API up but it still never delivered a result → stale fallback.
+  if (ctx.circuitBreakerTripped) return true;
+  return match.result === null;
 }

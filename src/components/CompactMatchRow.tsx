@@ -120,7 +120,7 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           <span className="compact-team-name pending">{pendingLabel ?? ""}</span>
         )}
       </span>
-      <CompactResult format="badge" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} />
+      <CompactResult format="badge" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} locked={predictionLocked} lockedLabel={t("scoreInput.lockedBadge")} />
       <span className={`compact-indicator ${indicator ? indicator.className : "none"}`}>
         {indicator ? indicator.text : "·"}
       </span>
@@ -146,17 +146,19 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
           </button>
         </div>
       )}
-      <CompactResult format="line" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} />
+      <CompactResult format="line" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} locked={predictionLocked} lockedLabel={t("scoreInput.lockedBadge")} />
     </div>
   );
 }
 
-function CompactResult({ format, result, editable, onChange, label }: {
+function CompactResult({ format, result, editable, onChange, label, locked, lockedLabel }: {
   format: "badge" | "line";
   result: Score | null;
   editable: boolean;
   onChange: (score: Score | null) => void;
   label: string;
+  locked: boolean;
+  lockedLabel: string;
 }) {
   const [h, setH] = useState(result?.home?.toString() ?? "");
   const [a, setA] = useState(result?.away?.toString() ?? "");
@@ -183,8 +185,16 @@ function CompactResult({ format, result, editable, onChange, label }: {
     );
   }
   if (!result) {
-    // The badge keeps an empty placeholder to hold its grid column on desktop;
-    // the line simply renders nothing (no second row) for pending matches.
+    // No result yet. While predictions are locked (match in progress / closed),
+    // show the lock indicator: just the padlock in the tight desktop badge
+    // column, the full label on the mobile result line.
+    if (locked) {
+      return format === "badge"
+        ? <span className="compact-result-badge locked" title={lockedLabel}>🔒</span>
+        : <span className="compact-result-line locked">{lockedLabel}</span>;
+    }
+    // Otherwise the badge keeps an empty placeholder to hold its grid column on
+    // desktop; the line simply renders nothing (no second row) for pending matches.
     return format === "badge" ? <span className="compact-result-badge none" aria-hidden="true" /> : null;
   }
   if (format === "line") {

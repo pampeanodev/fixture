@@ -90,7 +90,11 @@ export function useAutoResultSync(): void {
     }
 
     inFlightRef.current = true;
-    abortRef.current = new AbortController();
+    // Keep a local handle: an overlapping tick (React 19 StrictMode remount)
+    // can reassign abortRef.current before this fetch settles, so the catch
+    // below must check THIS controller, not whatever abortRef points at later.
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     const tickOutcome: TickOutcome = { applied: 0, skipped: 0, networkFailed: false };
     const appliedIds: string[] = [];
@@ -100,7 +104,7 @@ export function useAutoResultSync(): void {
     try {
       const raw = await fetchScoreboard({
         dates: buildFetchDates(now),
-        signal: abortRef.current.signal,
+        signal: controller.signal,
       });
       const events = parseScoreboard(raw);
       const allMatches = [
@@ -163,11 +167,10 @@ export function useAutoResultSync(): void {
     } catch (err) {
       // Our own AbortController cancelling the in-flight fetch on cleanup is not
       // a network failure — don't log it and don't count it toward the breaker
-      // (otherwise routine re-renders/visibility changes could trip it).
-      const aborted =
-        (err instanceof DOMException && err.name === "AbortError") ||
-        abortRef.current?.signal.aborted === true;
-      if (!aborted) {
+      // (otherwise routine re-renders/visibility changes could trip it). Check
+      // THIS fetch's controller; a timeout aborts a different (internal) one and
+      // must still count as a real failure.
+      if (!controller.signal.aborted) {
         tickOutcome.networkFailed = true;
         const msg = err instanceof AutoSyncNetworkError ? err.message : String(err);
         console.warn(`[autosync] network: ${msg}`);

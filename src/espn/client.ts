@@ -47,6 +47,10 @@ export async function fetchScoreboard(
     return (await res.json()) as EspnRawScoreboard;
   } catch (err) {
     if (err instanceof AutoSyncNetworkError) throw err;
+    // Preserve abort identity: a cancelled fetch (caller cleanup) or the timeout
+    // both reject with an AbortError. Wrapping it would erase `name` and make
+    // callers misclassify a benign cancellation as a network failure.
+    if (err instanceof DOMException && err.name === "AbortError") throw err;
     const msg = err instanceof Error ? err.message : String(err);
     throw new AutoSyncNetworkError(msg);
   } finally {

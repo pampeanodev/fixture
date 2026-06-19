@@ -109,6 +109,7 @@
   align-self: center;
 }
 .compact-result-badge.none { background: transparent; }
+.compact-result-badge.locked { background: transparent; font-size: 0.95em; }
 .compact-result-badge.editable {
   background: transparent;
   display: inline-flex;
@@ -132,6 +133,7 @@
   .compact-match-row { grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; }
   .compact-result-badge,
   .compact-result-badge.none,
+  .compact-result-badge.locked,
   .compact-result-badge.editable { display: none; }
   .compact-result-line {
     grid-column: 1 / -1;

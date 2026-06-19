@@ -96,16 +96,19 @@ export function ScheduleMatchCard(props: ScheduleMatchCardProps) {
       {synced && <div className="schedule-synced" title={t("schedule.matchCard.syncedTitle")}>{t("schedule.matchCard.synced")}</div>}
       <ScheduleResultRow result={match.result} editable={resultEditable && bothKnown} onChange={onResultChange}
         label={t("schedule.matchCard.real")}
+        locked={predictionLocked} lockedLabel={t("schedule.matchCard.locked")}
         indicator={scored ? { className: scored.kind, text: scored.label } : null} />
     </div>
   );
 }
 
-function ScheduleResultRow({ result, editable, onChange, label, indicator }: {
+function ScheduleResultRow({ result, editable, onChange, label, locked, lockedLabel, indicator }: {
   result: Score | null;
   editable: boolean;
   onChange: (score: Score | null) => void;
   label: string;
+  locked: boolean;
+  lockedLabel: string;
   indicator: { className: string; text: string } | null;
 }) {
   const [h, setH] = useState(result?.home?.toString() ?? "");
@@ -129,7 +132,11 @@ function ScheduleResultRow({ result, editable, onChange, label, indicator }: {
       </div>
     );
   }
-  if (!result) return null;
+  if (!result) {
+    // No result yet. While predictions are locked (match in progress / closed),
+    // show the lock indicator instead of leaving the card blank.
+    return locked ? <div className="schedule-locked">{lockedLabel}</div> : null;
+  }
   return (
     <div className="schedule-result-row">
       {label}: {result.home} - {result.away}

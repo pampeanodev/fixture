@@ -199,7 +199,14 @@ const FixtureContext = createContext<FixtureContextValue | null>(null);
 
 export function FixtureProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(fixtureReducer, undefined, buildInitialState);
-  const scoreField = state.mode === "predictions" ? "prediction" : "result";
+  // Unified view (f5.2, no mode toggle): group standings and the knockout
+  // bracket always reflect REAL results — ESPN is the source of truth. The
+  // user's predictions are per-match overlays for scoring only, never the
+  // bracket's structure. The simulator writes its generated outcomes into the
+  // `result` field too (ENTER_SIMULATION sets mode="results", and its field-less
+  // score dispatches route there), so "result" is correct during simulation as
+  // well. `state.mode` survives only to route those reducer writes.
+  const scoreField: "prediction" | "result" = "result";
 
   const standingsByGroup = useMemo(() => {
     const result: Record<string, StandingRow[]> = {};

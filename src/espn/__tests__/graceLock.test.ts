@@ -35,11 +35,34 @@ function koMatch(overrides: Partial<KnockoutMatch> = {}): KnockoutMatch {
 const kickoff = new Date("2026-06-15T18:00:00Z").getTime();
 
 describe("isMatchEditable", () => {
-  it("is editable when circuit breaker is tripped and the match has kicked off", () => {
+  it("is NOT editable while the match is in progress, even when the breaker is tripped", () => {
+    // A match that has kicked off but is still inside the grace window is "in
+    // progress": there is no final result to enter yet, so it shows the lock
+    // indicator rather than empty manual-entry fields.
     expect(
       isMatchEditable(groupMatch(), {
         circuitBreakerTripped: true,
         now: kickoff + 10_000,
+      }),
+    ).toBe(false);
+  });
+
+  it("is editable once the match should be over and the breaker is tripped", () => {
+    expect(
+      isMatchEditable(groupMatch(), {
+        circuitBreakerTripped: true,
+        now: kickoff + GRACE_PERIOD_GROUP_MS + 60_000,
+      }),
+    ).toBe(true);
+  });
+
+  it("allows manual correction after grace when the breaker is tripped even if a result exists", () => {
+    // ESPN is unreachable (breaker tripped); the stored result may be stale, so
+    // the admin can still overwrite it manually once the match is over.
+    expect(
+      isMatchEditable(groupMatch({ result: { home: 2, away: 1 } }), {
+        circuitBreakerTripped: true,
+        now: kickoff + GRACE_PERIOD_GROUP_MS + 60_000,
       }),
     ).toBe(true);
   });
