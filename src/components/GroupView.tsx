@@ -15,10 +15,11 @@ import "./GroupView.css";
 interface GroupViewProps { group: string; }
 
 export function GroupView({ group }: GroupViewProps) {
-  const { state, dispatch, standingsByGroup } = useFixture();
+  const { state, dispatch, standingsByGroup, groupSeedsConfirmed } = useFixture();
   const { t } = useLocale();
   const { mode: viewMode } = useViewMode();
   const standings = standingsByGroup[group] ?? [];
+  const confirmedTeamIds = groupSeedsConfirmed[group];
   const matches = state.groupMatches
     .filter((m) => m.group === group)
     .sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
@@ -41,7 +42,7 @@ export function GroupView({ group }: GroupViewProps) {
 
       {viewMode === "compact" ? (
         <>
-          <CompactStandings standings={standings} />
+          <CompactStandings standings={standings} confirmedTeamIds={confirmedTeamIds} />
           <div className="group-matches-title">{t("groups.matches")}</div>
           <div className="group-matches-compact" data-tour="match-cards">
             {matches.map((match) => {
@@ -97,7 +98,7 @@ export function GroupView({ group }: GroupViewProps) {
                 const team = getTeam(row.teamId);
                 return (
                   <tr key={row.teamId} className={i < 2 ? "qualify" : i === 2 ? "maybe-qualify" : ""}>
-                    <td><div className="team-cell"><span className="team-flag">{team?.flag}</span><span>{team ? t(`teams.${team.id}`) : row.teamId}</span></div></td>
+                    <td><div className="team-cell"><span className="team-flag">{team?.flag}</span><span>{team ? t(`teams.${team.id}`) : row.teamId}</span>{confirmedTeamIds?.has(row.teamId) && <span className="group-confirmed" title={t("knockout.confirmed")}>✓</span>}</div></td>
                     <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
                     <td>{row.goalsFor}</td><td>{row.goalsAgainst}</td>
                     <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>

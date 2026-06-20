@@ -4,7 +4,10 @@ import { useLocale } from "../i18n";
 import type { StandingRow } from "../types";
 import "./CompactStandings.css";
 
-export function CompactStandings({ standings }: { standings: StandingRow[] }) {
+export function CompactStandings({ standings, confirmedTeamIds }: {
+  standings: StandingRow[];
+  confirmedTeamIds?: Set<string>;
+}) {
   const { t } = useLocale();
   const initialMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
   const [collapsed, setCollapsed] = useState(initialMobile);
@@ -38,6 +41,9 @@ export function CompactStandings({ standings }: { standings: StandingRow[] }) {
                   <td>
                     <span className="team-flag">{team?.flag}</span>
                     <span>{team ? t(`teams.${team.id}`) : row.teamId}</span>
+                    {confirmedTeamIds?.has(row.teamId) && (
+                      <span className="group-confirmed" title={t("knockout.confirmed")}>✓</span>
+                    )}
                   </td>
                   <td>{row.played}</td>
                   <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>

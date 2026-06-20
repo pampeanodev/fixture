@@ -196,6 +196,8 @@ interface FixtureContextValue {
   // Per knockout match: whether each team slot is locked by real results
   // (true) vs only projected from a prediction (false). Keyed by match id.
   knockoutConfirmation: Record<string, { home: boolean; away: boolean }>;
+  // Per group: team ids whose finishing position is locked by real results.
+  groupSeedsConfirmed: Record<string, Set<string>>;
   bestThirds: { qualifying: ThirdPlaceEntry[]; eliminated: ThirdPlaceEntry[] };
 }
 
@@ -300,6 +302,23 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
     return out;
   }, [resolvedKnockout, confirmedKnockout]);
 
+  // Per group: the set of teams whose finishing position is already locked by
+  // real results (same clinching logic as the bracket ✓). A completed group has
+  // every position settled; an unfinished one only those mathematically clinched.
+  const groupSeedsConfirmed = useMemo(() => {
+    const out: Record<string, Set<string>> = {};
+    for (const group of GROUPS) {
+      const gm = state.groupMatches.filter((m) => m.group === group);
+      const teamIds = TEAMS.filter((t) => t.group === group).map((t) => t.id);
+      const complete = gm.length > 0 && gm.every((m) => m.result !== null);
+      const ids = complete
+        ? calculateStandings(gm, teamIds, "result").map((r) => r.teamId)
+        : clinchedGroupPositions(gm, teamIds, "result");
+      out[group] = new Set(ids.filter((id): id is string => !!id));
+    }
+    return out;
+  }, [state.groupMatches]);
+
   // Persist match data
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
@@ -324,8 +343,8 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
   useEffect(() => { saveSyncedResultIds(state.syncedResultIds); }, [state.syncedResultIds]);
 
   const value = useMemo(
-    () => ({ state, dispatch, standingsByGroup, resolvedKnockout, knockoutConfirmation, bestThirds }),
-    [state, standingsByGroup, resolvedKnockout, knockoutConfirmation, bestThirds]
+    () => ({ state, dispatch, standingsByGroup, resolvedKnockout, knockoutConfirmation, groupSeedsConfirmed, bestThirds }),
+    [state, standingsByGroup, resolvedKnockout, knockoutConfirmation, groupSeedsConfirmed, bestThirds]
   );
 
   return <FixtureContext.Provider value={value}>{children}</FixtureContext.Provider>;

@@ -1,3 +1,13 @@
+/* Badge on a team whose finishing position is locked by real results (same
+   meaning as the bracket ✓). Used in both the compact and full standings. */
+.group-confirmed {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; margin-left: 6px;
+  border-radius: 50%; background: var(--accent-green, #2e7d32);
+  color: #fff; font-size: 8px; font-weight: 700; line-height: 1;
+  vertical-align: middle;
+}
+
 /* Group tabs */
 .group-tabs {
   display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px;
