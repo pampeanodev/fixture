@@ -1,6 +1,7 @@
 // src/utils/knockout.ts
-import type { KnockoutMatch, KnockoutSlot, Score, ScoreField, StandingRow } from "../types";
+import type { KnockoutMatch, KnockoutSlot, Score, ScoreSource, StandingRow } from "../types";
 import type { ThirdPlaceAssignment } from "../data/thirdPlaceMapping";
+import { effectiveScore } from "./effectiveScore";
 
 function getWinner(homeTeamId: string | null, awayTeamId: string | null, score: Score | null): string | null {
   if (!homeTeamId || !awayTeamId || !score) return null;
@@ -25,7 +26,7 @@ function resolveSlot(
   thirdAssignment: ThirdPlaceAssignment,
   matchMap: Map<string, KnockoutMatch>,
   qualifyingThirdGroups: string[],
-  scoreField: ScoreField
+  scoreField: ScoreSource
 ): string | null {
   switch (slot.type) {
     case "group": {
@@ -47,12 +48,12 @@ function resolveSlot(
     case "winner": {
       const prev = matchMap.get(slot.matchId);
       if (!prev) return null;
-      return getWinner(prev.homeTeamId, prev.awayTeamId, prev[scoreField]);
+      return getWinner(prev.homeTeamId, prev.awayTeamId, effectiveScore(prev, scoreField));
     }
     case "loser": {
       const prev = matchMap.get(slot.matchId);
       if (!prev) return null;
-      return getLoser(prev.homeTeamId, prev.awayTeamId, prev[scoreField]);
+      return getLoser(prev.homeTeamId, prev.awayTeamId, effectiveScore(prev, scoreField));
     }
   }
 }
@@ -62,7 +63,7 @@ export function resolveKnockoutTeams(
   standingsByGroup: Record<string, StandingRow[]>,
   thirdAssignment: ThirdPlaceAssignment,
   qualifyingThirdGroups: string[],
-  scoreField: ScoreField = "result"
+  scoreField: ScoreSource = "result"
 ): KnockoutMatch[] {
   const matchMap = new Map<string, KnockoutMatch>();
   const resolved = matches.map((m) => ({ ...m }));

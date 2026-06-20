@@ -72,4 +72,24 @@ describe("calculateStandings", () => {
     const standings = calculateStandings(matches, ["T1", "T2"], "prediction");
     expect(standings.find((s) => s.teamId === "T1")!.points).toBe(3);
   });
+
+  it("hybrid uses real results where they exist and predictions where they don't", () => {
+    const matches: GroupMatch[] = [
+      // Played: real result T1 beats T2.
+      { id: "1", group: "A", homeTeamId: "T1", awayTeamId: "T2",
+        dateUtc: "2026-06-11T19:00:00Z", venue: "Test",
+        result: { home: 2, away: 0 }, prediction: { home: 0, away: 3 } },
+      // Not played yet: only a prediction (T1 beats T3).
+      { id: "2", group: "A", homeTeamId: "T1", awayTeamId: "T3",
+        dateUtc: "2026-06-15T19:00:00Z", venue: "Test",
+        result: null, prediction: { home: 1, away: 0 } },
+    ];
+    const standings = calculateStandings(matches, ["T1", "T2", "T3"], "hybrid");
+    const t1 = standings.find((s) => s.teamId === "T1")!;
+    // Real win (match 1) + projected win (match 2) = 6 points, ignoring the
+    // overridden prediction on the already-played match.
+    expect(t1.points).toBe(6);
+    expect(t1.played).toBe(2);
+    expect(standings.find((s) => s.teamId === "T2")!.points).toBe(0);
+  });
 });

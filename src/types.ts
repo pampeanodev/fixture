@@ -101,6 +101,12 @@ export interface SimulationSnapshot {
 
 export type ScoreField = "prediction" | "result";
 
+// Where standings / bracket projection read a match's score from. "hybrid" uses
+// the real result once it exists and falls back to the prediction otherwise, so
+// played fixtures reflect reality while yet-to-be-played ones stay projected
+// from the user's (locked) predictions.
+export type ScoreSource = "prediction" | "result" | "hybrid";
+
 export type FixtureAction =
   | { type: "SET_GROUP_SCORE"; matchId: string; score: Score | null; field?: ScoreField }
   | { type: "SET_KNOCKOUT_SCORE"; matchId: string; score: Score | null; field?: ScoreField }

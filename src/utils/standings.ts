@@ -1,10 +1,11 @@
 // src/utils/standings.ts
-import type { GroupMatch, StandingRow, Score } from "../types";
+import type { GroupMatch, StandingRow, Score, ScoreSource } from "../types";
+import { effectiveScore } from "./effectiveScore";
 
 export function calculateStandings(
   matches: GroupMatch[],
   teamIds: string[],
-  scoreField: "result" | "prediction" = "result"
+  scoreField: ScoreSource = "result"
 ): StandingRow[] {
   const map = new Map<string, StandingRow>();
 
@@ -16,7 +17,7 @@ export function calculateStandings(
   }
 
   for (const match of matches) {
-    const score: Score | null = match[scoreField];
+    const score: Score | null = effectiveScore(match, scoreField);
     if (!score) continue;
     const home = map.get(match.homeTeamId);
     const away = map.get(match.awayTeamId);
