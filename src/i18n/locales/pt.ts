@@ -112,6 +112,11 @@ export const pt = {
       loserOf: "Perdedor {matchId}",
     },
     vs: "vs",
+    confirmed: "Confirmado por resultado real",
+    legend: {
+      confirmed: "Confirmado por resultado real",
+      projectedHint: "sem marca = projetado do seu palpite",
+    },
     bracket: {
       collapseAria: "Recolher {round}",
       expandAria: "Expandir {round}",

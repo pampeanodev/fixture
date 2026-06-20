@@ -29,6 +29,23 @@
 .bracket-team.pending { color: #bbb; font-weight: 400; font-style: italic; }
 .bracket-venue { font-size: 10px; color: #aaa; margin-top: 6px; }
 
+/* Badge on a team locked in by a real result (projected teams stay unmarked). */
+.bk-confirmed {
+  flex-shrink: 0;
+  width: 15px; height: 15px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-green, #2e7d32);
+  color: #fff; font-size: 9px; font-weight: 700; line-height: 1;
+}
+/* Bracket legend: a single reference for the ✓ badge, with the "no mark" case
+   as a muted clarification on the same line (projected teams draw nothing). */
+.bracket-legend {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  margin-bottom: 16px; font-size: 12px; color: var(--content-text);
+}
+.bracket-legend-hint { color: var(--text-muted, #999); }
+
 /* Compact mode: bracket-tree visible on desktop, mobile fallback on small screens */
 .bracket-mobile-fallback { display: none; }
 .bracket-mobile-list {

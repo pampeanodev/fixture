@@ -19,9 +19,10 @@ function slotShort(t: TFunction, match: KnockoutMatch, side: "home" | "away"): s
 }
 
 export function BracketMatchCard({ match, variant = "regular" }: { match: KnockoutMatch; variant?: "regular" | "final" | "third" }) {
-  const { dispatch } = useFixture();
+  const { dispatch, knockoutConfirmation } = useFixture();
   const { t } = useLocale();
   const prediction = match.prediction;
+  const confirmed = knockoutConfirmation[match.id];
 
   const [homeStr, setHomeStr] = useState(prediction?.home?.toString() ?? "");
   const [awayStr, setAwayStr] = useState(prediction?.away?.toString() ?? "");
@@ -65,6 +66,7 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
       <div className={`bk-card-team ${homeTeam ? "" : "pending"}`}>
         <span className="bk-card-flag">{homeTeam?.flag ?? "·"}</span>
         <span className="bk-card-name">{homeTeam ? t(`teams.${homeTeam.id}`) : slotShort(t, match, "home")}</span>
+        {homeTeam && confirmed?.home && <span className="bk-confirmed" title={t("knockout.confirmed")}>✓</span>}
         {bothKnown && (
           <input type="number" min="0" max="99"
             className="bk-card-input prediction"
@@ -76,6 +78,7 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
       <div className={`bk-card-team ${awayTeam ? "" : "pending"}`}>
         <span className="bk-card-flag">{awayTeam?.flag ?? "·"}</span>
         <span className="bk-card-name">{awayTeam ? t(`teams.${awayTeam.id}`) : slotShort(t, match, "away")}</span>
+        {awayTeam && confirmed?.away && <span className="bk-confirmed" title={t("knockout.confirmed")}>✓</span>}
         {bothKnown && (
           <input type="number" min="0" max="99"
             className="bk-card-input prediction"

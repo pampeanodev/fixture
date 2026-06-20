@@ -112,6 +112,11 @@ export const en = {
       loserOf: "Loser {matchId}",
     },
     vs: "vs",
+    confirmed: "Confirmed by a real result",
+    legend: {
+      confirmed: "Confirmed by a real result",
+      projectedHint: "no mark = projected from your prediction",
+    },
     bracket: {
       collapseAria: "Collapse {round}",
       expandAria: "Expand {round}",

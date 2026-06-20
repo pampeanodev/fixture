@@ -192,6 +192,9 @@ interface FixtureContextValue {
   dispatch: React.Dispatch<FixtureAction>;
   standingsByGroup: Record<string, StandingRow[]>;
   resolvedKnockout: KnockoutMatch[];
+  // Per knockout match: whether each team slot is locked by real results
+  // (true) vs only projected from a prediction (false). Keyed by match id.
+  knockoutConfirmation: Record<string, { home: boolean; away: boolean }>;
   bestThirds: { qualifying: ThirdPlaceEntry[]; eliminated: ThirdPlaceEntry[] };
 }
 
@@ -235,6 +238,55 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
     return resolveKnockoutTeams(state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds.qualifying.map((t) => t.group), scoreField);
   }, [state.knockoutMatches, standingsByGroup, thirdAssignment, bestThirds, scoreField]);
 
+  // A second, "confirmed" resolution derived from REAL results only, used to
+  // tell which bracket teams are locked by reality vs merely projected from
+  // predictions. Conservative on purpose (never over-claims): a group only
+  // counts once every one of its matches has a real result, and best-thirds
+  // only once *all* groups are complete (the qualifying set isn't decided
+  // before then). The unified bracket itself still uses the hybrid resolution
+  // above; this is purely a provenance signal for styling.
+  const confirmedKnockout = useMemo(() => {
+    const groupComplete = (group: string) => {
+      const gm = state.groupMatches.filter((m) => m.group === group);
+      return gm.length > 0 && gm.every((m) => m.result !== null);
+    };
+    const confirmedStandings: Record<string, StandingRow[]> = {};
+    for (const group of GROUPS) {
+      if (!groupComplete(group)) { confirmedStandings[group] = []; continue; }
+      const teamIds = TEAMS.filter((t) => t.group === group).map((t) => t.id);
+      confirmedStandings[group] = calculateStandings(
+        state.groupMatches.filter((m) => m.group === group), teamIds, "result",
+      );
+    }
+    const allGroupsComplete = GROUPS.every(groupComplete);
+    const confirmedThirds: ThirdPlaceEntry[] = [];
+    if (allGroupsComplete) {
+      for (const group of GROUPS) {
+        const s = confirmedStandings[group];
+        if (s && s.length >= 3) confirmedThirds.push({ group, standing: s[2] });
+      }
+    }
+    const confirmedQualifying = allGroupsComplete ? selectBestThirds(confirmedThirds).qualifying : [];
+    const confirmedAssignment = assignThirdPlaceSlots(confirmedQualifying.map((t) => t.group));
+    return resolveKnockoutTeams(
+      state.knockoutMatches, confirmedStandings, confirmedAssignment,
+      confirmedQualifying.map((t) => t.group), "result",
+    );
+  }, [state.knockoutMatches, state.groupMatches]);
+
+  const knockoutConfirmation = useMemo(() => {
+    const confirmed = new Map(confirmedKnockout.map((m) => [m.id, m]));
+    const out: Record<string, { home: boolean; away: boolean }> = {};
+    for (const m of resolvedKnockout) {
+      const c = confirmed.get(m.id);
+      out[m.id] = {
+        home: m.homeTeamId !== null && c?.homeTeamId === m.homeTeamId,
+        away: m.awayTeamId !== null && c?.awayTeamId === m.awayTeamId,
+      };
+    }
+    return out;
+  }, [resolvedKnockout, confirmedKnockout]);
+
   // Persist match data
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
@@ -259,8 +311,8 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
   useEffect(() => { saveSyncedResultIds(state.syncedResultIds); }, [state.syncedResultIds]);
 
   const value = useMemo(
-    () => ({ state, dispatch, standingsByGroup, resolvedKnockout, bestThirds }),
-    [state, standingsByGroup, resolvedKnockout, bestThirds]
+    () => ({ state, dispatch, standingsByGroup, resolvedKnockout, knockoutConfirmation, bestThirds }),
+    [state, standingsByGroup, resolvedKnockout, knockoutConfirmation, bestThirds]
   );
 
   return <FixtureContext.Provider value={value}>{children}</FixtureContext.Provider>;

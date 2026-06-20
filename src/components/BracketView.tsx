@@ -33,7 +33,7 @@ function slotLabel(t: TFunction, match: KnockoutMatch, side: "home" | "away"): s
 }
 
 export function BracketView({ round }: { round: KnockoutRound }) {
-  const { state, dispatch, resolvedKnockout } = useFixture();
+  const { state, dispatch, resolvedKnockout, knockoutConfirmation } = useFixture();
   const { t, formatDate } = useLocale();
   const { mode: viewMode } = useViewMode();
   const roundsToShow: KnockoutRound[] = round === "F" ? ["F", "3P"] : [round];
@@ -41,9 +41,18 @@ export function BracketView({ round }: { round: KnockoutRound }) {
   const now = getEffectiveNow();
   const autoSyncMeta = loadAutoSyncMeta();
 
+  const legend = (
+    <div className="bracket-legend">
+      <span className="bk-confirmed">✓</span>
+      <span>{t("knockout.legend.confirmed")}</span>
+      <span className="bracket-legend-hint">· {t("knockout.legend.projectedHint")}</span>
+    </div>
+  );
+
   if (viewMode === "compact") {
     return (
       <div className="bracket-view compact">
+        {legend}
         <BracketTree />
         <BracketMobile round={round} />
       </div>
@@ -62,6 +71,7 @@ export function BracketView({ round }: { round: KnockoutRound }) {
         ))}
       </div>
       <h2>{t(`knockout.roundTitle.${round}`)}</h2>
+      {legend}
       {roundsToShow.map((r) => {
         const matches = resolvedKnockout.filter((m) => m.round === r).sort((a, b) => a.dateUtc.localeCompare(b.dateUtc));
         return (
@@ -72,6 +82,7 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                 const homeTeam = match.homeTeamId ? getTeam(match.homeTeamId) : null;
                 const awayTeam = match.awayTeamId ? getTeam(match.awayTeamId) : null;
                 const bothKnown = match.homeTeamId !== null && match.awayTeamId !== null;
+                const conf = knockoutConfirmation[match.id];
                 const editable = isMatchEditable(match, {
                   circuitBreakerTripped: breakerState.tripped,
                   now,
@@ -84,7 +95,7 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                     </div>
                     <div className="bracket-match-teams">
                       <div className={`bracket-team home ${!homeTeam ? "pending" : ""}`}>
-                        {homeTeam ? (<><span>{t(`teams.${homeTeam.id}`)}</span><span className="team-flag">{homeTeam.flag}</span></>) : <span>{slotLabel(t, match, "home")}</span>}
+                        {homeTeam ? (<>{conf?.home && <span className="bk-confirmed" title={t("knockout.confirmed")}>✓</span>}<span>{t(`teams.${homeTeam.id}`)}</span><span className="team-flag">{homeTeam.flag}</span></>) : <span>{slotLabel(t, match, "home")}</span>}
                       </div>
                       {bothKnown ? (
                         <ScoreInput
@@ -100,7 +111,7 @@ export function BracketView({ round }: { round: KnockoutRound }) {
                           homeTeam={homeTeam ?? undefined} awayTeam={awayTeam ?? undefined} />
                       ) : <span className="score-separator">{t("knockout.vs")}</span>}
                       <div className={`bracket-team ${!awayTeam ? "pending" : ""}`}>
-                        {awayTeam ? (<><span className="team-flag">{awayTeam.flag}</span><span>{t(`teams.${awayTeam.id}`)}</span></>) : <span>{slotLabel(t, match, "away")}</span>}
+                        {awayTeam ? (<><span className="team-flag">{awayTeam.flag}</span><span>{t(`teams.${awayTeam.id}`)}</span>{conf?.away && <span className="bk-confirmed" title={t("knockout.confirmed")}>✓</span>}</>) : <span>{slotLabel(t, match, "away")}</span>}
                       </div>
                     </div>
                     <div className="bracket-venue">{match.venue}</div>

@@ -110,6 +110,11 @@ export const es = {
       loserOf: "Perdedor {matchId}",
     },
     vs: "vs",
+    confirmed: "Confirmado por resultado real",
+    legend: {
+      confirmed: "Confirmado por resultado real",
+      projectedHint: "sin marca = proyectado desde tu predicción",
+    },
     bracket: {
       collapseAria: "Colapsar {round}",
       expandAria: "Expandir {round}",
