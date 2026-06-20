@@ -9,6 +9,7 @@ import { selectBestThirds } from "../utils/bestThirds";
 import type { ThirdPlaceEntry } from "../utils/bestThirds";
 import { assignThirdPlaceSlots } from "../data/thirdPlaceMapping";
 import { resolveKnockoutTeams } from "../utils/knockout";
+import { clinchedGroupPositions } from "../utils/clinch";
 import { isMatchLocked } from "../utils/lockTime";
 import {
   saveToLocalStorage, loadFromLocalStorage, reconcileMatches,
@@ -240,24 +241,36 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
 
   // A second, "confirmed" resolution derived from REAL results only, used to
   // tell which bracket teams are locked by reality vs merely projected from
-  // predictions. Conservative on purpose (never over-claims): a group only
-  // counts once every one of its matches has a real result, and best-thirds
-  // only once *all* groups are complete (the qualifying set isn't decided
-  // before then). The unified bracket itself still uses the hybrid resolution
-  // above; this is purely a provenance signal for styling.
+  // predictions. Per group we fill only the positions that are mathematically
+  // clinched (see clinchedGroupPositions) — so a team that has secured 1st with
+  // games to spare shows as confirmed, while undecided seeds stay projected. A
+  // completed group is fully resolved by calculateStandings (real GD tie-breaks
+  // apply there). Best-thirds need every group finished — the qualifying set
+  // isn't fixed before then. The unified bracket itself still uses the hybrid
+  // resolution above; this is purely a provenance signal for styling.
   const confirmedKnockout = useMemo(() => {
-    const groupComplete = (group: string) => {
-      const gm = state.groupMatches.filter((m) => m.group === group);
-      return gm.length > 0 && gm.every((m) => m.result !== null);
-    };
+    const zeroRow = (teamId: string): StandingRow => ({
+      teamId, played: 0, won: 0, drawn: 0, lost: 0,
+      goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0,
+    });
+    const groupComplete = (group: string) =>
+      state.groupMatches.some((m) => m.group === group) &&
+      state.groupMatches.filter((m) => m.group === group).every((m) => m.result !== null);
+
     const confirmedStandings: Record<string, StandingRow[]> = {};
     for (const group of GROUPS) {
-      if (!groupComplete(group)) { confirmedStandings[group] = []; continue; }
+      const gm = state.groupMatches.filter((m) => m.group === group);
       const teamIds = TEAMS.filter((t) => t.group === group).map((t) => t.id);
-      confirmedStandings[group] = calculateStandings(
-        state.groupMatches.filter((m) => m.group === group), teamIds, "result",
-      );
+      if (groupComplete(group)) {
+        confirmedStandings[group] = calculateStandings(gm, teamIds, "result");
+      } else {
+        // Only clinched positions carry a real team; the rest get a blank
+        // sentinel row so the slot resolves to "" (→ projected, not confirmed).
+        confirmedStandings[group] = clinchedGroupPositions(gm, teamIds, "result")
+          .map((id) => zeroRow(id ?? ""));
+      }
     }
+
     const allGroupsComplete = GROUPS.every(groupComplete);
     const confirmedThirds: ThirdPlaceEntry[] = [];
     if (allGroupsComplete) {
