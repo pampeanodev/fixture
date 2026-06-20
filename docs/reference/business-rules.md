@@ -21,13 +21,19 @@ Computes a per-team `StandingRow` (played/won/drawn/lost/GF/GA/GD/points) by sca
 
 - Win: 3. Draw: 1. Loss: 0.
 
-### Tiebreakers (sort order)
+### Tiebreakers (sort order) — FIFA 2026
 
-1. `points` (desc)
-2. `goalDifference` (desc)
-3. `goalsFor` (desc)
+Teams are ranked by overall **points** first. Teams level on points are split by the
+official FIFA 2026 order, which puts **head-to-head before overall goal difference**:
 
-No further tiebreakers. In real FIFA rules there are more (head-to-head, fair play, drawing of lots), but they'd require data the app doesn't have, and the simplification is acceptable for a prode.
+1. **Head-to-head** among the tied teams (matches between them only): points → GD → goals scored.
+2. If still level: **overall** goal difference → overall goals scored.
+3. Fallback: fair-play conduct, then FIFA ranking — neither is available to the app, so we use `teamId` (alphabetical) as a deterministic last resort.
+
+Head-to-head is a mini-league among the tied teams, re-applied to the matches
+between any teams that remain level after a partial split (recursion). It needs
+no extra data — it's computed from the same match results — so unlike fair-play
+and FIFA ranking it is fully implemented. See `calculateStandings` / `breakTie`.
 
 ## Best thirds
 
