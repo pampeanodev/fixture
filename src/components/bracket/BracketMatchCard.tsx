@@ -20,7 +20,7 @@ function slotShort(t: TFunction, match: KnockoutMatch, side: "home" | "away"): s
 
 export function BracketMatchCard({ match, variant = "regular" }: { match: KnockoutMatch; variant?: "regular" | "final" | "third" }) {
   const { dispatch, knockoutConfirmation } = useFixture();
-  const { t } = useLocale();
+  const { t, formatDate } = useLocale();
   const prediction = match.prediction;
   const confirmed = knockoutConfirmation[match.id];
 
@@ -63,6 +63,7 @@ export function BracketMatchCard({ match, variant = "regular" }: { match: Knocko
 
   return (
     <div className={`bk-card ${variant} ${indicatorClass ? "ind-" + indicatorClass : ""}`}>
+      <div className="bk-card-meta">{formatDate(match.dateUtc)}</div>
       <div className={`bk-card-team ${homeTeam ? "" : "pending"}`}>
         <span className="bk-card-flag">{homeTeam?.flag ?? "·"}</span>
         <span className="bk-card-name">{homeTeam ? t(`teams.${homeTeam.id}`) : slotShort(t, match, "home")}</span>

@@ -67,6 +67,7 @@ export function GroupView({ group }: GroupViewProps) {
                   resultEditable={editable}
                   synced={state.syncedResultIds.includes(match.id)}
                   autoSyncTooltip={autoSyncTooltip}
+                  showDate
                   pendingLabel={match.id}
                   onPredictionChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score, field: "prediction" })}
                   onResultChange={(score) => dispatch({ type: "SET_GROUP_SCORE", matchId: match.id, score, field: "result" })}

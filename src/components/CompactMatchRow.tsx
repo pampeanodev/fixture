@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getTeam } from "../data/teams";
 import { useLocale } from "../i18n";
 import { indicatorFor } from "../utils/scoring";
+import { CompactResult } from "./CompactResult";
 import type { Score } from "../types";
 import "./CompactMatchRow.css";
 
@@ -17,6 +18,7 @@ export interface CompactMatchRowProps {
   resultEditable: boolean;       // fallback -> result badge becomes inputs
   synced?: boolean;
   autoSyncTooltip?: string;
+  showDate?: boolean;            // badge shows the match date (views without day headers, e.g. groups)
   pendingLabel?: string;         // shown when a team slot is unresolved (knockouts only)
   onPredictionChange: (score: Score | null) => void;
   onResultChange: (score: Score | null) => void;
@@ -33,9 +35,9 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
   const {
     homeTeamId, awayTeamId, dateUtc, badgeLabel, badgeKind,
     prediction, result, predictionLocked, resultEditable, synced,
-    autoSyncTooltip, pendingLabel, onPredictionChange, onResultChange,
+    autoSyncTooltip, showDate, pendingLabel, onPredictionChange, onResultChange,
   } = props;
-  const { t, formatTime } = useLocale();
+  const { t, formatTime, formatDateShort } = useLocale();
   const [homeStr, setHomeStr] = useState(prediction?.home?.toString() ?? "");
   const [awayStr, setAwayStr] = useState(prediction?.away?.toString() ?? "");
 
@@ -77,6 +79,7 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
     <div className={`compact-match-row ${badgeKind} ${synced ? "synced" : ""} ${showPen ? "with-pen" : ""}`}>
       <span className={`compact-badge ${badgeKind}`}>
         <span className="badge-label">{badgeLabel}</span>
+        {showDate && <span className="badge-date">{formatDateShort(dateUtc)}</span>}
         <span className="badge-time">{time}</span>
       </span>
       <span className="compact-team home">
@@ -149,60 +152,4 @@ export function CompactMatchRow(props: CompactMatchRowProps) {
       <CompactResult format="line" result={result} editable={resultEditable && bothKnown} onChange={onResultChange} label={t("matchCard.resultBadge")} locked={predictionLocked} lockedLabel={t("scoreInput.lockedBadge")} />
     </div>
   );
-}
-
-function CompactResult({ format, result, editable, onChange, label, locked, lockedLabel }: {
-  format: "badge" | "line";
-  result: Score | null;
-  editable: boolean;
-  onChange: (score: Score | null) => void;
-  label: string;
-  locked: boolean;
-  lockedLabel: string;
-}) {
-  const [h, setH] = useState(result?.home?.toString() ?? "");
-  const [a, setA] = useState(result?.away?.toString() ?? "");
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- controlled-input resync to external result, matches the prediction-input pattern above
-  useEffect(() => { setH(result?.home?.toString() ?? ""); setA(result?.away?.toString() ?? ""); }, [result]);
-  function commit(hStr: string, aStr: string) {
-    const hh = parseInt(hStr, 10), aa = parseInt(aStr, 10);
-    if (!isNaN(hh) && !isNaN(aa) && hh >= 0 && aa >= 0) onChange({ home: hh, away: aa });
-    else if (hStr === "" && aStr === "") onChange(null);
-  }
-  const cls = format === "badge" ? "compact-result-badge" : "compact-result-line";
-  if (editable) {
-    return (
-      <span className={`${cls} editable`} title={label}>
-        {format === "line" && <span className="compact-result-line-label">{label}:</span>}
-        <input type="number" min="0" max="99" className="compact-score-input"
-          value={h}
-          onChange={(e) => { setH(e.target.value); commit(e.target.value, a); }} />
-        <span>–</span>
-        <input type="number" min="0" max="99" className="compact-score-input"
-          value={a}
-          onChange={(e) => { setA(e.target.value); commit(h, e.target.value); }} />
-      </span>
-    );
-  }
-  if (!result) {
-    // No result yet. While predictions are locked (match in progress / closed),
-    // show the lock indicator: just the padlock in the tight desktop badge
-    // column, the full label on the mobile result line.
-    if (locked) {
-      return format === "badge"
-        ? <span className="compact-result-badge locked" title={lockedLabel}>🔒</span>
-        : <span className="compact-result-line locked">{lockedLabel}</span>;
-    }
-    // Otherwise the badge keeps an empty placeholder to hold its grid column on
-    // desktop; the line simply renders nothing (no second row) for pending matches.
-    return format === "badge" ? <span className="compact-result-badge none" aria-hidden="true" /> : null;
-  }
-  if (format === "line") {
-    return (
-      <span className="compact-result-line">
-        <span className="compact-result-line-label">{label}:</span> {result.home}–{result.away}
-      </span>
-    );
-  }
-  return <span className="compact-result-badge" title={label}>{result.home}–{result.away}</span>;
 }

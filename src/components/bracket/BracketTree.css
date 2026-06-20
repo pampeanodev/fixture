@@ -93,6 +93,14 @@
 .bk-card.ind-winner { box-shadow: 0 0 0 2px var(--accent-gold); }
 .bk-card.ind-wrong { box-shadow: 0 0 0 2px var(--accent-eliminated); }
 
+.bk-card-meta {
+  font-size: 8px;
+  color: var(--text-muted, #999);
+  white-space: nowrap;
+  margin-bottom: 2px;
+  text-transform: none;
+  font-weight: 600;
+}
 .bk-card-team {
   display: flex;
   align-items: center;

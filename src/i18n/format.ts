@@ -46,6 +46,10 @@ export function formatMatchDate(utcDate: string, locale: LocaleCode): string {
   return `${datePart} · ${timePart}`;
 }
 
+export function formatMatchDateShort(utcDate: string, locale: LocaleCode): string {
+  return dateFormatter(locale).format(new Date(utcDate));
+}
+
 export function formatTime(utcDate: string, locale: LocaleCode): string {
   return timeFormatter(locale).format(new Date(utcDate));
 }

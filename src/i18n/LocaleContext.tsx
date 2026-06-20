@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from "react";
 import { SUPPORTED_LOCALES, type LocaleCode } from "./types";
 import { detectLocale } from "./detect";
-import { formatMatchDate, formatNumber, formatTime } from "./format";
+import { formatMatchDate, formatMatchDateShort, formatNumber, formatTime } from "./format";
 import { createT, type TFunction } from "./translate";
 import { es } from "./locales/es";
 import { en } from "./locales/en";
@@ -26,6 +26,7 @@ interface LocaleContextValue {
   setLocale: (next: LocaleCode) => void;
   t: TFunction;
   formatDate: (utcDate: string) => string;
+  formatDateShort: (utcDate: string) => string;
   formatTime: (utcDate: string) => string;
   formatNumber: (n: number) => string;
 }
@@ -48,6 +49,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     return {
       locale, setLocale, t,
       formatDate: (utc) => formatMatchDate(utc, locale),
+      formatDateShort: (utc) => formatMatchDateShort(utc, locale),
       formatTime: (utc) => formatTime(utc, locale),
       formatNumber: (n) => formatNumber(n, locale),
     };

@@ -62,6 +62,14 @@
   max-width: 640px;
   margin: 0 auto;
 }
+/* Every badge here is the same "Grupo X" label, so let the badge column shrink
+   to its content and hand the freed width to the team-name columns (which were
+   truncating). Scoped to groups — the schedule mixes labels of differing width
+   and relies on the fixed badge column to stay aligned. */
+.group-matches-compact .compact-match-row { grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) 3rem 2.5rem; }
+@media (max-width: 600px) {
+  .group-matches-compact .compact-match-row { grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr) 2.5rem; }
+}
 .group-view.compact .group-matches-title {
   max-width: 640px;
   margin-left: auto;

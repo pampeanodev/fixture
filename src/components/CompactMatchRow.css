@@ -10,12 +10,16 @@
 .compact-match-row:last-child { border-bottom: none; }
 
 .compact-badge {
+  /* shrink to content so the green pill doesn't stretch across the whole grid
+     column (which left empty padding to the right of the text) */
+  justify-self: start;
   display: inline-flex; flex-direction: column; align-items: flex-start;
   background: var(--accent-qualify); color: var(--accent-green);
   padding: 3px 6px; border-radius: 4px; line-height: 1.1;
   font-size: 9px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
 }
 .compact-badge.knockout { background: var(--accent-maybe); color: #f57f17; }
+.compact-badge .badge-date { font-size: 9px; font-weight: 600; opacity: 0.8; text-transform: none; letter-spacing: 0; }
 .compact-badge .badge-time { font-size: 10px; font-weight: 600; opacity: 0.8; }
 
 .compact-team { display: flex; align-items: center; gap: 5px; min-width: 0; }

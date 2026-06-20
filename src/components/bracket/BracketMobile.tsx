@@ -61,6 +61,7 @@ export function BracketMobile({ round }: { round: KnockoutRound }) {
                     resultEditable={editable}
                     synced={state.syncedResultIds.includes(m.id)}
                     autoSyncTooltip={autoSyncTooltip}
+                    showDate
                     pendingLabel={m.id}
                     onPredictionChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: m.id, score, field: "prediction" })}
                     onResultChange={(score) => dispatch({ type: "SET_KNOCKOUT_SCORE", matchId: m.id, score, field: "result" })}
