@@ -192,6 +192,9 @@ interface FixtureContextValue {
   state: FixtureState;
   dispatch: React.Dispatch<FixtureAction>;
   standingsByGroup: Record<string, StandingRow[]>;
+  // Standings counting ONLY played matches (real results, predictions ignored).
+  // The "real current table" surfaced behind the Group view toggle (f5.3).
+  realStandingsByGroup: Record<string, StandingRow[]>;
   resolvedKnockout: KnockoutMatch[];
   // Per knockout match: whether each team slot is locked by real results
   // (true) vs only projected from a prediction (false). Keyed by match id.
@@ -223,6 +226,19 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
     }
     return result;
   }, [state.groupMatches, scoreField]);
+
+  // "Real" table for the Group view toggle (f5.3): always the result-only
+  // source, independent of simulation. Predictions never leak in, so teams
+  // show only the matches actually played.
+  const realStandingsByGroup = useMemo(() => {
+    const result: Record<string, StandingRow[]> = {};
+    for (const group of GROUPS) {
+      const groupMatches = state.groupMatches.filter((m) => m.group === group);
+      const teamIds = TEAMS.filter((t) => t.group === group).map((t) => t.id);
+      result[group] = calculateStandings(groupMatches, teamIds, "result");
+    }
+    return result;
+  }, [state.groupMatches]);
 
   const bestThirds = useMemo(() => {
     const thirds: ThirdPlaceEntry[] = [];
@@ -343,8 +359,8 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
   useEffect(() => { saveSyncedResultIds(state.syncedResultIds); }, [state.syncedResultIds]);
 
   const value = useMemo(
-    () => ({ state, dispatch, standingsByGroup, resolvedKnockout, knockoutConfirmation, groupSeedsConfirmed, bestThirds }),
-    [state, standingsByGroup, resolvedKnockout, knockoutConfirmation, groupSeedsConfirmed, bestThirds]
+    () => ({ state, dispatch, standingsByGroup, realStandingsByGroup, resolvedKnockout, knockoutConfirmation, groupSeedsConfirmed, bestThirds }),
+    [state, standingsByGroup, realStandingsByGroup, resolvedKnockout, knockoutConfirmation, groupSeedsConfirmed, bestThirds]
   );
 
   return <FixtureContext.Provider value={value}>{children}</FixtureContext.Provider>;

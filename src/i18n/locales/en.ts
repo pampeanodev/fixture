@@ -81,6 +81,11 @@ export const en = {
       expandAria: "Show table",
       collapseAria: "Hide table",
       compactTeam: "Team",
+      source: {
+        label: "Table type",
+        real: "Actual",
+        projected: "Projected",
+      },
     },
     legend: {
       qualified: "Qualifies directly",

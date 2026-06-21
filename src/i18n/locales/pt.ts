@@ -81,6 +81,11 @@ export const pt = {
       expandAria: "Mostrar tabela",
       collapseAria: "Ocultar tabela",
       compactTeam: "Eq",
+      source: {
+        label: "Tipo de tabela",
+        real: "Real",
+        projected: "Projetada",
+      },
     },
     legend: {
       qualified: "Classifica direto",

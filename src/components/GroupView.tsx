@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useFixture } from "../context/FixtureContext";
 import { getTeam, GROUPS } from "../data/teams";
 import { isMatchLocked } from "../utils/lockTime";
@@ -10,15 +11,18 @@ import { useViewMode } from "../context/ViewModeContext";
 import { CompactMatchRow } from "./CompactMatchRow";
 import { CompactStandings } from "./CompactStandings";
 import { GroupMatchCard } from "./group/GroupMatchCard";
+import { GroupStandingsToggle, type StandingsSource } from "./group/GroupStandingsToggle";
 import "./GroupView.css";
 
 interface GroupViewProps { group: string; }
 
 export function GroupView({ group }: GroupViewProps) {
-  const { state, dispatch, standingsByGroup, groupSeedsConfirmed } = useFixture();
+  const { state, dispatch, standingsByGroup, realStandingsByGroup, groupSeedsConfirmed } = useFixture();
   const { t } = useLocale();
   const { mode: viewMode } = useViewMode();
-  const standings = standingsByGroup[group] ?? [];
+  const [source, setSource] = useState<StandingsSource>("real");
+  const standings =
+    (source === "real" ? realStandingsByGroup[group] : standingsByGroup[group]) ?? [];
   const confirmedTeamIds = groupSeedsConfirmed[group];
   const matches = state.groupMatches
     .filter((m) => m.group === group)
@@ -42,6 +46,7 @@ export function GroupView({ group }: GroupViewProps) {
 
       {viewMode === "compact" ? (
         <>
+          <GroupStandingsToggle value={source} onChange={setSource} />
           <CompactStandings standings={standings} confirmedTeamIds={confirmedTeamIds} />
           <div className="group-matches-title">{t("groups.matches")}</div>
           <div className="group-matches-compact" data-tour="match-cards">
@@ -79,6 +84,7 @@ export function GroupView({ group }: GroupViewProps) {
         </>
       ) : (
         <>
+          <GroupStandingsToggle value={source} onChange={setSource} />
           <table className="standings-table" data-tour="standings-table">
             <thead>
               <tr>

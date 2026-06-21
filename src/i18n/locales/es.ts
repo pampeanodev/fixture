@@ -79,6 +79,11 @@ export const es = {
       expandAria: "Mostrar tabla",
       collapseAria: "Ocultar tabla",
       compactTeam: "Eq",
+      source: {
+        label: "Tipo de tabla",
+        real: "Real",
+        projected: "Proyectada",
+      },
     },
     legend: {
       qualified: "Clasifica directo",

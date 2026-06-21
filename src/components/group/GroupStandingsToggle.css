@@ -1,0 +1,21 @@
+.standings-source-toggle {
+  display: inline-flex;
+  margin: 0 auto 0.75rem;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.standings-source-option {
+  border: none;
+  background: transparent;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--content-text);
+}
+
+.standings-source-option.active {
+  background: var(--accent-green);
+  color: white;
+}
