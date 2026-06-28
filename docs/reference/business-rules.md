@@ -65,18 +65,22 @@ This is the tricky part. Each R32 match with a "best_third" slot only accepts th
 | R32-13 | E, F, G, I, J |
 | R32-15 | D, E, I, J, L |
 
-Source: [`src/data/thirdPlaceMapping.ts`](../../src/data/thirdPlaceMapping.ts). The algorithm:
+Source: [`src/data/thirdPlaceMapping.ts`](../../src/data/thirdPlaceMapping.ts). The assignment is **FIFA's official lookup table** (World Cup 2026 Regulations, **Annexe C**), not an algorithm:
 
-1. Sort qualifying groups alphabetically.
-2. Iteratively pick the group with **fewest remaining eligible slots** (most constrained first — "constraint propagation").
-3. Assign it to the slot that has **fewest remaining eligible groups** (again most constrained first).
-4. Mark the slot used, remove the group from the pool, repeat.
+1. Sort the 8 qualifying group letters alphabetically into a key (e.g. `"BDEFIJKL"`).
+2. Look the key up in `OFFICIAL_THIRD_PLACE_TABLE` — all C(12,8) = 495 combinations are precomputed.
+3. The value is 8 group letters; `value[i]` is the third assigned to `SLOT_ORDER[i]` (the 8 host matches in Annexe C column order: 1A, 1B, 1D, 1E, 1G, 1I, 1K, 1L → `R32-7, R32-13, R32-9, R32-2, R32-10, R32-5, R32-15, R32-8`).
+4. While the group stage is unfinished the caller passes fewer than 8 groups (or none); there is no official assignment yet, so the function returns `{}` and the bracket stays projected.
 
-This greedy algorithm always terminates with a valid assignment when the qualifying-groups set is consistent with the eligibility table. It does NOT reproduce FIFA's official assignment table (which is a lookup by "which groups qualified" — all 495 cases precomputed). Our greedy matches FIFA in common cases; in pathological cases it may differ but will always be self-consistent.
+**Why a table and not a solver.** Every one of the 495 qualifying-group sets admits *multiple* valid assignments (each third to an eligible, distinct slot). FIFA fixes one specific assignment per set in Annexe C — an essentially arbitrary choice no greedy/constraint solver reproduces. The previous greedy implementation matched Annexe C in only **14 of 495** cases, so the bracket disagreed with the officially confirmed thirds. The table is transcribed from [Wikipedia's Annexe C template](https://en.wikipedia.org/wiki/Template:2026_FIFA_World_Cup_third-place_table) and guarded by tests asserting all 495 entries exist and every assignment is eligible and collision-free.
 
 ### Group → R32 assignment lookup
 
 Output of `assignThirdPlaceSlots(qualifyingGroups)` is `Record<group, matchId>` — "if the third from group X qualifies, they play R32 match Y".
+
+### Confirming a third before all groups finish
+
+[`src/utils/confirmedThirds.ts`](../../src/utils/confirmedThirds.ts) decides which best-third slots are *confirmed by real results* (the ✓ in the bracket) versus merely projected. A third's R32 slot depends on the **whole** set of 8 qualifying groups, so it can't simply confirm when its own group finishes. The function enumerates every still-possible completion of the unfinished groups and confirms a completed group's third only when, across all of them, that group **always** lands among the 8 best thirds **and** always maps to the **same** R32 match. It's sound (never confirms a slot a legal completion could change) and conservative — when the search space is too large (early stage) it confirms nothing and the bracket stays projected. Once all 12 groups are played the qualifying set is unique and all 8 thirds confirm. This replaced an all-or-nothing gate that waited for every group to finish before confirming any third.
 
 ## Knockout bracket resolution
 

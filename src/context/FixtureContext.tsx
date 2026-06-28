@@ -9,6 +9,7 @@ import { selectBestThirds } from "../utils/bestThirds";
 import type { ThirdPlaceEntry } from "../utils/bestThirds";
 import { assignThirdPlaceSlots } from "../data/thirdPlaceMapping";
 import { resolveKnockoutTeams } from "../utils/knockout";
+import { confirmedThirds } from "../utils/confirmedThirds";
 import { clinchedGroupPositions } from "../utils/clinch";
 import { isMatchLocked } from "../utils/lockTime";
 import {
@@ -289,19 +290,20 @@ export function FixtureProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    const allGroupsComplete = GROUPS.every(groupComplete);
-    const confirmedThirds: ThirdPlaceEntry[] = [];
-    if (allGroupsComplete) {
-      for (const group of GROUPS) {
-        const s = confirmedStandings[group];
-        if (s && s.length >= 3) confirmedThirds.push({ group, standing: s[2] });
-      }
-    }
-    const confirmedQualifying = allGroupsComplete ? selectBestThirds(confirmedThirds).qualifying : [];
-    const confirmedAssignment = assignThirdPlaceSlots(confirmedQualifying.map((t) => t.group));
+    // Confirm a third's slot as soon as it's mathematically locked by real
+    // results — not only once all 12 groups finish. A third's R32 match depends
+    // on the whole set of qualifying third-groups, so this returns only the
+    // groups whose slot is invariant across every still-possible completion.
+    const { assignment: confirmedAssignment, qualifyingGroups: confirmedThirdGroups } = confirmedThirds(
+      GROUPS.map((group) => ({
+        group,
+        matches: state.groupMatches.filter((m) => m.group === group),
+        teamIds: TEAMS.filter((t) => t.group === group).map((t) => t.id),
+      })),
+    );
     return resolveKnockoutTeams(
       state.knockoutMatches, confirmedStandings, confirmedAssignment,
-      confirmedQualifying.map((t) => t.group), "result",
+      confirmedThirdGroups, "result",
     );
   }, [state.knockoutMatches, state.groupMatches]);
 
