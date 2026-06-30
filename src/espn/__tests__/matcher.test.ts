@@ -104,4 +104,38 @@ describe("matchEvent", () => {
     });
     expect(matchEvent(ev, matches)).toEqual({ ok: false, reason: "no_match" });
   });
+
+  it("matches a knockout fixture despite a multi-hour kickoff drift (placeholder times)", () => {
+    // Real ESPN bug: our hardcoded knockout kickoff is a placeholder. ESPN had
+    // GER–PAR at 20:30Z while the fixture says 17:00Z (3.5h) — beyond the 2h
+    // group tolerance, so it was wrongly skipped. Knockout gets a wide window.
+    const matches = [koMatch({ homeTeamId: "GER", awayTeamId: "PAR", dateUtc: "2026-06-29T17:00:00Z" })];
+    const ev = baseEvent({
+      dateUtc: "2026-06-29T20:30:00Z",
+      home: { abbreviation: "GER", score: 1 },
+      away: { abbreviation: "PAR", score: 1 },
+      statusName: "STATUS_FINAL_PEN",
+      shootout: { home: 4, away: 2 },
+    });
+    expect(matchEvent(ev, matches)).toEqual({ ok: true, matchId: "KO-R32-1" });
+  });
+
+  it("matches a knockout fixture when the real kickoff slips past midnight", () => {
+    // NED–MAR: fixture 29 Jun 20:00Z, ESPN 30 Jun 01:00Z — a calendar-day flip.
+    const matches = [koMatch({ homeTeamId: "NED", awayTeamId: "MAR", dateUtc: "2026-06-29T20:00:00Z" })];
+    const ev = baseEvent({
+      dateUtc: "2026-06-30T01:00:00Z",
+      home: { abbreviation: "NED", score: 1 },
+      away: { abbreviation: "MAR", score: 1 },
+      statusName: "STATUS_FINAL_PEN",
+      shootout: { home: 4, away: 2 },
+    });
+    expect(matchEvent(ev, matches)).toEqual({ ok: true, matchId: "KO-R32-1" });
+  });
+
+  it("keeps the tight ±2h window for group fixtures", () => {
+    // Groups still demand close agreement — only knockout times are placeholders.
+    const matches = [groupMatch({ dateUtc: "2026-06-15T12:00:00Z" })]; // 6h from event
+    expect(matchEvent(baseEvent(), matches)).toEqual({ ok: false, reason: "no_match" });
+  });
 });

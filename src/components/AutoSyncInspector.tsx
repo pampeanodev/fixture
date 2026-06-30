@@ -148,7 +148,7 @@ function EventRow({ row }: EventRowProps) {
 }
 
 export function AutoSyncInspector() {
-  const { state } = useFixture();
+  const { state, resolvedKnockout } = useFixture();
   const [league, setLeague] = useState<string>("fifa.world");
   const [dates, setDates] = useState<string>(() => buildFetchDates(getEffectiveNow()));
   const [result, setResult] = useState<FetchResult | null>(null);
@@ -162,7 +162,7 @@ export function AutoSyncInspector() {
     try {
       const scoreboard = await fetchScoreboard({ leagueSlug: league, dates });
       const events = parseScoreboard(scoreboard);
-      const all = [...state.groupMatches, ...state.knockoutMatches];
+      const all = [...state.groupMatches, ...resolvedKnockout]; // resolved: raw knockout teams are null
       const rows: InspectorRow[] = [];
       let matched = 0;
       let idempotent = 0;
@@ -208,7 +208,7 @@ export function AutoSyncInspector() {
     } finally {
       setLoading(false);
     }
-  }, [league, dates, state.groupMatches, state.knockoutMatches]);
+  }, [league, dates, state.groupMatches, resolvedKnockout]);
 
   const allParsedJson = useMemo(() => {
     if (!result) return "";

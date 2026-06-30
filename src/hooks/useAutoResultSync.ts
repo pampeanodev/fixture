@@ -50,7 +50,7 @@ function scoresDiffer(a: Score, b: Score): boolean {
 }
 
 export function useAutoResultSync(): void {
-  const { state, dispatch } = useFixture();
+  const { state, dispatch, resolvedKnockout } = useFixture();
   const inFlightRef = useRef<boolean>(false);
   const abortRef = useRef<AbortController | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -60,6 +60,13 @@ export function useAutoResultSync(): void {
   // state change.
   const stateRef = useRef(state);
   stateRef.current = state;
+
+  // The matcher keys on team ids, but raw knockout matches in state carry null
+  // teams until the bracket resolves — so we must match ESPN events against the
+  // *resolved* knockout bracket, or no playoff result ever syncs. Mirrored via a
+  // ref so runTick stays referentially stable (same reason as stateRef).
+  const resolvedKnockoutRef = useRef(resolvedKnockout);
+  resolvedKnockoutRef.current = resolvedKnockout;
 
   // Breaker state is mirrored in React so the UI re-renders on trip.
   const [breaker, setBreaker] = useState<BreakerState>(() => loadBreakerState());
@@ -109,7 +116,7 @@ export function useAutoResultSync(): void {
       const events = parseScoreboard(raw);
       const allMatches = [
         ...stateRef.current.groupMatches,
-        ...stateRef.current.knockoutMatches,
+        ...resolvedKnockoutRef.current,
       ];
 
       const groupResults: Record<string, Score> = {};
